@@ -91,7 +91,7 @@ const AdminSidebar = () => {
 
       <div className="breadcrumb">
         <span>admin8 관리자홈으로</span>
-        <Link to="/admin/login" className="logout-link">로그아웃</Link>
+        <Link to="/" className="logout-link">메인으로</Link>
       </div>
 
       <nav className="sidebar-nav">

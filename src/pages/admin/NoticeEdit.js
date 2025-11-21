@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import './NoticeWrite.css';
 
-const NoticeWrite = () => {
+const NoticeEdit = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -11,7 +12,53 @@ const NoticeWrite = () => {
     isFixed: false,
     isPublic: true
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchNoticeDetail();
+  }, [id]);
+
+  const fetchNoticeDetail = async () => {
+    setLoading(true);
+    try {
+      // API 호출 구현
+      // const response = await fetch(`/api/admin/notices/${id}`);
+      // const data = await response.json();
+      
+      // 임시 더미 데이터
+      const dummyData = {
+        id: Number(id),
+        title: '사이트 이용 안내',
+        content: `안녕하세요, On&Home 관리자입니다.
+
+사이트 이용에 대한 안내 말씀드립니다.
+
+1. 회원가입 및 로그인
+- 이메일 인증을 통한 회원가입이 가능합니다.
+- 소셜 로그인(카카오, 네이버, 구글)도 지원됩니다.
+
+2. 상품 주문
+- 장바구니에 담은 상품은 30일간 보관됩니다.
+- 주문 시 배송지 정보를 정확히 입력해주세요.`,
+        isFixed: true,
+        isPublic: true
+      };
+      
+      setFormData({
+        title: dummyData.title,
+        content: dummyData.content,
+        isFixed: dummyData.isFixed,
+        isPublic: dummyData.isPublic
+      });
+    } catch (error) {
+      console.error('공지사항 로드 실패:', error);
+      alert('공지사항을 불러오는데 실패했습니다.');
+      navigate('/admin/notices');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -34,32 +81,43 @@ const NoticeWrite = () => {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       // API 호출 구현
-      // const response = await fetch('/api/admin/notices', {
-      //   method: 'POST',
+      // const response = await fetch(`/api/admin/notices/${id}`, {
+      //   method: 'PUT',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(formData)
       // });
       
       // 임시 처리
-      console.log('공지사항 등록:', formData);
-      alert('공지사항이 등록되었습니다.');
-      navigate('/admin/notices');
+      console.log('공지사항 수정:', formData);
+      alert('공지사항이 수정되었습니다.');
+      navigate(`/admin/notices/${id}`);
     } catch (error) {
-      console.error('공지사항 등록 실패:', error);
-      alert('공지사항 등록에 실패했습니다.');
+      console.error('공지사항 수정 실패:', error);
+      alert('공지사항 수정에 실패했습니다.');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   const handleCancel = () => {
-    if (window.confirm('작성을 취소하시겠습니까? 작성 중인 내용은 저장되지 않습니다.')) {
-      navigate('/admin/notices');
+    if (window.confirm('수정을 취소하시겠습니까? 변경사항은 저장되지 않습니다.')) {
+      navigate(`/admin/notices/${id}`);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="admin-dashboard">
+        <AdminSidebar />
+        <div className="dashboard-main">
+          <div className="loading">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
@@ -68,8 +126,8 @@ const NoticeWrite = () => {
       <div className="dashboard-main">
         <div className="notice-write-container">
           <div className="notice-write-header">
-            <h1>공지사항 작성</h1>
-            <p className="notice-description">새로운 공지사항을 작성합니다</p>
+            <h1>공지사항 수정</h1>
+            <p className="notice-description">공지사항을 수정합니다</p>
           </div>
 
           <form onSubmit={handleSubmit} className="notice-write-form">
@@ -156,9 +214,9 @@ const NoticeWrite = () => {
               <button
                 type="submit"
                 className="btn-submit"
-                disabled={loading}
+                disabled={submitting}
               >
-                {loading ? '등록 중...' : '등록하기'}
+                {submitting ? '수정 중...' : '수정하기'}
               </button>
             </div>
           </form>
@@ -168,4 +226,4 @@ const NoticeWrite = () => {
   );
 };
 
-export default NoticeWrite;
+export default NoticeEdit;

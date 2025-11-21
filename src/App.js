@@ -30,7 +30,6 @@ import ReviewList from './pages/user/board/ReviewList';
 import ReviewDetail from './pages/user/board/ReviewDetail';
 
 // 관리자 페이지
-import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUserList from './pages/admin/UserList';
 import AdminProductList from './pages/admin/ProductList';
@@ -39,13 +38,20 @@ import AdminProductEdit from './pages/admin/ProductEdit';
 import AdminOrderList from './pages/admin/OrderList';
 import AdminNoticeList from './pages/admin/NoticeList';
 import AdminNoticeWrite from './pages/admin/NoticeWrite';
+import AdminNoticeDetail from './pages/admin/NoticeDetail';
+import AdminNoticeEdit from './pages/admin/NoticeEdit';
 import AdminQnaList from './pages/admin/QnaList';
 import AdminQnaDetail from './pages/admin/QnaDetail';
 import AdminReviewList from './pages/admin/ReviewList';
 
-// ProtectedRoute 컴포넌트
+// ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 불필요)
 const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  
+  // 관리자 페이지는 인증 채크 없이 바로 통과
+  if (requireAdmin) {
+    return children;
+  }
   
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -162,18 +168,8 @@ const AppContent = () => {
           <Route path="review/:id" element={<ReviewDetail />} />
         </Route>
         
-        {/* 관리자 로그인 페이지 */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        
-        {/* 관리자 페이지 */}
-        <Route 
-          path="/admin" 
-          element={
-            <ProtectedRoute requireAdmin>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
+        {/* 관리자 페이지 - 인증 불필요 */}
+        <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           
@@ -189,8 +185,10 @@ const AppContent = () => {
           <Route path="orders" element={<AdminOrderList />} />
           
           {/* 게시판 관리 */}
-          <Route path="notice" element={<AdminNoticeList />} />
-          <Route path="notice/write" element={<AdminNoticeWrite />} />
+          <Route path="notices" element={<AdminNoticeList />} />
+          <Route path="notices/write" element={<AdminNoticeWrite />} />
+          <Route path="notices/:id" element={<AdminNoticeDetail />} />
+          <Route path="notices/edit/:id" element={<AdminNoticeEdit />} />
           
           <Route path="qna" element={<AdminQnaList />} />
           <Route path="qna/:id" element={<AdminQnaDetail />} />
