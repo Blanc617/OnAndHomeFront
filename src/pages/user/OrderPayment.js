@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './OrderPayment.css';
 
 const OrderPayment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useSelector((state) => state.user);
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
   // location.state에서 주문 정보 받기
   const { products, fromCart } = location.state || { products: [], fromCart: false };
@@ -58,7 +56,7 @@ const OrderPayment = () => {
   const handlePayment = async () => {
     // 필수 입력 검증
     if (!orderInfo.address || orderInfo.address.trim() === '') {
-      alert('주소는 필수 입력 항목입니다.');
+      alert('주소를 입력해주세요.');
       return;
     }
 
@@ -67,70 +65,17 @@ const OrderPayment = () => {
       return;
     }
 
-    setLoading(true);
+    // 결제 완료 alert
+    alert('결제가 완료되었습니다');
 
-    try {
-      // 주문 생성
-      const orderData = {
-        userId: user.id,
-        recipientName: orderInfo.name,
-        recipientPhone: orderInfo.phone,
-        recipientEmail: orderInfo.email,
-        shippingAddress: orderInfo.address + ' ' + orderInfo.detailAddress,
-        deliveryRequest: orderInfo.request,
-        totalAmount: calculateTotalPrice(),
-        items: products.map(product => ({
-          productId: product.id,
-          quantity: product.quantity,
-          price: product.salePrice || product.price
-        }))
-      };
-
-      console.log('주문 데이터:', orderData);
-
-      const response = await axios.post(
-        `${API_BASE_URL}/api/orders`,
-        orderData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      console.log('주문 응답:', response.data);
-
-      // 장바구니에서 주문한 경우 장바구니 아이템 삭제
-      if (fromCart) {
-        try {
-          const cartItemIds = products.map(p => p.cartItemId).filter(Boolean);
-          if (cartItemIds.length > 0) {
-            await axios.post(
-              `${API_BASE_URL}/api/cart/remove-items`,
-              { ids: cartItemIds },
-              {
-                headers: {
-                  'Content-Type': 'application/json'
-                }
-              }
-            );
-          }
-        } catch (error) {
-          console.error('장바구니 삭제 실패:', error);
-        }
+    // 결제 완료 페이지로 이동 (주문 정보 전달)
+    navigate('/user/order-complete', {
+      state: {
+        orderInfo: orderInfo,
+        products: products,
+        totalPrice: calculateTotalPrice()
       }
-
-      alert('결제가 완료되었습니다.');
-      
-      // 주문 내역 페이지로 이동
-      navigate('/user/my-orders');
-
-    } catch (error) {
-      console.error('주문 실패:', error);
-      alert('주문 처리 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   const formatPrice = (price) => {
@@ -178,7 +123,7 @@ const OrderPayment = () => {
                 </td>
               </tr>
               <tr>
-                <th>전화번호</th>
+                <th>연락처</th>
                 <td>
                   <input
                     type="tel"

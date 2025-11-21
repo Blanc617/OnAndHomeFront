@@ -1,55 +1,56 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import store from './store';
 import { initializeAuth } from './store/slices/userSlice';
 
 // 레이아웃
-import UserLayout from './components/layout/UserLayout';
 import AdminLayout from './components/layout/AdminLayout';
+import UserLayout from './components/layout/UserLayout';
 
 // 사용자 페이지
+import Cart from './pages/user/Cart';
 import Home from './pages/user/Home';
 import Login from './pages/user/Login';
-import Signup from './pages/user/Signup';
-import ProductList from './pages/user/ProductList';
-import ProductDetail from './pages/user/ProductDetail';
-import Cart from './pages/user/Cart';
-import Order from './pages/user/Order';
-import MyPage from './pages/user/MyPage';
 import MyInfo from './pages/user/MyInfo';
 import MyOrders from './pages/user/MyOrders';
+import MyPage from './pages/user/MyPage';
+import Order from './pages/user/Order';
+import OrderComplete from './pages/user/OrderComplete';
 import OrderPayment from './pages/user/OrderPayment';
+import ProductDetail from './pages/user/ProductDetail';
+import ProductList from './pages/user/ProductList';
+import Signup from './pages/user/Signup';
 
 // 공지사항, Q&A, 리뷰
-import NoticeList from './pages/user/board/NoticeList';
 import NoticeDetail from './pages/user/board/NoticeDetail';
-import QnaList from './pages/user/board/QnaList';
+import NoticeList from './pages/user/board/NoticeList';
 import QnaDetail from './pages/user/board/QnaDetail';
+import QnaList from './pages/user/board/QnaList';
 import QnaWrite from './pages/user/board/QnaWrite';
-import ReviewList from './pages/user/board/ReviewList';
 import ReviewDetail from './pages/user/board/ReviewDetail';
+import ReviewList from './pages/user/board/ReviewList';
 
 // 관리자 페이지
 import AdminDashboard from './pages/admin/Dashboard';
-import AdminUserList from './pages/admin/UserList';
-import AdminProductList from './pages/admin/ProductList';
-import AdminProductCreate from './pages/admin/ProductCreate';
-import AdminProductEdit from './pages/admin/ProductEdit';
-import AdminOrderList from './pages/admin/OrderList';
-import AdminNoticeList from './pages/admin/NoticeList';
-import AdminNoticeWrite from './pages/admin/NoticeWrite';
 import AdminNoticeDetail from './pages/admin/NoticeDetail';
 import AdminNoticeEdit from './pages/admin/NoticeEdit';
-import AdminQnaList from './pages/admin/QnaList';
+import AdminNoticeList from './pages/admin/NoticeList';
+import AdminNoticeWrite from './pages/admin/NoticeWrite';
+import AdminOrderList from './pages/admin/OrderList';
+import AdminProductCreate from './pages/admin/ProductCreate';
+import AdminProductEdit from './pages/admin/ProductEdit';
+import AdminProductList from './pages/admin/ProductList';
 import AdminQnaDetail from './pages/admin/QnaDetail';
+import AdminQnaList from './pages/admin/QnaList';
 import AdminReviewList from './pages/admin/ReviewList';
+import AdminUserList from './pages/admin/UserList';
 
-// ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 불필요)
+// ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 분기 제외)
 const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   
-  // 관리자 페이지는 인증 채크 없이 바로 통과
+  // 관리자 페이지는 인증 체크 없이 바로 통과
   if (requireAdmin) {
     return children;
   }
@@ -70,7 +71,7 @@ const AppContent = () => {
   const dispatch = useDispatch();
   
   useEffect(() => {
-    // 앱 시작 시 localStorage에서 토큰과 사용자 정보 확인하여 인증 상태 초기화
+    // 최초 접속 시 localStorage에서 토큰과 사용자 정보 확인하여 인증 상태 초기화
     const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
     
@@ -79,7 +80,7 @@ const AppContent = () => {
         const user = JSON.parse(userInfo);
         // Redux store에 로그인 상태 복원
         dispatch(initializeAuth());
-        console.log('로그인 상태 복원됨:', user);
+        console.log('로그인 상태 복원:', user);
       } catch (error) {
         console.error('사용자 정보 파싱 오류:', error);
         // 잘못된 데이터면 제거
@@ -128,6 +129,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <OrderPayment />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user/order-complete" 
+            element={
+              <ProtectedRoute>
+                <OrderComplete />
               </ProtectedRoute>
             } 
           />
