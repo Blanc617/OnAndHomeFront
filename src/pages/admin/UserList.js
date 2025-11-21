@@ -1,37 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import axios from 'axios';
 import './UserList.css';
 
 const UserList = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([
-    { id: 1, no: 1, username: '이소은', userId: 'User', name: '남자', phone: '010-3219-0100', registeredDate: '2025-10-27', status: 'active', checked: false },
-    { id: 2, no: 2, username: 'Winter1', userId: 'Winter1', name: '-', phone: 'qwda@e1f!asdf', registeredDate: '2025-10-26', status: 'active', checked: false },
-    { id: 3, no: 3, username: 'asdf', userId: 'happy', name: '-', phone: 'asdfdas', registeredDate: '2025-10-26', status: 'active', checked: false },
-    { id: 4, no: 4, username: 'asdfadsf', userId: 'Winter', name: '-', phone: 'asdfasdf', registeredDate: '2025-10-26', status: 'active', checked: false },
-    { id: 5, no: 5, username: 'dsafs', userId: '4321', name: '-', phone: 'edfdasdfasfdsa', registeredDate: '2025-10-26', status: 'active', checked: false },
-    { id: 6, no: 6, username: '1234', userId: '1234', name: '-', phone: '1234', registeredDate: '2025-10-26', status: 'active', checked: false },
-    { id: 7, no: 7, username: '김타자', userId: 'admin', name: '남자', phone: '010-1111-2222', registeredDate: '2025-10-26', status: 'active', checked: false }
-  ]);
-
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // API Base URL
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
   useEffect(() => {
-    // API 호출하여 회원 목록 가져오기
     fetchUsers();
-  }, [currentPage]);
+  }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
-      // 실제 API 호출 구현
-      // const response = await adminService.getUsers({ page: currentPage, size: itemsPerPage });
-      // setUsers(response.data);
+      // REST API 경로: /api/admin/users
+      const params = new URLSearchParams();
+      if (searchTerm && searchTerm.trim()) {
+        params.append('kw', searchTerm.trim());
+      }
+      
+      const url = `${API_BASE_URL}/api/admin/users${params.toString() ? '?' + params.toString() : ''}`;
+      console.log('=== Fetching users ===' );
+      console.log('URL:', url);
+      
+      const response = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      console.log('Response data type:', typeof response.data);
+      console.log('Response data is array:', Array.isArray(response.data));
+      console.log('Response data:', response.data);
+      
+      if (response.data && Array.isArray(response.data)) {
+        console.log('Number of users:', response.data.length);
+        
+        const mappedUsers = response.data.map((user, index) => ({
+          ...user,
+          checked: false,
+          no: (currentPage - 1) * itemsPerPage + index + 1
+        }));
+        
+        console.log('Mapped users:', mappedUsers);
+        setUsers(mappedUsers);
+        console.log('Users state updated');
+      } else {
+        console.warn('Unexpected response format:', response.data);
+        setUsers([]);
+      }
     } catch (error) {
-      console.error('회원 목록 조회 실패:', error);
+      console.error('=== 회원 목록 조회 실패 ===');
+      console.error('Error object:', error);
+      
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        
+        // 인증 관련 에러는 무시 (관리자 페이지는 DB role로 구분)
+        if (error.response.status === 401 || error.response.status === 403) {
+          console.warn('인증 오류가 발생했지만 계속 진행합니다.');
+          // 로그인 페이지로 리다이렉트하지 않음
+        } else {
+          alert('회원 목록을 불러오는데 실패했습니다.');
+        }
+      } else if (error.request) {
+        console.error('No response received');
+        alert('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
+      } else {
+        console.error('Error:', error.message);
+      }
+      
+      setUsers([]);
+    } finally {
+      setLoading(false);
+      setSelectAll(false);
     }
   };
 
@@ -42,35 +98,127 @@ const UserList = () => {
   };
 
   const handleSelectUser = (userId) => {
-    setUsers(users.map(user => 
+    const updatedUsers = users.map(user => 
       user.id === userId ? { ...user, checked: !user.checked } : user
-    ));
+    );
+    setUsers(updatedUsers);
+    
+    // selectAll 체크박스 상태 업데이트
+    const allChecked = updatedUsers.every(user => user.checked);
+    setSelectAll(allChecked);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // 검색 API 호출
-    console.log('검색어:', searchTerm);
+    setCurrentPage(1);
+    fetchUsers();
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     const selectedUsers = users.filter(user => user.checked);
+    
     if (selectedUsers.length === 0) {
       alert('삭제할 회원을 선택해주세요.');
       return;
     }
     
-    if (window.confirm(`선택한 ${selectedUsers.length}명의 회원을 삭제하시겠습니까?`)) {
-      // 삭제 API 호출
-      console.log('삭제할 회원:', selectedUsers);
+    if (!window.confirm(`선택한 ${selectedUsers.length}명의 회원을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const userIds = selectedUsers.map(user => user.id);
+      
+      console.log('Deleting users:', userIds);
+      
+      // REST API 호출: /api/admin/users/delete
+      const response = await axios.post(
+        `${API_BASE_URL}/api/admin/users/delete`,
+        { ids: userIds },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log('Delete response:', response.data);
+      
+      if (response.data && response.data.success) {
+        alert(response.data.message || `${selectedUsers.length}명의 회원이 삭제되었습니다.`);
+        
+        // 목록 새로고침
+        await fetchUsers();
+        setSelectAll(false);
+      } else {
+        alert(response.data.message || '회원 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('회원 삭제 실패:', error);
+      
+      if (error.response?.status === 403) {
+        alert('회원 삭제 권한이 없습니다.');
+      } else if (error.response?.status === 404) {
+        alert('일부 회원을 찾을 수 없습니다. 목록을 새로고침합니다.');
+        fetchUsers();
+      } else if (error.code === 'ERR_NETWORK') {
+        alert('네트워크 오류가 발생했습니다. 서버가 실행 중인지 확인해주세요.');
+      } else {
+        alert('회원 삭제 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.phone.includes(searchTerm)
-  );
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    
+    try {
+      // ISO 형식의 날짜를 파싱
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatPhone = (phone) => {
+    if (!phone) return '-';
+    
+    // 전화번호 포맷팅 (010-1234-5678)
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 11) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+    } else if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
+  };
+
+  const formatGender = (gender) => {
+    if (!gender) return '-';
+    if (gender.toUpperCase() === 'MALE' || gender === '남자' || gender === 'M') return '남자';
+    if (gender.toUpperCase() === 'FEMALE' || gender === '여자' || gender === 'F') return '여자';
+    return gender;
+  };
+
+  // 페이지네이션 계산
+  const totalPages = Math.max(1, Math.ceil(users.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
 
   return (
     <div className="admin-user-list">
@@ -93,18 +241,25 @@ const UserList = () => {
           </div>
         </div>
 
+        {loading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner">로딩 중...</div>
+          </div>
+        )}
+
         <div className="user-table-container">
           <table className="user-table">
             <thead>
               <tr>
-                <th>
+                <th style={{ width: '50px' }}>
                   <input
                     type="checkbox"
                     checked={selectAll}
                     onChange={handleSelectAll}
+                    disabled={currentUsers.length === 0}
                   />
                 </th>
-                <th>No</th>
+                <th style={{ width: '80px' }}>No</th>
                 <th>이름</th>
                 <th>ID</th>
                 <th>성별</th>
@@ -114,51 +269,60 @@ const UserList = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={user.checked}
-                      onChange={() => handleSelectUser(user.id)}
-                    />
+              {currentUsers.length > 0 ? (
+                currentUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={user.checked || false}
+                        onChange={() => handleSelectUser(user.id)}
+                      />
+                    </td>
+                    <td>{user.no}</td>
+                    <td>{user.username || '-'}</td>
+                    <td>{user.userId || user.email || '-'}</td>
+                    <td>{formatGender(user.gender)}</td>
+                    <td>{formatPhone(user.phone)}</td>
+                    <td>{formatDate(user.birthDate)}</td>
+                    <td>{formatDate(user.createdAt)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="no-data">
+                    {loading ? '로딩 중...' : '등록된 회원이 없습니다.'}
                   </td>
-                  <td>{user.no}</td>
-                  <td>{user.username}</td>
-                  <td>{user.userId}</td>
-                  <td>{user.name}</td>
-                  <td>{user.phone}</td>
-                  <td>-</td>
-                  <td>{user.registeredDate}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
-
-          {filteredUsers.length === 0 && (
-            <div className="no-data">
-              <p>등록된 회원이 없습니다.</p>
-            </div>
-          )}
         </div>
 
         <div className="table-footer">
-          <button className="delete-btn" onClick={handleDeleteSelected}>
+          <button 
+            className="delete-btn" 
+            onClick={handleDeleteSelected}
+            disabled={loading || users.filter(u => u.checked).length === 0}
+          >
             삭제
           </button>
           
           <div className="pagination">
             <button 
               className="page-btn"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1 || loading}
             >
               이전
             </button>
-            <span className="page-info">{currentPage}</span>
+            <span className="page-info">
+              {currentPage} / {totalPages}
+            </span>
             <button 
               className="page-btn"
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages || loading}
             >
               다음
             </button>

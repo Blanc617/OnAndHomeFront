@@ -75,6 +75,16 @@ const adminService = {
     return response.data;
   },
 
+  deleteUser: async (userId) => {
+    const response = await adminApi.delete(`/users/${userId}`);
+    return response.data;
+  },
+
+  deleteUsers: async (userIds) => {
+    const response = await adminApi.post('/users/delete', { userIds });
+    return response.data;
+  },
+
   // 상품 관리
   getProducts: async (params) => {
     const response = await adminApi.get('/products', { params });
