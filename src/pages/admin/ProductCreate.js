@@ -104,22 +104,32 @@ const ProductCreate = () => {
       submitData.append('salePrice', formData.salePrice || formData.price);
       submitData.append('stock', formData.stock || 0);
       
-      submitData.append('description', JSON.stringify({
-        size: formData.size,
-        weight: formData.weight,
-        power: formData.power,
-        material: formData.material,
-        additionalFeatures: formData.additionalFeatures
-      }));
+      // 상세스펙을 문자열로 저장
+      const specs = [
+        formData.size && `크기: ${formData.size}`,
+        formData.weight && `무게: ${formData.weight}`,
+        formData.power && `전압: ${formData.power}`,
+        formData.material && `재질: ${formData.material}`,
+        formData.additionalFeatures && `추가상품: ${formData.additionalFeatures}`
+      ].filter(Boolean).join(', ');
+      
+      submitData.append('description', specs);
 
       if (formData.thumbnailImage) {
         submitData.append('thumbnailImage', formData.thumbnailImage);
+        console.log('Uploading thumbnail image');
       }
       if (formData.detailImage) {
         submitData.append('detailImage', formData.detailImage);
+        console.log('Uploading detail image');
       }
 
       console.log('Submitting product data...');
+      
+      // FormData 내용 로깅
+      for (let pair of submitData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
       const response = await axios.post(
         `${API_BASE_URL}/api/admin/products`,
@@ -132,8 +142,13 @@ const ProductCreate = () => {
       );
 
       console.log('Product created:', response.data);
-      alert('상품이 등록되었습니다.');
-      navigate('/admin/products');
+      
+      if (response.data && response.data.success) {
+        alert('상품이 등록되었습니다.');
+        navigate('/admin/products');
+      } else {
+        alert(response.data.message || '상품 등록에 실패했습니다.');
+      }
 
     } catch (error) {
       console.error('상품 등록 실패:', error);

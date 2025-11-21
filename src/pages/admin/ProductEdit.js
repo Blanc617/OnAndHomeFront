@@ -164,19 +164,24 @@ const ProductEdit = () => {
       submitData.append('price', formData.price || 0);
       submitData.append('salePrice', formData.salePrice || formData.price);
       submitData.append('stock', formData.stock || 0);
-      
-      submitData.append('description', JSON.stringify({
-        additionalFeatures: formData.additionalFeatures
-      }));
+      submitData.append('description', formData.additionalFeatures || '');
 
+      // 파일이 실제 File 객체일 때만 추가
       if (formData.thumbnailImage instanceof File) {
         submitData.append('thumbnailImage', formData.thumbnailImage);
+        console.log('Uploading new thumbnail image');
       }
       if (formData.detailImage instanceof File) {
         submitData.append('detailImage', formData.detailImage);
+        console.log('Uploading new detail image');
       }
 
       console.log('Updating product data...');
+      
+      // FormData 내용 로깅
+      for (let pair of submitData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
       const response = await axios.put(
         `${API_BASE_URL}/api/admin/products/${id}`,
@@ -189,8 +194,13 @@ const ProductEdit = () => {
       );
 
       console.log('Product updated:', response.data);
-      alert('상품이 수정되었습니다.');
-      navigate('/admin/products');
+      
+      if (response.data && response.data.success) {
+        alert('상품이 수정되었습니다.');
+        navigate('/admin/products');
+      } else {
+        alert(response.data.message || '상품 수정에 실패했습니다.');
+      }
 
     } catch (error) {
       console.error('상품 수정 실패:', error);
