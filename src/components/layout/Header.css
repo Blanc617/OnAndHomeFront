@@ -1,0 +1,358 @@
+.on-header {
+  display: block;
+  width: 100%;
+  position: relative;
+}
+
+.on-header-top {
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid #c1c1c1;
+  align-items: center;
+  display: flex;
+}
+
+.on-header-inner {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 40px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.on-header-inner2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.header-logo {
+  width: 153px;
+  height: 38px;
+  background-image: url('../../../public/images/logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.header-logo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #ddd;
+  flex-shrink: 0;
+  background: url('../../../public/product_img/top_left.jpg') center / cover no-repeat;
+  cursor: pointer;
+}
+
+.header-search-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-search-area form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.header-search-area .input-m {
+  width: 400px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #d6d6d6;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.header-search-area .input-m:focus {
+  border-color: #888;
+  outline: none;
+}
+
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.header-icons li {
+  width: 22px;
+  height: 22px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+.ico-mypage {
+  background-image: url('../../../public/images/mypage.png');
+}
+
+.ico-cart {
+  background-image: url('../../../public/images/cart.png');
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: red;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SNS 리스트 */
+.sns-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sns-list li {
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sns-obj-fb {
+  background-image: url('../../../public/images/fb.png');
+}
+.sns-obj-blg {
+  background-image: url('../../../public/images/blg.png');
+}
+.sns-obj-ins {
+  background-image: url('../../../public/images/ins.png');
+}
+.sns-obj-ut {
+  background-image: url('../../../public/images/ut.png');
+}
+
+.sns-list li:hover {
+  transform: scale(1.05);
+  opacity: 0.85;
+}
+
+/* 로그인 그룹 */
+.login-group {
+  display: flex;
+  align-items: center;
+}
+
+.login-group-list {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.login-group-list li {
+  line-height: 1;
+  cursor: pointer;
+}
+
+.login-group-list li + li {
+  border-left: 1px solid #ccc;
+  padding-left: 12px;
+  margin-left: 12px;
+}
+
+.login-group-list li:hover {
+  font-weight: 600;
+}
+
+/* 메뉴 */
+.menu-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.menu-wrapper > ul.gnb {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 40px;
+}
+
+.menu-wrapper > ul.gnb > li {
+  position: relative;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-wrapper > ul.gnb > li > a {
+  display: block;
+  padding: 0 12px;
+  line-height: 40px;
+  text-decoration: none;
+  color: #222;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.menu-wrapper > ul.gnb > li > a:hover {
+  color: #ab1414;
+}
+
+/* 2뎁스: 기본 숨김 */
+.menu-wrapper .depth2 {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  display: none;
+  min-width: 160px;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  z-index: 20;
+  opacity: 0.9;
+}
+
+.menu-wrapper .depth2 > li > a {
+  display: block;
+  padding: 8px 14px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.menu-wrapper .depth2 > li > a:hover {
+  background: #f5f5f5;
+}
+
+.menu-wrapper > ul.gnb > li:hover > .depth2,
+.menu-wrapper > ul.gnb > li:focus-within > .depth2,
+.menu-wrapper > ul.gnb > li.is-open > .depth2 {
+  display: block;
+}
+
+/* 헤더 우측 버튼들 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.btn-admin,
+.btn-mypage,
+.btn-logout,
+.btn-login,
+.btn-signup {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-admin {
+  background-color: #ab1414;
+  color: white;
+}
+
+.btn-admin:hover {
+  background-color: #8c1010;
+}
+
+.btn-mypage {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-mypage:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-logout {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.btn-logout:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
+
+.btn-login {
+  background-color: #333;
+  color: white;
+}
+
+.btn-login:hover {
+  background-color: #222;
+}
+
+.btn-signup {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-signup:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  text-decoration: none;
+  cursor: pointer;
+}

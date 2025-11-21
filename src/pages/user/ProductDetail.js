@@ -1,0 +1,367 @@
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { productAPI, cartAPI, reviewAPI, qnaAPI } from '../../api';
+import './ProductDetail.css';
+
+const ProductDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.user);
+  
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [qnas, setQnas] = useState([]);
+  const [reviewContent, setReviewContent] = useState('');
+  const [qnaContent, setQnaContent] = useState('');
+  
+  useEffect(() => {
+    loadProductDetail();
+  }, [id]);
+  
+  useEffect(() => {
+    if (product) {
+      loadReviews();
+      loadQnas();
+    }
+  }, [product]);
+  
+  const loadProductDetail = async () => {
+    try {
+      const response = await productAPI.getProductDetail(id);
+      if (response.success && response.data) {
+        setProduct(response.data);
+      } else {
+        alert('상품을 찾을 수 없습니다.');
+        navigate('/products');
+      }
+    } catch (error) {
+      console.error('상품 조회 오류:', error);
+      alert('상품 정보를 불러올 수 없습니다.');
+      navigate('/products');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const loadReviews = async () => {
+    try {
+      const response = await reviewAPI.getProductReviews(id);
+      if (response.success && response.data) {
+        setReviews(response.data);
+      }
+    } catch (error) {
+      console.error('리뷰 조회 오류:', error);
+    }
+  };
+  
+  const loadQnas = async () => {
+    try {
+      const response = await qnaAPI.getProductQnas(id);
+      if (response.success && response.data) {
+        setQnas(response.data);
+      }
+    } catch (error) {
+      console.error('QnA 조회 오류:', error);
+    }
+  };
+  
+  const formatPrice = (price) => {
+    if (!price) return '0원';
+    return `${price.toLocaleString()}원`;
+  };
+  
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/images/no-image.png';
+    if (imagePath.startsWith('uploads/') || imagePath.startsWith('/uploads/')) {
+      return `http://localhost:8080/${imagePath}`;
+    }
+    return imagePath;
+  };
+  
+  const increaseQuantity = () => {
+    setQuantity(prev => prev + 1);
+  };
+  
+  const decreaseQuantity = () => {
+    if (quantity <= 1) {
+      alert('최소 주문 수량은 1개입니다.');
+      return;
+    }
+    setQuantity(prev => prev - 1);
+  };
+  
+  const getTotalPrice = () => {
+    if (!product) return 0;
+    const pricePerUnit = (product.salePrice && product.salePrice < product.price) 
+      ? product.salePrice 
+      : product.price;
+    return pricePerUnit * quantity;
+  };
+  
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    navigate(`/order?productId=${product.id}&quantity=${quantity}`);
+  };
+  
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      const response = await cartAPI.addToCart(product.id, quantity);
+      if (response.success) {
+        if (window.confirm('상품이 장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?')) {
+          navigate('/cart');
+        }
+      } else {
+        alert(response.message || '장바구니 추가에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('장바구니 추가 오류:', error);
+      alert('장바구니에 상품을 추가하는 중 오류가 발생했습니다.');
+    }
+  };
+  
+  const handleSubmitReview = async () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    
+    if (!reviewContent.trim()) {
+      alert('리뷰 내용을 입력해주세요.');
+      return;
+    }
+    
+    try {
+      const response = await reviewAPI.createReview({
+        productId: product.id,
+        content: reviewContent,
+        rating: 5
+      });
+      
+      if (response.success) {
+        alert('리뷰가 등록되었습니다.');
+        setReviewContent('');
+        loadReviews();
+      } else {
+        alert(response.message || '리뷰 등록에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('리뷰 작성 오류:', error);
+      alert('리뷰 작성 중 오류가 발생했습니다.');
+    }
+  };
+  
+  const handleSubmitQna = async () => {
+    if (!isAuthenticated) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    
+    if (!qnaContent.trim()) {
+      alert('문의 내용을 입력해주세요.');
+      return;
+    }
+    
+    try {
+      const response = await qnaAPI.createQna({
+        productId: product.id,
+        title: '상품 문의',
+        question: qnaContent
+      });
+      
+      if (response.success) {
+        alert('문의가 등록되었습니다.');
+        setQnaContent('');
+        loadQnas();
+      } else {
+        alert(response.message || '문의 등록에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('QnA 작성 오류:', error);
+      alert('문의 작성 중 오류가 발생했습니다.');
+    }
+  };
+  
+  if (loading) {
+    return <div className="loading">로딩 중...</div>;
+  }
+  
+  if (!product) {
+    return <div className="loading">상품을 찾을 수 없습니다.</div>;
+  }
+  
+  return (
+    <div className="product-detail-container">
+      <div className="product-detail-inner">
+        <h2 className="page-title">상품 상세정보</h2>
+        
+        {/* 상품 정보 섹션 */}
+        <div className="product-info-section">
+          <div className="product-image-wrapper">
+            <img
+              src={getImageUrl(product.thumbnailImage)}
+              alt={product.name}
+              className="product-main-image"
+              onError={(e) => {
+                e.target.src = '/images/item.png';
+                e.target.onerror = null;
+              }}
+            />
+          </div>
+          
+          <div className="product-info-wrapper">
+            <h2 className="product-title">{product.name}</h2>
+            
+            <table className="product-info-table">
+              <tbody>
+                <tr>
+                  <th>정상가격</th>
+                  <td className="price-original">{formatPrice(product.price)}</td>
+                </tr>
+                {product.salePrice && product.salePrice < product.price && (
+                  <tr>
+                    <th>할인가격</th>
+                    <td className="price-sale">{formatPrice(product.salePrice)}</td>
+                  </tr>
+                )}
+                <tr>
+                  <th>제조사</th>
+                  <td>{product.manufacturer || '-'}</td>
+                </tr>
+                <tr>
+                  <th>제조국</th>
+                  <td>{product.country || '-'}</td>
+                </tr>
+                <tr>
+                  <th>배송비</th>
+                  <td>무료</td>
+                </tr>
+                <tr>
+                  <th>판매처</th>
+                  <td>On&Home</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div className="action-buttons">
+              <button className="btn btn-buy" onClick={handleBuyNow}>
+                바로구매
+              </button>
+              <button className="btn btn-cart" onClick={handleAddToCart}>
+                장바구니 담기
+              </button>
+            </div>
+            
+            <div className="order-summary">
+              <div className="quantity-control">
+                <span>주문수량</span>
+                <button className="btn-quantity" onClick={decreaseQuantity}>-</button>
+                <span className="quantity">{quantity}</span>
+                <button className="btn-quantity" onClick={increaseQuantity}>+</button>
+              </div>
+              <div className="total-price-wrapper">
+                <span>합계금액</span>
+                <span className="total-price">{formatPrice(getTotalPrice())}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* 상품 상세 이미지 */}
+        {product.detailImage && (
+          <div className="product-detail-image-section">
+            <img
+              src={getImageUrl(product.detailImage)}
+              alt="상세 이미지"
+              className="product-detail-image"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </div>
+        )}
+        
+        {/* 리뷰 섹션 */}
+        <div className="review-section">
+          <h2 className="section-title">Review</h2>
+          <div className="review-list">
+            {reviews.length === 0 ? (
+              <div className="empty-message">등록된 리뷰가 없습니다.</div>
+            ) : (
+              reviews.map((review, index) => (
+                <div key={index} className="review-item">
+                  <div className="review-content">{review.content}</div>
+                  <div className="review-author">{review.author || review.username || '익명'}</div>
+                </div>
+              ))
+            )}
+          </div>
+          {isAuthenticated && (
+            <div className="review-write">
+              <textarea
+                className="textarea"
+                placeholder="리뷰를 작성해주세요"
+                value={reviewContent}
+                onChange={(e) => setReviewContent(e.target.value)}
+              />
+              <button className="btn btn-submit" onClick={handleSubmitReview}>
+                저장
+              </button>
+            </div>
+          )}
+        </div>
+        
+        {/* QnA 섹션 */}
+        <div className="qna-section">
+          <h2 className="section-title">Q&A</h2>
+          <div className="qna-list">
+            {qnas.length === 0 ? (
+              <div className="empty-message">등록된 문의가 없습니다.</div>
+            ) : (
+              qnas.map((qna, index) => (
+                <div key={index}>
+                  <div className="qna-item">
+                    <div className="qna-question">{qna.question}</div>
+                    <div className="qna-author">{qna.writer || '익명'}</div>
+                  </div>
+                  {qna.replies && qna.replies.map((reply, replyIndex) => (
+                    <div key={replyIndex} className="qna-reply">
+                      <div className="reply-content">{reply.content}</div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+          {isAuthenticated && (
+            <div className="qna-write">
+              <textarea
+                className="textarea"
+                placeholder="문의 내용을 입력해주세요"
+                value={qnaContent}
+                onChange={(e) => setQnaContent(e.target.value)}
+              />
+              <button className="btn btn-submit" onClick={handleSubmitQna}>
+                작성
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductDetail;
