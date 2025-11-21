@@ -107,7 +107,23 @@ const ProductDetail = () => {
       navigate('/login');
       return;
     }
-    navigate(`/order?productId=${product.id}&quantity=${quantity}`);
+    
+    // 주문 페이지로 상품 정보 전달
+    const productInfo = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      salePrice: product.salePrice,
+      quantity: quantity,
+      thumbnailImage: product.thumbnailImage
+    };
+    
+    navigate('/user/order-payment', {
+      state: {
+        products: [productInfo],
+        fromCart: false
+      }
+    });
   };
   
   const handleAddToCart = async () => {

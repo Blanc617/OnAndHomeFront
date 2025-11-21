@@ -1,0 +1,278 @@
+/* 전체 컨테이너 */
+.my-orders-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  min-height: 600px;
+}
+
+.my-orders-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* 주문 없음 */
+.no-orders {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.no-orders p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.go-shopping-btn {
+  padding: 12px 30px;
+  background: #4361ee;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.go-shopping-btn:hover {
+  background: #3651d4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+/* 주문 목록 */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 주문 카드 */
+.order-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 주문 헤더 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.order-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.order-number {
+  font-size: 13px;
+  color: #999;
+}
+
+.order-status {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-paid {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-preparing {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-shipping {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.status-delivered {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-refunded {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* 주문 본문 */
+.order-body {
+  padding: 20px;
+}
+
+.order-items {
+  margin-bottom: 20px;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.order-item:last-child {
+  margin-bottom: 0;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.item-quantity {
+  font-size: 14px;
+  color: #666;
+}
+
+.item-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4361ee;
+}
+
+.no-items {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+/* 주문 요약 */
+.order-summary {
+  padding-top: 20px;
+  border-top: 1px solid #dee2e6;
+}
+
+.delivery-info {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #333;
+}
+
+.total-amount .amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+/* 주문 푸터 */
+.order-footer {
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  text-align: right;
+}
+
+.detail-btn {
+  padding: 10px 24px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.detail-btn:hover {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 로딩 */
+.loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .my-orders-container {
+    padding: 10px;
+  }
+
+  .my-orders-content h1 {
+    font-size: 24px;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .order-summary {
+    font-size: 14px;
+  }
+
+  .total-amount {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}

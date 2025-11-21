@@ -159,9 +159,25 @@ const Cart = () => {
       return;
     }
     
-    // 선택된 상품 ID들을 쿼리 파라미터로 전달
-    const selectedItemIds = selectedItems.join(',');
-    navigate(`/order?cartItems=${selectedItemIds}`);
+    // 선택된 상품들의 정보를 모아서 OrderPayment로 전달
+    const selectedProducts = cartItems
+      .filter(item => selectedItems.includes(item.id))
+      .map(item => ({
+        id: item.product.id,
+        cartItemId: item.id,
+        name: item.product.name,
+        price: item.product.price,
+        salePrice: item.product.salePrice,
+        quantity: item.quantity,
+        thumbnailImage: item.product.thumbnailImage
+      }));
+    
+    navigate('/user/order-payment', {
+      state: {
+        products: selectedProducts,
+        fromCart: true
+      }
+    });
   };
   
   if (loading) {
