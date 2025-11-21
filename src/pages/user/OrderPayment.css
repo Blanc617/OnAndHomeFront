@@ -1,0 +1,181 @@
+/* 전체 컨테이너 */
+.order-payment-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.order-payment-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* 섹션 */
+.order-section {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-section h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #4361ee;
+}
+
+/* 테이블 */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th {
+  background: #f8f9fa;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border: 1px solid #dee2e6;
+}
+
+.order-table td {
+  padding: 15px;
+  border: 1px solid #dee2e6;
+}
+
+.order-table input[type="text"],
+.order-table input[type="tel"],
+.order-table input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.order-table input[type="text"]:focus,
+.order-table input[type="tel"]:focus,
+.order-table input[type="email"]:focus {
+  outline: none;
+  border-color: #4361ee;
+}
+
+.order-table input.readonly-input {
+  background: #f8f9fa;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.order-table input.full-width {
+  width: 100%;
+}
+
+.required {
+  color: #dc3545;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+/* 주문정보 테이블 */
+.order-table thead th {
+  text-align: center;
+  background: #4361ee;
+  color: white;
+}
+
+.order-table tbody td {
+  text-align: center;
+}
+
+.order-table tbody td.text-right {
+  text-align: right;
+  padding-right: 20px;
+}
+
+.order-table .total-row {
+  background: #f8f9fa;
+  font-weight: bold;
+}
+
+.order-table .total-row td {
+  padding: 20px 15px;
+  font-size: 16px;
+}
+
+/* 결제하기 버튼 */
+.payment-button-container {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.payment-button {
+  width: 400px;
+  padding: 18px 0;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.payment-button:hover {
+  background: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.payment-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 로딩 */
+.loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .order-payment-container {
+    padding: 10px;
+  }
+
+  .order-section {
+    padding: 20px 10px;
+  }
+
+  .order-section h2 {
+    font-size: 20px;
+  }
+
+  .order-table {
+    font-size: 14px;
+  }
+
+  .order-table th,
+  .order-table td {
+    padding: 10px 5px;
+  }
+
+  .payment-button {
+    width: 100%;
+    max-width: 400px;
+  }
+}

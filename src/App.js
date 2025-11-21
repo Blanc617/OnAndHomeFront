@@ -19,6 +19,7 @@ import Order from './pages/user/Order';
 import MyPage from './pages/user/MyPage';
 import MyInfo from './pages/user/MyInfo';
 import MyOrders from './pages/user/MyOrders';
+import OrderPayment from './pages/user/OrderPayment';
 
 // 공지사항, Q&A, 리뷰
 import NoticeList from './pages/user/board/NoticeList';
@@ -119,6 +120,22 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Order />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user/order-payment" 
+            element={
+              <ProtectedRoute>
+                <OrderPayment />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="user/my-orders" 
+            element={
+              <ProtectedRoute>
+                <MyOrders />
               </ProtectedRoute>
             } 
           />
