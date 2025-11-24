@@ -14,6 +14,8 @@ const Header = () => {
   
   const [searchKeyword, setSearchKeyword] = useState('');
   const [cartCount, setCartCount] = useState(0);
+  const [openMenu, setOpenMenu] = useState(null);
+  const menuTimeoutRef = React.useRef(null);
 
   // 카테고리 데이터
   const categoryData = [
@@ -78,6 +80,20 @@ const Header = () => {
     }
   };
 
+  // 관리자 확인 로그
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      console.log('=== 사용자 정보 ===');
+      console.log('username:', user.username);
+      console.log('userId:', user.userId);
+      console.log('role:', user.role);
+      console.log('role type:', typeof user.role);
+      console.log('role === 0:', user.role === 0);
+      console.log('role === "0":', user.role === "0");
+      console.log('full user object:', JSON.stringify(user));
+    }
+  }, [isAuthenticated, user]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchKeyword.trim()) {
@@ -116,6 +132,20 @@ const Header = () => {
     }
   };
 
+  // 메뉴 열기/닫기 함수
+  const handleMenuEnter = (index) => {
+    if (menuTimeoutRef.current) {
+      clearTimeout(menuTimeoutRef.current);
+    }
+    setOpenMenu(index);
+  };
+
+  const handleMenuLeave = () => {
+    menuTimeoutRef.current = setTimeout(() => {
+      setOpenMenu(null);
+    }, 200); // 200ms 지연
+  };
+
   return (
     <header className="on-header">
       {/* line01 - SNS 및 로그인 */}
@@ -144,9 +174,9 @@ const Header = () => {
                   <li>
                     <span className="user-name">{user?.username || user?.userId}님</span>
                   </li>
-                  {user?.role === 0 && (
-                    <li>
-                      <Link to="/admin">관리자</Link>
+                  {(user?.role === 0 || user?.role === "0") && (
+                    <li className="admin-button-wrapper">
+                      <Link to="/admin" className="admin-button">관리자</Link>
                     </li>
                   )}
                   <li>
@@ -213,9 +243,14 @@ const Header = () => {
           <div className="menu-wrapper">
             <ul className="gnb">
               {categoryData.map((category, index) => (
-                <li key={index}>
-                  <a href="#">{category.parentName}</a>
-                  <ul className="depth2">
+                <li 
+                  key={index}
+                  onMouseEnter={() => handleMenuEnter(index)}
+                  onMouseLeave={handleMenuLeave}
+                  className={openMenu === index ? 'menu-open' : ''}
+                >
+                  <a href="#" onClick={(e) => e.preventDefault()}>{category.parentName}</a>
+                  <ul className={`depth2 ${openMenu === index ? 'show' : ''}`}>
                     {category.children.map((child, childIndex) => (
                       <li key={childIndex}>
                         <Link to={`/products/category/${encodeURIComponent(child)}`}>
