@@ -219,7 +219,7 @@ const AppContent = () => {
           <Route path="qna" element={<AdminQnaList />} />
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
-          <Route path="review" element={<AdminReviewList />} />
+          <Route path="reviews" element={<AdminReviewList />} />
         </Route>
         
         {/* 404 페이지 */}
