@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { productAPI, cartAPI, reviewAPI, qnaAPI } from '../../api';
+import ReviewItem from '../../components/review/ReviewItem';
+import QnaItem from '../../components/qna/QnaItem';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -15,6 +17,7 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [qnas, setQnas] = useState([]);
   const [reviewContent, setReviewContent] = useState('');
+  const [qnaTitle, setQnaTitle] = useState('');
   const [qnaContent, setQnaContent] = useState('');
   
   useEffect(() => {
@@ -108,7 +111,6 @@ const ProductDetail = () => {
       return;
     }
     
-    // 주문 페이지로 상품 정보 전달
     const productInfo = {
       id: product.id,
       name: product.name,
@@ -165,7 +167,7 @@ const ProductDetail = () => {
         productId: product.id,
         content: reviewContent,
         rating: 5,
-        userId: user.id // userId 추가
+        userId: user.id
       });
       
       if (response.success) {
@@ -188,6 +190,11 @@ const ProductDetail = () => {
       return;
     }
     
+    if (!qnaTitle.trim()) {
+      alert('문의 제목을 입력해주세요.');
+      return;
+    }
+    
     if (!qnaContent.trim()) {
       alert('문의 내용을 입력해주세요.');
       return;
@@ -196,14 +203,15 @@ const ProductDetail = () => {
     try {
       const response = await qnaAPI.createQna({
         productId: product.id,
-        title: '상품 문의',
+        title: qnaTitle,
         question: qnaContent,
-        userId: user.id, // userId 추가
-        writer: user.username || user.userId // writer 추가
+        userId: user.id,
+        writer: user.username || user.userId
       });
       
       if (response.success) {
         alert('문의가 등록되었습니다.');
+        setQnaTitle('');
         setQnaContent('');
         loadQnas();
       } else {
@@ -212,6 +220,66 @@ const ProductDetail = () => {
     } catch (error) {
       console.error('QnA 작성 오류:', error);
       alert('문의 작성 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleEditReview = async (reviewId, data) => {
+    try {
+      const response = await reviewAPI.updateReview(reviewId, data);
+      if (response.success) {
+        alert('리뷰가 수정되었습니다.');
+        loadReviews();
+      } else {
+        alert(response.message || '리뷰 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('리뷰 수정 오류:', error);
+      alert('리뷰 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      const response = await reviewAPI.deleteReview(reviewId);
+      if (response.success) {
+        alert('리뷰가 삭제되었습니다.');
+        loadReviews();
+      } else {
+        alert(response.message || '리뷰 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('리뷰 삭제 오류:', error);
+      alert('리뷰 삭제에 실패했습니다.');
+    }
+  };
+
+  const handleEditQna = async (qnaId, data) => {
+    try {
+      const response = await qnaAPI.updateQna(qnaId, data);
+      if (response.success) {
+        alert('문의가 수정되었습니다.');
+        loadQnas();
+      } else {
+        alert(response.message || '문의 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('QnA 수정 오류:', error);
+      alert('문의 수정에 실패했습니다.');
+    }
+  };
+
+  const handleDeleteQna = async (qnaId) => {
+    try {
+      const response = await qnaAPI.deleteQna(qnaId);
+      if (response.success) {
+        alert('문의가 삭제되었습니다.');
+        loadQnas();
+      } else {
+        alert(response.message || '문의 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('QnA 삭제 오류:', error);
+      alert('문의 삭제에 실패했습니다.');
     }
   };
   
@@ -228,7 +296,6 @@ const ProductDetail = () => {
       <div className="product-detail-inner">
         <h2 className="page-title">상품 상세정보</h2>
         
-        {/* 상품 정보 섹션 */}
         <div className="product-info-section">
           <div className="product-image-wrapper">
             <img
@@ -300,7 +367,6 @@ const ProductDetail = () => {
           </div>
         </div>
         
-        {/* 상품 상세 이미지 */}
         {product.detailImage && (
           <div className="product-detail-image-section">
             <img
@@ -312,18 +378,19 @@ const ProductDetail = () => {
           </div>
         )}
         
-        {/* 리뷰 섹션 */}
         <div className="review-section">
           <h2 className="section-title">Review</h2>
           <div className="review-list">
             {reviews.length === 0 ? (
               <div className="empty-message">등록된 리뷰가 없습니다.</div>
             ) : (
-              reviews.map((review, index) => (
-                <div key={index} className="review-item">
-                  <div className="review-content">{review.content}</div>
-                  <div className="review-author">{review.author || review.username || '익명'}</div>
-                </div>
+              reviews.map((review) => (
+                <ReviewItem
+                  key={review.id}
+                  review={review}
+                  onEdit={handleEditReview}
+                  onDelete={handleDeleteReview}
+                />
               ))
             )}
           </div>
@@ -342,30 +409,31 @@ const ProductDetail = () => {
           )}
         </div>
         
-        {/* QnA 섹션 */}
         <div className="qna-section">
           <h2 className="section-title">Q&A</h2>
           <div className="qna-list">
             {qnas.length === 0 ? (
               <div className="empty-message">등록된 문의가 없습니다.</div>
             ) : (
-              qnas.map((qna, index) => (
-                <div key={index}>
-                  <div className="qna-item">
-                    <div className="qna-question">{qna.question}</div>
-                    <div className="qna-author">{qna.writer || '익명'}</div>
-                  </div>
-                  {qna.replies && qna.replies.map((reply, replyIndex) => (
-                    <div key={replyIndex} className="qna-reply">
-                      <div className="reply-content">{reply.content}</div>
-                    </div>
-                  ))}
-                </div>
+              qnas.map((qna) => (
+                <QnaItem
+                  key={qna.id}
+                  qna={qna}
+                  onEdit={handleEditQna}
+                  onDelete={handleDeleteQna}
+                />
               ))
             )}
           </div>
           {isAuthenticated && (
             <div className="qna-write">
+              <input
+                type="text"
+                className="input-title"
+                placeholder="문의 제목을 입력해주세요"
+                value={qnaTitle}
+                onChange={(e) => setQnaTitle(e.target.value)}
+              />
               <textarea
                 className="textarea"
                 placeholder="문의 내용을 입력해주세요"

@@ -1,0 +1,170 @@
+.review-item {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+  transition: background-color 0.2s;
+}
+
+.review-item:hover {
+  background-color: #f9f9f9;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.review-rating {
+  font-size: 16px;
+  color: #FFB800;
+}
+
+.review-author {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}
+
+.review-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.review-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #45a049;
+}
+
+.btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+}
+
+/* 수정 폼 스타일 */
+.review-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rating-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-edit label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.rating-select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.review-edit-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.review-edit-textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.review-edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.btn-save {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #45a049;
+}
+
+.btn-cancel {
+  background-color: #9E9E9E;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #757575;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .review-item {
+    padding: 16px;
+  }
+
+  .review-header {
+    flex-wrap: wrap;
+  }
+
+  .review-date {
+    flex-basis: 100%;
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}
