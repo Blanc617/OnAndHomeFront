@@ -87,7 +87,7 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  overflow-x: auto;
   min-height: 500px;
 }
 
@@ -95,6 +95,7 @@
 .order-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .order-table thead {
@@ -102,14 +103,23 @@
 }
 
 .order-table th {
-  padding: 15px;
-  text-align: left;
+  padding: 15px 10px;
+  text-align: center;
   font-size: 14px;
   font-weight: 600;
   color: #666;
   border-bottom: 2px solid #e0e0e0;
   white-space: nowrap;
 }
+
+/* 컬럼 너비 고정 */
+.order-table th:nth-child(1) { width: 150px; } /* 주문번호 */
+.order-table th:nth-child(2) { width: 250px; } /* 상품명 */
+.order-table th:nth-child(3) { width: 120px; } /* 주문가격 */
+.order-table th:nth-child(4) { width: 120px; } /* 구매자 ID */
+.order-table th:nth-child(5) { width: 120px; } /* 구매자명 */
+.order-table th:nth-child(6) { width: 100px; } /* 주문상태 */
+.order-table th:nth-child(7) { width: 120px; } /* 주문일자 */
 
 .order-table tbody tr.clickable-row {
   border-bottom: 1px solid #f0f0f0;
@@ -119,36 +129,41 @@
 
 .order-table tbody tr.clickable-row:hover {
   background: #f0f8ff;
-  transform: scale(1.01);
+  transform: scale(1.001);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .order-table td {
-  padding: 15px;
+  padding: 15px 10px;
   font-size: 14px;
   color: #333;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.order-table .order-number {
+/* 주문번호 */
+.order-table td.order-number {
   color: #ff6b35;
   font-weight: 500;
+  text-align: center;
 }
 
-.order-table .product-info {
-  max-width: 250px;
+/* 상품명 */
+.order-table td.product-info {
+  text-align: left !important;
+  padding-left: 15px !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.order-table .text-left {
-  text-align: left;
-}
-
-.order-table .price {
+/* 가격 */
+.order-table td.price {
   font-weight: 600;
   color: #333;
   white-space: nowrap;
+  text-align: right;
+  padding-right: 15px !important;
 }
 
 /* 상태 뱃지 */
@@ -159,7 +174,7 @@
   font-size: 12px;
   font-weight: 600;
   text-align: center;
-  min-width: 80px;
+  min-width: 70px;
 }
 
 .status-badge.status-paid {
@@ -189,14 +204,9 @@
 
 /* 데이터 없음 */
 .no-data {
-  padding: 100px 20px;
-  text-align: center;
+  padding: 100px 20px !important;
+  text-align: center !important;
   color: #999;
-}
-
-.no-data p {
-  font-size: 16px;
-  margin: 0;
 }
 
 /* 로딩 */
@@ -266,12 +276,8 @@
     align-items: stretch;
   }
   
-  .order-table-container {
-    overflow-x: auto;
-  }
-  
   .order-table {
-    min-width: 900px;
+    min-width: 1000px;
   }
   
   .order-summary {
