@@ -80,31 +80,6 @@ const Header = () => {
     }
   };
 
-  // 관리자 확인 로그 - 더 상세하게
-  useEffect(() => {
-    console.log('=== Header 렌더링 상태 ===');
-    console.log('isAuthenticated:', isAuthenticated);
-    console.log('user 전체:', user);
-    
-    if (isAuthenticated && user) {
-      console.log('=== 사용자 정보 ===');
-      console.log('username:', user.username);
-      console.log('userId:', user.userId);
-      console.log('role:', user.role);
-      console.log('role type:', typeof user.role);
-      console.log('role === 0:', user.role === 0);
-      console.log('role === "0":', user.role === "0");
-      console.log('Number(role) === 0:', Number(user.role) === 0);
-      console.log('full user object:', JSON.stringify(user));
-      
-      // 관리자 여부 확인
-      const isAdmin = user.role === 0 || user.role === "0" || Number(user.role) === 0;
-      console.log('>>> 관리자 여부:', isAdmin);
-    } else {
-      console.log('인증되지 않았거나 user가 없습니다.');
-    }
-  }, [isAuthenticated, user]);
-
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchKeyword.trim()) {
@@ -154,7 +129,7 @@ const Header = () => {
   const handleMenuLeave = () => {
     menuTimeoutRef.current = setTimeout(() => {
       setOpenMenu(null);
-    }, 200); // 200ms 지연
+    }, 200);
   };
 
   // 관리자 여부 확인 함수
@@ -211,77 +186,49 @@ const Header = () => {
                   <li>
                     <Link to="/signup">회원가입</Link>
                   </li>
-                  <li>공지사항</li>
                 </>
               )}
+              <li>
+                <Link to="/notices">공지사항</Link>
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
-      {/* line02 - 로고 및 검색 */}
-      <div className="on-header-top">
-        <div className="on-header-inner2">
+      {/* line02 - 로고만 완전 중앙 배치 */}
+      <div className="on-header-logo-section">
+        <div className="logo-container">
           <Link to="/">
-            <div className="header-logo-placeholder"></div>
+            <h1 className="header-logo"></h1>
           </Link>
-          <div>
-            <Link to="/">
-              <h1 className="header-logo ml-200"></h1>
-            </Link>
-          </div>
-          <div className="header-search-area">
-            <form onSubmit={handleSearch}>
-              <input
-                type="text"
-                className="input-m"
-                placeholder="검색어를 입력하세요"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-              />
-            </form>
-            <ul className="header-icons">
-              <Link to="/mypage">
-                <li className="ico-mypage"></li>
-              </Link>
-              <Link to="/cart">
-                <li className="ico-cart">
-                  {cartCount > 0 && (
-                    <span className="cart-badge">{cartCount}</span>
-                  )}
-                </li>
-              </Link>
-            </ul>
-          </div>
         </div>
       </div>
 
-      {/* line03 - 메뉴 */}
-      <div className="on-header-top">
-        <div className="on-header-inner">
-          <div className="menu-wrapper">
-            <ul className="gnb">
-              {categoryData.map((category, index) => (
-                <li 
-                  key={index}
-                  onMouseEnter={() => handleMenuEnter(index)}
-                  onMouseLeave={handleMenuLeave}
-                  className={openMenu === index ? 'menu-open' : ''}
-                >
-                  <a href="#" onClick={(e) => e.preventDefault()}>{category.parentName}</a>
-                  <ul className={`depth2 ${openMenu === index ? 'show' : ''}`}>
-                    {category.children.map((child, childIndex) => (
-                      <li key={childIndex}>
-                        <Link to={`/products/category/${encodeURIComponent(child)}`}>
-                          {child}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* line03 - 네비게이션 바 (로고 아래 중앙) */}
+      <div className="on-header-nav-section">
+        <div className="nav-container">
+          <ul className="gnb">
+            {categoryData.map((category, index) => (
+              <li 
+                key={index}
+                onMouseEnter={() => handleMenuEnter(index)}
+                onMouseLeave={handleMenuLeave}
+                className={openMenu === index ? 'menu-open' : ''}
+              >
+                <a href="#" onClick={(e) => e.preventDefault()}>{category.parentName}</a>
+                <ul className={`depth2 ${openMenu === index ? 'show' : ''}`}>
+                  {category.children.map((child, childIndex) => (
+                    <li key={childIndex}>
+                      <Link to={`/products/category/${encodeURIComponent(child)}`}>
+                        {child}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </header>

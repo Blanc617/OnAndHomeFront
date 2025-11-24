@@ -11,20 +11,6 @@ const UserLayout = () => {
   const [showMyPageDropdown, setShowMyPageDropdown] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
 
-  // 관리자 확인 로그
-  useEffect(() => {
-    console.log('=== UserLayout 렌더링 상태 ===');
-    console.log('isAuthenticated:', isAuthenticated);
-    console.log('user:', user);
-    
-    if (isAuthenticated && user) {
-      console.log('role:', user.role);
-      console.log('role type:', typeof user.role);
-      const isAdmin = user.role === 0 || user.role === "0" || Number(user.role) === 0;
-      console.log('>>> 관리자 여부:', isAdmin);
-    }
-  }, [isAuthenticated, user]);
-
   // 관리자 여부 확인 함수
   const isAdmin = () => {
     if (!user) return false;
@@ -33,12 +19,6 @@ const UserLayout = () => {
 
   // 카테고리 구조 정의
   const categories = [
-    {
-      id: 'all',
-      name: '전체상품',
-      link: '/products',
-      subCategories: []
-    },
     {
       id: 'tv-audio',
       name: 'TV/오디오',
@@ -52,7 +32,7 @@ const UserLayout = () => {
       name: '주방가전',
       subCategories: [
         { name: '냉장고', link: '/products/category/냉장고' },
-        { name: '전자레인지', link: '/products/category/전자레인지' },
+        { name: '전자렌지', link: '/products/category/전자렌지' },
         { name: '식기세척기', link: '/products/category/식기세척기' }
       ]
     },
@@ -69,14 +49,14 @@ const UserLayout = () => {
       name: '에어컨/공기청정기',
       subCategories: [
         { name: '에어컨', link: '/products/category/에어컨' },
-        { name: '공기청정기', link: '/products/category/공기청정기' }
+        { name: '공기청정기', link: '/products/category/공기청정기' },
+        { name: '정수기', link: '/products/category/정수기' }
       ]
     },
     {
       id: 'etc',
       name: '기타',
       subCategories: [
-        { name: '정수기', link: '/products/category/정수기' },
         { name: '안마의자', link: '/products/category/안마의자' },
         { name: 'PC', link: '/products/category/PC' }
       ]
@@ -120,127 +100,94 @@ const UserLayout = () => {
     <div className="user-layout">
       {/* 헤더 */}
       <header className="user-header">
-        <div className="header-container">
-          {/* 로고 */}
-          <div className="logo">
+        {/* 상단 라인: 로그인/회원가입/공지사항 */}
+        <div className="header-top-line">
+          <div className="header-container">
+            <div className="header-left">
+              {/* SNS 아이콘은 제거하거나 추가 가능 */}
+            </div>
+            <div className="header-right">
+              {isAuthenticated ? (
+                <>
+                  <span className="user-name">{user?.username}님</span>
+                  <Link to="/mypage" onClick={closeDropdowns}>마이페이지</Link>
+                  {isAdmin() && (
+                    <Link 
+                      to="/admin/dashboard" 
+                      onClick={closeDropdowns}
+                      style={{ color: '#ff6b00', fontWeight: 'bold' }}
+                    >
+                      관리자페이지
+                    </Link>
+                  )}
+                  <button onClick={handleLogout} className="logout-button">로그아웃</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={closeDropdowns}>로그인</Link>
+                  <Link to="/signup" onClick={closeDropdowns}>회원가입</Link>
+                </>
+              )}
+              <Link to="/notices" onClick={closeDropdowns}>공지사항</Link>
+            </div>
+          </div>
+        </div>
+
+        {/* 로고 중앙 배치 */}
+        <div className="header-logo-line">
+          <div className="logo-center">
             <Link to="/" onClick={closeDropdowns}>
               <img src="/images/logo.png" alt="On&Home" />
             </Link>
           </div>
+        </div>
 
-          {/* 네비게이션 */}
-          <nav className="main-nav">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="nav-item-wrapper"
-                onMouseEnter={() => handleCategoryMouseEnter(category.id)}
-                onMouseLeave={handleCategoryMouseLeave}
-              >
-                {category.link ? (
-                  <Link
-                    to={category.link}
-                    className="nav-item"
-                    onClick={closeDropdowns}
-                  >
-                    {category.name}
-                  </Link>
-                ) : (
-                  <span
-                    className="nav-item nav-item-no-link"
-                    onClick={(e) => handleCategoryClick(e, category)}
-                  >
-                    {category.name}
-                  </span>
-                )}
+        {/* 네비게이션 바 */}
+        <div className="header-nav-line">
+          <div className="header-container">
+            <nav className="main-nav">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="nav-item-wrapper"
+                  onMouseEnter={() => handleCategoryMouseEnter(category.id)}
+                  onMouseLeave={handleCategoryMouseLeave}
+                >
+                  {category.link ? (
+                    <Link
+                      to={category.link}
+                      className="nav-item"
+                      onClick={closeDropdowns}
+                    >
+                      {category.name}
+                    </Link>
+                  ) : (
+                    <span
+                      className="nav-item nav-item-no-link"
+                      onClick={(e) => handleCategoryClick(e, category)}
+                    >
+                      {category.name}
+                    </span>
+                  )}
 
-                {/* 소카테고리 드롭다운 */}
-                {category.subCategories && category.subCategories.length > 0 && hoveredCategory === category.id && (
-                  <div className="sub-category-dropdown">
-                    {category.subCategories.map((subCategory, index) => (
-                      <Link
-                        key={index}
-                        to={subCategory.link}
-                        className="sub-category-item"
-                        onClick={closeDropdowns}
-                      >
-                        {subCategory.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-
-          {/* 사용자 메뉴 */}
-          <div className="user-menu">
-            {isAuthenticated ? (
-              <>
-                <span className="user-name">{user?.username}님</span>
-                
-                {/* 마이페이지 드롭다운 */}
-                <div className="mypage-dropdown-container">
-                  <button 
-                    className="mypage-button"
-                    onClick={toggleMyPageDropdown}
-                  >
-                    마이페이지
-                  </button>
-                  {showMyPageDropdown && (
-                    <div className="mypage-dropdown-menu">
-                      <Link 
-                        to="/user/my-orders" 
-                        onClick={closeDropdowns}
-                        className="dropdown-item"
-                      >
-                        주문내역
-                      </Link>
-                      <Link 
-                        to="/mypage/info" 
-                        onClick={closeDropdowns}
-                        className="dropdown-item"
-                      >
-                        내정보
-                      </Link>
-                      <Link 
-                        to="/cart" 
-                        onClick={closeDropdowns}
-                        className="dropdown-item"
-                      >
-                        장바구니
-                      </Link>
+                  {/* 소카테고리 드롭다운 */}
+                  {category.subCategories && category.subCategories.length > 0 && hoveredCategory === category.id && (
+                    <div className="sub-category-dropdown">
+                      {category.subCategories.map((subCategory, index) => (
+                        <Link
+                          key={index}
+                          to={subCategory.link}
+                          className="sub-category-item"
+                          onClick={closeDropdowns}
+                        >
+                          {subCategory.name}
+                        </Link>
+                      ))}
                     </div>
                   )}
                 </div>
-
-                {/* 관리자 버튼 - 마이페이지와 로그아웃 사이 */}
-                {isAdmin() && (
-                  <Link 
-                    to="/admin/dashboard" 
-                    onClick={closeDropdowns}
-                    style={{ 
-                      color: '#ff6b00', 
-                      fontWeight: 'bold',
-                      marginLeft: '15px',
-                      marginRight: '15px'
-                    }}
-                  >
-                    관리자페이지
-                  </Link>
-                )}
-
-                <button onClick={handleLogout} className="logout-button">로그아웃</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={closeDropdowns}>로그인</Link>
-                <Link to="/signup" onClick={closeDropdowns}>회원가입</Link>
-              </>
-            )}
-            <Link to="/cart" onClick={closeDropdowns}>
-              <img src="/images/cart-icon.png" alt="장바구니" className="cart-icon" />
-            </Link>
+              ))}
+            </nav>
           </div>
         </div>
       </header>
@@ -259,7 +206,7 @@ const UserLayout = () => {
             <p>© 2024 On&Home. All rights reserved.</p>
           </div>
           <div className="footer-links">
-            <Link to="/notice" onClick={closeDropdowns}>공지사항</Link>
+            <Link to="/notices" onClick={closeDropdowns}>공지사항</Link>
             <Link to="/qna" onClick={closeDropdowns}>Q&A</Link>
             <Link to="/review" onClick={closeDropdowns}>리뷰</Link>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import noticeApi from '../../api/noticeApi';
 import './NoticeDetail.css';
 
 const NoticeDetail = () => {
@@ -16,46 +17,8 @@ const NoticeDetail = () => {
   const fetchNoticeDetail = async () => {
     setLoading(true);
     try {
-      // API 호출 구현
-      // const response = await fetch(`/api/admin/notices/${id}`);
-      // const data = await response.json();
-      
-      // 임시 더미 데이터
-      const dummyData = {
-        id: Number(id),
-        title: '사이트 이용 안내',
-        content: `안녕하세요, On&Home 관리자입니다.
-
-사이트 이용에 대한 안내 말씀드립니다.
-
-1. 회원가입 및 로그인
-- 이메일 인증을 통한 회원가입이 가능합니다.
-- 소셜 로그인(카카오, 네이버, 구글)도 지원됩니다.
-
-2. 상품 주문
-- 장바구니에 담은 상품은 30일간 보관됩니다.
-- 주문 시 배송지 정보를 정확히 입력해주세요.
-
-3. 배송 안내
-- 평일 오후 2시 이전 주문 시 당일 출고됩니다.
-- 제주 및 도서산간 지역은 추가 배송비가 발생할 수 있습니다.
-
-4. 교환 및 환불
-- 상품 수령 후 7일 이내 교환 및 환불이 가능합니다.
-- 단순 변심의 경우 왕복 배송비가 부과됩니다.
-
-문의사항이 있으시면 고객센터(1588-0000)로 연락주시기 바랍니다.
-
-감사합니다.`,
-        author: '관리자',
-        createdDate: '2024-01-15 14:30:25',
-        updatedDate: '2024-01-15 14:30:25',
-        views: 150,
-        isFixed: true,
-        isPublic: true
-      };
-      
-      setNotice(dummyData);
+      const data = await noticeApi.getNoticeDetail(id);
+      setNotice(data);
     } catch (error) {
       console.error('공지사항 로드 실패:', error);
       alert('공지사항을 불러오는데 실패했습니다.');
@@ -75,8 +38,7 @@ const NoticeDetail = () => {
     }
 
     try {
-      // API 호출 구현
-      // await fetch(`/api/admin/notices/${id}`, { method: 'DELETE' });
+      await noticeApi.deleteNotice(id);
       alert('삭제되었습니다.');
       navigate('/admin/notices');
     } catch (error) {
@@ -87,6 +49,19 @@ const NoticeDetail = () => {
 
   const handleList = () => {
     navigate('/admin/notices');
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
   };
 
   if (loading) {
@@ -125,37 +100,23 @@ const NoticeDetail = () => {
             {/* 헤더 */}
             <div className="detail-header">
               <div className="title-section">
-                {notice.isFixed && <span className="badge-fixed">공지</span>}
                 <h2 className="detail-title">{notice.title}</h2>
               </div>
               
               <div className="meta-info">
                 <div className="meta-item">
                   <span className="meta-label">작성자</span>
-                  <span className="meta-value">{notice.author}</span>
+                  <span className="meta-value">{notice.writer || '관리자'}</span>
                 </div>
                 <div className="meta-item">
                   <span className="meta-label">작성일</span>
-                  <span className="meta-value">{notice.createdDate}</span>
+                  <span className="meta-value">{formatDate(notice.createdAt)}</span>
                 </div>
-                {notice.updatedDate !== notice.createdDate && (
+                {notice.updatedAt && (
                   <div className="meta-item">
                     <span className="meta-label">수정일</span>
-                    <span className="meta-value">{notice.updatedDate}</span>
+                    <span className="meta-value">{formatDate(notice.updatedAt)}</span>
                   </div>
-                )}
-                <div className="meta-item">
-                  <span className="meta-label">조회수</span>
-                  <span className="meta-value">{notice.views}</span>
-                </div>
-              </div>
-
-              <div className="status-badges">
-                <span className={`status-badge ${notice.isPublic ? 'public' : 'private'}`}>
-                  {notice.isPublic ? '공개' : '비공개'}
-                </span>
-                {notice.isFixed && (
-                  <span className="status-badge fixed">상단 고정</span>
                 )}
               </div>
             </div>
