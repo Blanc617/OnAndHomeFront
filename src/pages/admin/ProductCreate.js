@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import axios from 'axios';
@@ -32,14 +32,24 @@ const ProductCreate = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [detailPreview, setDetailPreview] = useState(null);
 
-  const categories = {
-    'TV': ['선택2'],
-    '전자레인지': ['선택2'],
-    '에어컨': ['선택2'],
-    '냉장고': ['선택2'],
-    '세탁기': ['선택2'],
-    '오디오': ['선택2'],
-    '청소기': ['선택2']
+  // 카테고리 데이터 state
+  const [categories, setCategories] = useState([]);
+  const [selectedMainCategory, setSelectedMainCategory] = useState('');
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // 카테고리 데이터 가져오기
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/products/categories`);
+      setCategories(response.data);
+      console.log('카테고리 데이터 로드 성공:', response.data);
+    } catch (error) {
+      console.error('카테고리 로드 실패:', error);
+      alert('카테고리 데이터를 불러오는데 실패했습니다.');
+    }
   };
 
   const handleInputChange = (e) => {
@@ -48,6 +58,32 @@ const ProductCreate = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  // 대카테고리 선택 핸들러
+  const handleMainCategoryChange = (e) => {
+    const mainCategoryValue = e.target.value;
+    setSelectedMainCategory(mainCategoryValue);
+    setFormData(prev => ({
+      ...prev,
+      category: '' // 소카테고리 초기화
+    }));
+  };
+
+  // 소카테고리 선택 핸들러
+  const handleSubCategoryChange = (e) => {
+    const subCategoryValue = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      category: subCategoryValue
+    }));
+  };
+
+  // 현재 선택된 대카테고리의 소카테고리 목록 가져오기
+  const getCurrentSubCategories = () => {
+    if (!selectedMainCategory) return [];
+    const mainCat = categories.find(cat => cat.parentCategory === selectedMainCategory);
+    return mainCat ? mainCat.subCategories : [];
   };
 
   const handleFileChange = (e, type) => {
@@ -204,24 +240,25 @@ const ProductCreate = () => {
                   <td>
                     <div className="category-select">
                       <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
+                        value={selectedMainCategory}
+                        onChange={handleMainCategoryChange}
                         required
                       >
                         <option value="">선택1</option>
-                        {Object.keys(categories).map(cat => (
-                          <option key={cat} value={cat}>{cat}</option>
+                        {categories.map(cat => (
+                          <option key={cat.parentCategory} value={cat.parentCategory}>
+                            {cat.parentCategoryName}
+                          </option>
                         ))}
                       </select>
                       <select
-                        name="subCategory"
-                        value={formData.subCategory}
-                        onChange={handleInputChange}
-                        disabled={!formData.category}
+                        value={formData.category}
+                        onChange={handleSubCategoryChange}
+                        disabled={!selectedMainCategory}
+                        required
                       >
                         <option value="">선택2</option>
-                        {formData.category && categories[formData.category]?.map(subCat => (
+                        {getCurrentSubCategories().map(subCat => (
                           <option key={subCat} value={subCat}>{subCat}</option>
                         ))}
                       </select>

@@ -20,14 +20,7 @@ const OrderList = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('주문 목록 응답:', response.data);
-
+      const response = await axios.get(`${API_BASE_URL}/api/admin/orders`);
       if (response.data && Array.isArray(response.data)) {
         setOrders(response.data);
       } else {
@@ -35,77 +28,22 @@ const OrderList = () => {
       }
     } catch (error) {
       console.error('주문 목록 조회 실패:', error);
-      alert('주문 목록을 불러오는데 실패했습니다.');
       setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // 검색은 클라이언트 측 필터링으로 처리
-  };
-
   const handleRowClick = (orderId) => {
     navigate(`/admin/orders/${orderId}`);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    
-    try {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    } catch {
-      return dateString;
-    }
-  };
-
-  const formatPrice = (price) => {
-    return price ? price.toLocaleString() + '원' : '0원';
-  };
-
-  const getStatusText = (status) => {
-    const statusMap = {
-      'ORDERED': '결제완료',
-      'CANCELED': '취소',
-      'DELIVERING': '배송중',
-      'DELIVERED': '배송완료'
-    };
-    return statusMap[status] || status;
-  };
-
-  const getStatusBadgeClass = (status) => {
-    const classMap = {
-      'ORDERED': 'status-paid',
-      'CANCELED': 'status-cancelled',
-      'DELIVERING': 'status-shipping',
-      'DELIVERED': 'status-delivered'
-    };
-    return classMap[status] || '';
-  };
-
-  const getProductInfo = (orderItems) => {
-    if (!orderItems || orderItems.length === 0) return '-';
-    
-    if (orderItems.length === 1) {
-      return orderItems[0].productName;
-    } else {
-      return `${orderItems[0].productName} 외 ${orderItems.length - 1}건`;
-    }
-  };
-
   // 필터링
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch = !searchTerm || 
       order.orderNumber?.includes(searchTerm) || 
       order.userId?.includes(searchTerm) ||
-      order.userName?.includes(searchTerm) ||
-      order.username?.includes(searchTerm);
+      (order.userName || order.username || '').includes(searchTerm);
     
     const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
     
@@ -145,7 +83,7 @@ const OrderList = () => {
             </select>
             
             <div className="search-box">
-              <form onSubmit={handleSearch}>
+              <form onSubmit={(e) => e.preventDefault()}>
                 <input
                   type="text"
                   placeholder="주문번호 또는 구매자명을 입력하세요"
@@ -162,44 +100,84 @@ const OrderList = () => {
           <table className="order-table">
             <thead>
               <tr>
-                <th style={{ width: '150px' }}>주문번호</th>
+                <th>주문번호</th>
                 <th>상품명</th>
-                <th style={{ width: '120px' }}>주문가격</th>
-                <th style={{ width: '120px' }}>구매자 ID</th>
-                <th style={{ width: '120px' }}>구매자명</th>
-                <th style={{ width: '100px' }}>주문상태</th>
-                <th style={{ width: '120px' }}>주문일자</th>
+                <th>주문가격</th>
+                <th>구매자 ID</th>
+                <th>구매자명</th>
+                <th>주문상태</th>
+                <th>주문일자</th>
               </tr>
             </thead>
             <tbody>
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="no-data">
-                    조회된 주문이 없습니다.
-                  </td>
+                  <td colSpan="7">조회된 주문이 없습니다.</td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
-                  <tr 
-                    key={order.id} 
-                    onClick={() => handleRowClick(order.id)}
-                    className="clickable-row"
-                  >
-                    <td className="order-number">{order.orderNumber}</td>
-                    <td className="product-info text-left">
-                      {getProductInfo(order.orderItems)}
-                    </td>
-                    <td className="price">{formatPrice(order.totalPrice)}</td>
-                    <td>{order.userId || '-'}</td>
-                    <td>{order.userName || order.username || '-'}</td>
-                    <td>
-                      <span className={`status-badge ${getStatusBadgeClass(order.status)}`}>
-                        {getStatusText(order.status)}
-                      </span>
-                    </td>
-                    <td>{formatDate(order.createdAt)}</td>
-                  </tr>
-                ))
+                filteredOrders.map((order) => {
+                  // 상품명 추출
+                  let productName = '-';
+                  if (order.orderItems && Array.isArray(order.orderItems) && order.orderItems.length > 0) {
+                    const first = order.orderItems[0];
+                    productName = first.productName || '-';
+                    if (order.orderItems.length > 1) {
+                      productName += ` 외 ${order.orderItems.length - 1}건`;
+                    }
+                  }
+
+                  // 가격 포맷
+                  const price = order.totalPrice ? order.totalPrice.toLocaleString() + '원' : '0원';
+
+                  // 날짜 포맷
+                  let dateStr = '-';
+                  if (order.createdAt) {
+                    try {
+                      const d = new Date(order.createdAt);
+                      dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    } catch (e) {
+                      dateStr = '-';
+                    }
+                  }
+
+                  // 상태 텍스트
+                  const statusMap = {
+                    'ORDERED': '결제완료',
+                    'CANCELED': '취소',
+                    'DELIVERING': '배송중',
+                    'DELIVERED': '배송완료'
+                  };
+                  const statusText = statusMap[order.status] || order.status;
+
+                  // 상태 클래스
+                  const statusClassMap = {
+                    'ORDERED': 'status-paid',
+                    'CANCELED': 'status-cancelled',
+                    'DELIVERING': 'status-shipping',
+                    'DELIVERED': 'status-delivered'
+                  };
+                  const statusClass = statusClassMap[order.status] || '';
+
+                  return (
+                    <tr 
+                      key={order.id} 
+                      onClick={() => handleRowClick(order.id)}
+                      className="clickable-row"
+                    >
+                      <td>{order.orderNumber || '-'}</td>
+                      <td style={{ textAlign: 'left', paddingLeft: '15px' }}>{productName}</td>
+                      <td style={{ textAlign: 'right', paddingRight: '15px' }}>{price}</td>
+                      <td>{order.userId || '-'}</td>
+                      <td>{order.userName || order.username || '-'}</td>
+                      <td>
+                        <span className={`status-badge ${statusClass}`}>
+                          {statusText}
+                        </span>
+                      </td>
+                      <td>{dateStr}</td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -213,7 +191,7 @@ const OrderList = () => {
           <div className="summary-item">
             <span className="summary-label">총 매출액:</span>
             <span className="summary-value">
-              {filteredOrders.reduce((sum, order) => sum + (order.totalPrice || 0), 0).toLocaleString()}원
+              {filteredOrders.reduce((sum, o) => sum + (o.totalPrice || 0), 0).toLocaleString()}원
             </span>
           </div>
         </div>

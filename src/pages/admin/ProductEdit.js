@@ -29,20 +29,27 @@ const ProductEdit = () => {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [detailPreview, setDetailPreview] = useState(null);
-
-  const categories = {
-    'TV': ['선택2'],
-    '전자레인지': ['선택2'],
-    '에어컨': ['선택2'],
-    '냉장고': ['선택2'],
-    '세탁기': ['선택2'],
-    '오디오': ['선택2'],
-    '청소기': ['선택2']
-  };
+  
+  // 카테고리 데이터 state
+  const [categories, setCategories] = useState([]);
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null);
 
   useEffect(() => {
+    fetchCategories();
     fetchProductData();
   }, [id]);
+
+  // 카테고리 데이터 가져오기
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/products/categories`);
+      setCategories(response.data);
+      console.log('카테고리 데이터 로드 성공:', response.data);
+    } catch (error) {
+      console.error('카테고리 로드 실패:', error);
+      alert('카테고리 데이터를 불러오는데 실패했습니다.');
+    }
+  };
 
   const fetchProductData = async () => {
     setFetchLoading(true);
@@ -93,11 +100,42 @@ const ProductEdit = () => {
     }
   };
 
+  // 현재 상품의 카테고리에 맞는 대카테고리 찾기
+  useEffect(() => {
+    if (formData.category && categories.length > 0) {
+      const mainCat = categories.find(cat => 
+        cat.subCategories.includes(formData.category)
+      );
+      if (mainCat) {
+        setSelectedMainCategory(mainCat.parentCategory);
+      }
+    }
+  }, [formData.category, categories]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  // 대카테고리 선택 핸들러
+  const handleMainCategoryChange = (e) => {
+    const mainCategoryValue = e.target.value;
+    setSelectedMainCategory(mainCategoryValue);
+    setFormData(prev => ({
+      ...prev,
+      category: '' // 소카테고리 초기화
+    }));
+  };
+
+  // 소카테고리 선택 핸들러
+  const handleSubCategoryChange = (e) => {
+    const subCategoryValue = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      category: subCategoryValue
     }));
   };
 
@@ -221,6 +259,13 @@ const ProductEdit = () => {
     }
   };
 
+  // 현재 선택된 대카테고리의 소카테고리 목록 가져오기
+  const getCurrentSubCategories = () => {
+    if (!selectedMainCategory) return [];
+    const mainCat = categories.find(cat => cat.parentCategory === selectedMainCategory);
+    return mainCat ? mainCat.subCategories : [];
+  };
+
   if (fetchLoading) {
     return (
       <div className="admin-product-form">
@@ -291,24 +336,25 @@ const ProductEdit = () => {
                   <td>
                     <div className="category-select">
                       <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
+                        value={selectedMainCategory || ''}
+                        onChange={handleMainCategoryChange}
                         required
                       >
                         <option value="">선택1</option>
-                        {Object.keys(categories).map(cat => (
-                          <option key={cat} value={cat}>{cat}</option>
+                        {categories.map(cat => (
+                          <option key={cat.parentCategory} value={cat.parentCategory}>
+                            {cat.parentCategoryName}
+                          </option>
                         ))}
                       </select>
                       <select
-                        name="subCategory"
-                        value={formData.subCategory}
-                        onChange={handleInputChange}
-                        disabled={!formData.category}
+                        value={formData.category}
+                        onChange={handleSubCategoryChange}
+                        disabled={!selectedMainCategory}
+                        required
                       >
                         <option value="">선택2</option>
-                        {formData.category && categories[formData.category]?.map(subCat => (
+                        {getCurrentSubCategories().map(subCat => (
                           <option key={subCat} value={subCat}>{subCat}</option>
                         ))}
                       </select>

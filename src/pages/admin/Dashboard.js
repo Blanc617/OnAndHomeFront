@@ -8,26 +8,28 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState({
     sales: {
-      todayOrders: 15,
-      todayRevenue: 30256000,
-      monthRevenue: 456723645
+      todayOrders: 0,
+      todayRevenue: 0,
+      monthRevenue: 0
     },
     products: {
-      totalProducts: 62,
-      notForSale: 8,
-      outOfStock: 4
+      totalProducts: 0,
+      outOfStock: 0
     },
     members: {
-      newMembers: 3,
-      totalMembers: 7,
-      monthlyMembers: 3
+      newMembers: 0,
+      totalMembers: 0,
+      inactiveMembers: 0
     },
     board: {
-      notices: 5,
-      reviews: 12,
-      qna: 5
+      notices: 0,
+      reviews: 0,
+      qna: 0
     }
   });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [adminInfo, setAdminInfo] = useState({
     name: 'Admin',
@@ -41,24 +43,84 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // 실제 API 호출 구현
-      // const response = await fetch('/api/admin/dashboard');
-      // const data = await response.json();
-      // setDashboardData(data);
+      setLoading(true);
+      const response = await fetch('http://localhost:8080/api/admin/dashboard', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('대시보드 데이터 로드 실패');
+      }
+
+      const data = await response.json();
+      
+      setDashboardData({
+        sales: {
+          todayOrders: data.todayOrderCount || 0,
+          todayRevenue: data.todayRevenue || 0,
+          monthRevenue: data.monthRevenue || 0
+        },
+        products: {
+          totalProducts: data.totalProducts || 0,
+          outOfStock: data.outOfStockProducts || 0
+        },
+        members: {
+          newMembers: data.todayNewUsers || 0,
+          totalMembers: data.totalUsers || 0,
+          inactiveMembers: data.inactiveUsers || 0
+        },
+        board: {
+          notices: data.totalNotices || 0,
+          reviews: data.totalReviews || 0,
+          qna: data.totalQnas || 0
+        }
+      });
+      
+      setLoading(false);
     } catch (error) {
       console.error('대시보드 데이터 로드 실패:', error);
+      setError(error.message);
+      setLoading(false);
     }
   };
 
   const handleLogout = () => {
     // 로그아웃 처리
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('accessToken');
     navigate('/admin/login');
   };
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('ko-KR').format(value);
   };
+
+  if (loading) {
+    return (
+      <div className="admin-dashboard">
+        <AdminSidebar />
+        <div className="dashboard-main">
+          <div className="loading-message">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="admin-dashboard">
+        <AdminSidebar />
+        <div className="dashboard-main">
+          <div className="error-message">오류: {error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
@@ -96,10 +158,6 @@ const Dashboard = () => {
                 <span className="value">{dashboardData.products.totalProducts} 건</span>
               </div>
               <div className="data-row">
-                <span className="label">판매 중지 상품</span>
-                <span className="value">{dashboardData.products.notForSale} 건</span>
-              </div>
-              <div className="data-row">
                 <span className="label">품절 상품</span>
                 <span className="value">{dashboardData.products.outOfStock} 건</span>
               </div>
@@ -119,7 +177,7 @@ const Dashboard = () => {
               </div>
               <div className="data-row">
                 <span className="label">탈퇴 회원</span>
-                <span className="value">{dashboardData.members.monthlyMembers} 명</span>
+                <span className="value">{dashboardData.members.inactiveMembers} 명</span>
               </div>
             </div>
           </DashboardCard>
