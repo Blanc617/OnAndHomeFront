@@ -15,6 +15,8 @@ import Login from './pages/user/Login';
 import MyInfo from './pages/user/MyInfo';
 import MyOrders from './pages/user/MyOrders';
 import MyPage from './pages/user/MyPage';
+import MyQna from './pages/user/MyQna';
+import MyReviews from './pages/user/MyReviews';
 import Order from './pages/user/Order';
 import OrderComplete from './pages/user/OrderComplete';
 import OrderPayment from './pages/user/OrderPayment';
@@ -172,6 +174,22 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <MyOrders />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="mypage/qna" 
+            element={
+              <ProtectedRoute>
+                <MyQna />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="mypage/reviews" 
+            element={
+              <ProtectedRoute>
+                <MyReviews />
               </ProtectedRoute>
             } 
           />

@@ -1,4 +1,4 @@
-import apiClient from './axiosConfig';
+import apiClient from "./axiosConfig";
 
 /**
  * 리뷰 관련 API
@@ -9,7 +9,7 @@ const reviewApi = {
    */
   getProductReviews: async (productId, page = 0, size = 10) => {
     const response = await apiClient.get(`/api/reviews/product/${productId}`, {
-      params: { page, size }
+      params: { page, size },
     });
     return response.data;
   },
@@ -18,7 +18,7 @@ const reviewApi = {
    * 리뷰 작성
    */
   createReview: async (reviewData) => {
-    const response = await apiClient.post('/api/reviews', reviewData);
+    const response = await apiClient.post("/api/reviews", reviewData);
     return response.data;
   },
 
@@ -26,7 +26,10 @@ const reviewApi = {
    * 리뷰 수정
    */
   updateReview: async (reviewId, reviewData) => {
-    const response = await apiClient.put(`/api/reviews/${reviewId}`, reviewData);
+    const response = await apiClient.put(
+      `/api/reviews/${reviewId}`,
+      reviewData
+    );
     return response.data;
   },
 
@@ -41,10 +44,8 @@ const reviewApi = {
   /**
    * 내 리뷰 목록 조회
    */
-  getMyReviews: async (page = 0, size = 10) => {
-    const response = await apiClient.get('/api/reviews/my', {
-      params: { page, size }
-    });
+  getMyReviews: async () => {
+    const response = await apiClient.get("/api/reviews/my", {});
     return response.data;
   },
 
@@ -52,8 +53,8 @@ const reviewApi = {
    * 최근 리뷰 조회
    */
   getRecentReviews: async (limit = 5) => {
-    const response = await apiClient.get('/api/reviews/recent', {
-      params: { limit }
+    const response = await apiClient.get("/api/reviews/recent", {
+      params: { limit },
     });
     return response.data;
   },
