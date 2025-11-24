@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { logout } from '../../store/slices/userSlice';
@@ -10,6 +10,26 @@ const UserLayout = () => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const [showMyPageDropdown, setShowMyPageDropdown] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
+
+  // 관리자 확인 로그
+  useEffect(() => {
+    console.log('=== UserLayout 렌더링 상태 ===');
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('user:', user);
+    
+    if (isAuthenticated && user) {
+      console.log('role:', user.role);
+      console.log('role type:', typeof user.role);
+      const isAdmin = user.role === 0 || user.role === "0" || Number(user.role) === 0;
+      console.log('>>> 관리자 여부:', isAdmin);
+    }
+  }, [isAuthenticated, user]);
+
+  // 관리자 여부 확인 함수
+  const isAdmin = () => {
+    if (!user) return false;
+    return user.role === 0 || user.role === "0" || Number(user.role) === 0;
+  };
 
   // 카테고리 구조 정의
   const categories = [
@@ -193,6 +213,22 @@ const UserLayout = () => {
                     </div>
                   )}
                 </div>
+
+                {/* 관리자 버튼 - 마이페이지와 로그아웃 사이 */}
+                {isAdmin() && (
+                  <Link 
+                    to="/admin/dashboard" 
+                    onClick={closeDropdowns}
+                    style={{ 
+                      color: '#ff6b00', 
+                      fontWeight: 'bold',
+                      marginLeft: '15px',
+                      marginRight: '15px'
+                    }}
+                  >
+                    관리자페이지
+                  </Link>
+                )}
 
                 <button onClick={handleLogout} className="logout-button">로그아웃</button>
               </>

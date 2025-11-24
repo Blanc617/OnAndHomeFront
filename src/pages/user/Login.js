@@ -55,14 +55,8 @@ const Login = () => {
         
         console.log('로그인 성공 - Redux store 업데이트 완료');
         
-        // 역할에 따라 리다이렉트
-        if (response.user && response.user.role === 0) {
-          // 관리자
-          navigate('/admin/dashboard');
-        } else {
-          // 일반 사용자
-          navigate('/');
-        }
+        // 모든 사용자를 메인 페이지로 리다이렉트
+        navigate('/');
       } else {
         setError(response.message || '로그인에 실패했습니다.');
       }
