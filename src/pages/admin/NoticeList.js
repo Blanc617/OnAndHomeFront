@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import noticeApi from '../../api/noticeApi';
 import './NoticeList.css';
 
 const NoticeList = () => {
@@ -18,57 +19,15 @@ const NoticeList = () => {
   const fetchNotices = async () => {
     setLoading(true);
     try {
-      // API 호출 구현
-      // const response = await fetch('/api/admin/notices');
-      // const data = await response.json();
-      
-      // 임시 더미 데이터
-      const dummyData = [
-        {
-          id: 1,
-          title: '사이트 이용 안내',
-          author: '관리자',
-          createdDate: '2024-01-15',
-          views: 150,
-          isFixed: true
-        },
-        {
-          id: 2,
-          title: '개인정보 처리방침 변경 안내',
-          author: '관리자',
-          createdDate: '2024-01-10',
-          views: 89,
-          isFixed: false
-        },
-        {
-          id: 3,
-          title: '새로운 상품 입고 안내',
-          author: '관리자',
-          createdDate: '2024-01-05',
-          views: 234,
-          isFixed: false
-        },
-        {
-          id: 4,
-          title: '배송 지연 안내',
-          author: '관리자',
-          createdDate: '2024-01-03',
-          views: 178,
-          isFixed: false
-        },
-        {
-          id: 5,
-          title: '고객센터 운영시간 변경',
-          author: '관리자',
-          createdDate: '2023-12-28',
-          views: 95,
-          isFixed: false
-        }
-      ];
-      
-      setNotices(dummyData);
+      const data = await noticeApi.getAllNotices();
+      // 날짜 기준 내림차순 정렬
+      const sortedData = data.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setNotices(sortedData);
     } catch (error) {
       console.error('공지사항 로드 실패:', error);
+      alert('공지사항을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -81,7 +40,7 @@ const NoticeList = () => {
 
   const filteredNotices = notices.filter(notice =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    notice.author.toLowerCase().includes(searchTerm.toLowerCase())
+    (notice.writer && notice.writer.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -104,15 +63,24 @@ const NoticeList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        // API 호출 구현
-        // await fetch(`/api/admin/notices/${id}`, { method: 'DELETE' });
-        setNotices(notices.filter(notice => notice.id !== id));
+        await noticeApi.deleteNotice(id);
         alert('삭제되었습니다.');
+        fetchNotices(); // 목록 새로고침
       } catch (error) {
         console.error('삭제 실패:', error);
         alert('삭제에 실패했습니다.');
       }
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).replace(/\. /g, '-').replace('.', '');
   };
 
   return (
@@ -159,27 +127,20 @@ const NoticeList = () => {
                       <th style={{ width: 'auto' }}>제목</th>
                       <th style={{ width: '120px' }}>작성자</th>
                       <th style={{ width: '120px' }}>작성일</th>
-                      <th style={{ width: '100px' }}>조회수</th>
                       <th style={{ width: '150px' }}>관리</th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentNotices.length === 0 ? (
                       <tr>
-                        <td colSpan="6" className="no-data">
+                        <td colSpan="5" className="no-data">
                           등록된 공지사항이 없습니다.
                         </td>
                       </tr>
                     ) : (
                       currentNotices.map((notice, index) => (
-                        <tr key={notice.id} className={notice.isFixed ? 'fixed-notice' : ''}>
-                          <td>
-                            {notice.isFixed ? (
-                              <span className="badge-fixed">공지</span>
-                            ) : (
-                              indexOfFirstItem + index + 1
-                            )}
-                          </td>
+                        <tr key={notice.id}>
+                          <td>{indexOfFirstItem + index + 1}</td>
                           <td className="title-cell">
                             <span
                               className="notice-title"
@@ -188,9 +149,8 @@ const NoticeList = () => {
                               {notice.title}
                             </span>
                           </td>
-                          <td>{notice.author}</td>
-                          <td>{notice.createdDate}</td>
-                          <td>{notice.views}</td>
+                          <td>{notice.writer || '관리자'}</td>
+                          <td>{formatDate(notice.createdAt)}</td>
                           <td>
                             <div className="action-buttons">
                               <button

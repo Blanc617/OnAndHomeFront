@@ -176,10 +176,11 @@ const AppContent = () => {
             } 
           />
           
-          {/* 게시판 */}
-          <Route path="notice" element={<NoticeList />} />
-          <Route path="notice/:id" element={<NoticeDetail />} />
+          {/* 게시판 - 공지사항 */}
+          <Route path="notices" element={<NoticeList />} />
+          <Route path="notices/:id" element={<NoticeDetail />} />
           
+          {/* 게시판 - Q&A */}
           <Route path="qna" element={<QnaList />} />
           <Route path="qna/:id" element={<QnaDetail />} />
           <Route 
@@ -191,6 +192,7 @@ const AppContent = () => {
             } 
           />
           
+          {/* 게시판 - 리뷰 */}
           <Route path="review" element={<ReviewList />} />
           <Route path="review/:id" element={<ReviewDetail />} />
         </Route>

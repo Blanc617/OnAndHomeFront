@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import noticeApi from '../../api/noticeApi';
 import './NoticeWrite.css';
 
 const NoticeWrite = () => {
@@ -8,16 +9,15 @@ const NoticeWrite = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    isFixed: false,
-    isPublic: true
+    writer: '관리자'
   });
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
@@ -36,15 +36,7 @@ const NoticeWrite = () => {
 
     setLoading(true);
     try {
-      // API 호출 구현
-      // const response = await fetch('/api/admin/notices', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
-      // 임시 처리
-      console.log('공지사항 등록:', formData);
+      await noticeApi.createNotice(formData);
       alert('공지사항이 등록되었습니다.');
       navigate('/admin/notices');
     } catch (error) {
@@ -94,6 +86,21 @@ const NoticeWrite = () => {
 
               <div className="form-section">
                 <label className="form-label required">
+                  작성자
+                </label>
+                <input
+                  type="text"
+                  name="writer"
+                  value={formData.writer}
+                  onChange={handleInputChange}
+                  placeholder="작성자명을 입력하세요"
+                  className="form-input"
+                  maxLength={50}
+                />
+              </div>
+
+              <div className="form-section">
+                <label className="form-label required">
                   내용
                 </label>
                 <textarea
@@ -106,41 +113,6 @@ const NoticeWrite = () => {
                 />
                 <div className="char-count">
                   {formData.content.length}자
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label className="form-label">
-                  설정
-                </label>
-                <div className="form-options">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="isFixed"
-                      checked={formData.isFixed}
-                      onChange={handleInputChange}
-                      className="form-checkbox"
-                    />
-                    <span className="checkbox-text">
-                      <strong>상단 고정</strong>
-                      <span className="checkbox-desc">이 공지사항을 목록 상단에 고정합니다</span>
-                    </span>
-                  </label>
-
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="isPublic"
-                      checked={formData.isPublic}
-                      onChange={handleInputChange}
-                      className="form-checkbox"
-                    />
-                    <span className="checkbox-text">
-                      <strong>공개</strong>
-                      <span className="checkbox-desc">사용자 페이지에 공지사항을 표시합니다</span>
-                    </span>
-                  </label>
                 </div>
               </div>
             </div>

@@ -8,35 +8,105 @@
 /* 헤더 */
 .user-header {
   background: white;
-  border-bottom: 1px solid #e0e0e0;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.header-container {
-  max-width: 1400px;
+/* 상단 라인: 로그인/회원가입 등 */
+.header-top-line {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 0;
+}
+
+.header-top-line .header-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 40px;
+  padding: 0 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* 로고 */
-.logo img {
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 14px;
+}
+
+.header-right a,
+.header-right button {
+  color: #333;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+  font-size: 14px;
+}
+
+.header-right a:hover,
+.header-right button:hover {
+  color: #ab1414;
+  font-weight: 600;
+}
+
+.header-right .user-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.logout-button {
+  padding: 0;
+  margin: 0;
+}
+
+/* 로고 중앙 배치 라인 */
+.header-logo-line {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-center img {
   height: 50px;
   cursor: pointer;
+}
+
+/* 네비게이션 라인 */
+.header-nav-line {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-nav-line .header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: center;
 }
 
 /* 네비게이션 */
 .main-nav {
   display: flex;
-  gap: 40px;
-  flex: 1;
-  justify-content: center;
+  gap: 50px;
   align-items: center;
+  justify-content: center;
 }
 
 /* 네비게이션 아이템 래퍼 */
@@ -49,17 +119,17 @@
 .nav-item {
   color: #333;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 17px;
+  font-weight: 600;
   transition: color 0.3s;
   white-space: nowrap;
   cursor: pointer;
   display: block;
-  padding: 10px 0;
+  padding: 20px 0;
 }
 
 .nav-item:hover {
-  color: #4361ee;
+  color: #ab1414;
 }
 
 /* 링크가 없는 네비게이션 아이템 (대카테고리) */
@@ -73,12 +143,12 @@
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 8px;
+  margin-top: 0;
   background: white;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 150px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
   overflow: hidden;
   z-index: 1000;
   animation: fadeIn 0.2s ease-in-out;
@@ -101,7 +171,7 @@
   padding: 12px 20px;
   color: #333;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
   transition: all 0.2s;
   border-bottom: 1px solid #f0f0f0;
   white-space: nowrap;
@@ -113,8 +183,7 @@
 
 .sub-category-item:hover {
   background: #f8f9fa;
-  color: #4361ee;
-  padding-left: 24px;
+  color: #ab1414;
 }
 
 /* 사용자 메뉴 */
@@ -142,18 +211,7 @@
 
 .user-menu a:hover,
 .user-menu button:hover {
-  color: #4361ee;
-}
-
-.logout-button {
-  padding: 8px 16px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.logout-button:hover {
-  background: #e0e0e0;
+  color: #ab1414;
 }
 
 .cart-icon {
@@ -168,7 +226,7 @@
 
 .mypage-button {
   padding: 8px 16px;
-  background: #4361ee;
+  background: #ab1414;
   color: white;
   border: none;
   border-radius: 4px;
@@ -179,7 +237,7 @@
 }
 
 .mypage-button:hover {
-  background: #3451d8;
+  background: #8c1010;
 }
 
 .mypage-dropdown-menu {
@@ -213,8 +271,7 @@
 
 .dropdown-item:hover {
   background: #f8f9fa;
-  color: #4361ee;
-  padding-left: 24px;
+  color: #ab1414;
 }
 
 /* 메인 컨텐츠 */
@@ -267,10 +324,21 @@
 
 /* 반응형 */
 @media (max-width: 1200px) {
-  .header-container {
-    padding: 15px 20px;
+  .header-top-line .header-container,
+  .header-nav-line .header-container {
+    padding: 0 20px;
   }
 
+  .main-nav {
+    gap: 35px;
+  }
+
+  .nav-item {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
   .main-nav {
     gap: 25px;
   }
@@ -280,33 +348,25 @@
   }
 }
 
-@media (max-width: 1024px) {
-  .main-nav {
-    gap: 20px;
-  }
-
-  .nav-item {
-    font-size: 14px;
-  }
-}
-
 @media (max-width: 768px) {
-  .header-container {
-    flex-wrap: wrap;
+  .header-logo-line {
+    padding: 20px 0;
+  }
+
+  .logo-center img {
+    height: 40px;
   }
 
   .main-nav {
-    width: 100%;
-    order: 3;
-    margin-top: 15px;
     gap: 15px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding: 0 20px;
     justify-content: flex-start;
   }
 
   .nav-item {
-    font-size: 13px;
+    font-size: 14px;
+    padding: 15px 0;
   }
 
   .sub-category-dropdown {
@@ -314,8 +374,9 @@
     transform: translateX(0);
   }
 
-  .user-menu {
+  .header-right {
     gap: 10px;
+    font-size: 13px;
   }
 
   .footer-container {
@@ -330,8 +391,8 @@
 }
 
 @media (max-width: 480px) {
-  .logo img {
-    height: 40px;
+  .logo-center img {
+    height: 35px;
   }
 
   .main-nav {
@@ -339,26 +400,21 @@
   }
 
   .nav-item {
-    font-size: 12px;
-    padding: 8px 0;
+    font-size: 13px;
+    padding: 12px 0;
   }
 
   .sub-category-dropdown {
-    min-width: 120px;
+    min-width: 140px;
   }
 
   .sub-category-item {
     padding: 10px 15px;
-    font-size: 13px;
+    font-size: 14px;
   }
 
-  .user-name {
-    font-size: 13px;
-  }
-
-  .mypage-button,
-  .logout-button {
+  .header-right {
+    gap: 8px;
     font-size: 12px;
-    padding: 6px 12px;
   }
 }
