@@ -37,6 +37,7 @@ import AdminNoticeDetail from './pages/admin/NoticeDetail';
 import AdminNoticeEdit from './pages/admin/NoticeEdit';
 import AdminNoticeList from './pages/admin/NoticeList';
 import AdminNoticeWrite from './pages/admin/NoticeWrite';
+import AdminOrderDetail from './pages/admin/OrderDetail';
 import AdminOrderList from './pages/admin/OrderList';
 import AdminProductCreate from './pages/admin/ProductCreate';
 import AdminProductEdit from './pages/admin/ProductEdit';
@@ -209,6 +210,7 @@ const AppContent = () => {
           
           {/* 주문 관리 */}
           <Route path="orders" element={<AdminOrderList />} />
+          <Route path="orders/:id" element={<AdminOrderDetail />} />
           
           {/* 게시판 관리 */}
           <Route path="notices" element={<AdminNoticeList />} />

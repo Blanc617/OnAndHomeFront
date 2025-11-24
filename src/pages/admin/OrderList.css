@@ -111,14 +111,16 @@
   white-space: nowrap;
 }
 
-.order-table tbody tr {
+.order-table tbody tr.clickable-row {
   border-bottom: 1px solid #f0f0f0;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.order-table tbody tr:hover {
-  background: #f9f9f9;
+.order-table tbody tr.clickable-row:hover {
+  background: #f0f8ff;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .order-table td {
@@ -137,6 +139,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.order-table .text-left {
+  text-align: left;
 }
 
 .order-table .price {
@@ -191,6 +197,14 @@
 .no-data p {
   font-size: 16px;
   margin: 0;
+}
+
+/* 로딩 */
+.loading {
+  text-align: center;
+  padding: 100px 20px;
+  font-size: 16px;
+  color: #666;
 }
 
 /* 주문 요약 정보 */

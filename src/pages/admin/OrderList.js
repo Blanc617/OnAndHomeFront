@@ -47,6 +47,10 @@ const OrderList = () => {
     // 검색은 클라이언트 측 필터링으로 처리
   };
 
+  const handleRowClick = (orderId) => {
+    navigate(`/admin/orders/${orderId}`);
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     
@@ -176,7 +180,11 @@ const OrderList = () => {
                 </tr>
               ) : (
                 filteredOrders.map((order) => (
-                  <tr key={order.id}>
+                  <tr 
+                    key={order.id} 
+                    onClick={() => handleRowClick(order.id)}
+                    className="clickable-row"
+                  >
                     <td className="order-number">{order.orderNumber}</td>
                     <td className="product-info text-left">
                       {getProductInfo(order.orderItems)}
