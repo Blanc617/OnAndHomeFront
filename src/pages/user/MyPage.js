@@ -8,7 +8,7 @@ const MyPage = () => {
   const { user } = useSelector((state) => state.user);
 
   // 관리자 여부 확인
-  const isAdmin = user && user.role === 0;
+  const isAdmin = user && (user.role === 0 || user.role === "0" || Number(user.role) === 0);
 
   const handleAdminClick = () => {
     navigate('/admin/dashboard');
@@ -55,14 +55,14 @@ const MyPage = () => {
         <div className="mypage-section">
           <h2>게시판</h2>
           <div className="mypage-menu">
-            <Link to="/qna" className="mypage-menu-item">
+            <Link to="/mypage/qna" className="mypage-menu-item">
               <div className="menu-icon">❓</div>
               <div className="menu-text">
                 <h3>문의 내역</h3>
                 <p>작성한 문의를 확인할 수 있습니다.</p>
               </div>
             </Link>
-            <Link to="/review" className="mypage-menu-item">
+            <Link to="/mypage/reviews" className="mypage-menu-item">
               <div className="menu-icon">⭐</div>
               <div className="menu-text">
                 <h3>리뷰 관리</h3>
