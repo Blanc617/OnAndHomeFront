@@ -55,7 +55,8 @@ const MyOrders = () => {
 
       console.log('API 응답:', response.data);
 
-      const orders = response.data || [];
+      // 백엔드 응답 구조: {success: true, data: [...], count: 3}
+      const orders = response.data.data || [];
       
       // 날짜순으로 정렬 (최신순)
       const sortedOrders = orders.sort((a, b) => {
@@ -213,7 +214,7 @@ const MyOrders = () => {
 
             <div className="orders-list">
               {displayOrders.map((order) => (
-                <div key={order.id} className="order-card">
+                <div key={order.orderId} className="order-card">
                   <div className="order-header">
                     <div className="order-date">
                       <span className="label">주문일자:</span>
@@ -221,7 +222,7 @@ const MyOrders = () => {
                     </div>
                     <div className="order-number">
                       <span className="label">주문번호:</span>
-                      <span className="value">{order.orderNumber || order.id}</span>
+                      <span className="value">{order.orderNumber || order.orderId}</span>
                     </div>
                     <div className={`order-status ${getStatusClass(order.status)}`}>
                       {getStatusText(order.status)}
@@ -230,15 +231,15 @@ const MyOrders = () => {
 
                   <div className="order-body">
                     <div className="order-items">
-                      {order.items && order.items.length > 0 ? (
+                      {order.orderItems && order.orderItems.length > 0 ? (
                         <>
                           <div className="order-item-main">
-                            <span className="item-name">{order.items[0].productName || '상품명 없음'}</span>
-                            <span className="item-quantity">수량: {order.items[0].quantity || 1}개</span>
+                            <span className="item-name">{order.orderItems[0].productName || '상품명 없음'}</span>
+                            <span className="item-quantity">수량: {order.orderItems[0].quantity || 1}개</span>
                           </div>
-                          {order.items.length > 1 && (
+                          {order.orderItems.length > 1 && (
                             <div className="order-item-more">
-                              외 {order.items.length - 1}건
+                              외 {order.orderItems.length - 1}건
                             </div>
                           )}
                         </>
@@ -250,21 +251,27 @@ const MyOrders = () => {
                     <div className="order-info">
                       <div className="info-row">
                         <span className="info-label">받는 분:</span>
-                        <span className="info-value">{order.recipientName || '-'}</span>
+                        <span className="info-value">{order.recipientName || order.username || '-'}</span>
                       </div>
                       <div className="info-row">
                         <span className="info-label">연락처:</span>
-                        <span className="info-value">{order.recipientPhone || '-'}</span>
+                        <span className="info-value">{order.recipientPhone || order.userPhone || '-'}</span>
                       </div>
                       <div className="info-row">
                         <span className="info-label">배송지:</span>
-                        <span className="info-value">{order.shippingAddress || '-'}</span>
+                        <span className="info-value">{order.shippingAddress || order.userAddress || '-'}</span>
                       </div>
+                      {order.shippingRequest && (
+                        <div className="info-row">
+                          <span className="info-label">배송 요청사항:</span>
+                          <span className="info-value">{order.shippingRequest}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="order-total">
                       <span className="total-label">총 결제금액</span>
-                      <span className="total-amount">{formatPrice(order.totalAmount)}</span>
+                      <span className="total-amount">{formatPrice(order.totalPrice)}</span>
                     </div>
                   </div>
                 </div>
