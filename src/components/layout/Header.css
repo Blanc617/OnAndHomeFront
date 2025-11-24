@@ -193,6 +193,37 @@
   font-weight: 600;
 }
 
+/* 관리자 버튼 래퍼 - border 제거 */
+.login-group-list .admin-button-wrapper {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+.login-group-list .admin-button-wrapper + li {
+  border-left: 1px solid #ccc;
+  padding-left: 12px;
+  margin-left: 12px;
+}
+
+/* 관리자 버튼 스타일 */
+.login-group-list .admin-button {
+  display: inline-block;
+  padding: 6px 14px;
+  background: #ab1414;
+  color: white !important;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.login-group-list .admin-button:hover {
+  background: #8c1010;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(171, 20, 20, 0.3);
+}
+
 /* 메뉴 */
 .menu-wrapper {
   display: flex;
@@ -216,7 +247,7 @@
 
 .menu-wrapper > ul.gnb > li {
   position: relative;
-  height: 40px;
+  height: 60px; /* hover 영역 확장 */
   display: flex;
   align-items: center;
 }
@@ -235,42 +266,49 @@
   color: #ab1414;
 }
 
-/* 2뎁스: 기본 숨김 */
+/* 2뎁스 드롭다운: 기본 숨김 */
 .menu-wrapper .depth2 {
   position: absolute;
   left: 0;
-  top: 100%;
+  top: 40px;
   display: none;
   min-width: 160px;
   margin: 0;
-  padding: 8px 0;
+  padding: 10px 0;
   list-style: none;
   background: #ffffff;
   border: 1px solid #ddd;
-  border-radius: 2px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-  z-index: 20;
-  opacity: 0.9;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+/* 메뉴가 열렸을 때 */
+.menu-wrapper > ul.gnb > li.menu-open .depth2,
+.menu-wrapper .depth2.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .menu-wrapper .depth2 > li > a {
   display: block;
-  padding: 8px 14px;
+  padding: 10px 16px;
   text-decoration: none;
   color: #333;
   font-size: 14px;
   white-space: nowrap;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .menu-wrapper .depth2 > li > a:hover {
   background: #f5f5f5;
-}
-
-.menu-wrapper > ul.gnb > li:hover > .depth2,
-.menu-wrapper > ul.gnb > li:focus-within > .depth2,
-.menu-wrapper > ul.gnb > li.is-open > .depth2 {
-  display: block;
+  color: #ab1414;
 }
 
 /* 헤더 우측 버튼들 */

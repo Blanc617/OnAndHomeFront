@@ -164,7 +164,8 @@ const ProductDetail = () => {
       const response = await reviewAPI.createReview({
         productId: product.id,
         content: reviewContent,
-        rating: 5
+        rating: 5,
+        userId: user.id // userId 추가
       });
       
       if (response.success) {
@@ -196,7 +197,9 @@ const ProductDetail = () => {
       const response = await qnaAPI.createQna({
         productId: product.id,
         title: '상품 문의',
-        question: qnaContent
+        question: qnaContent,
+        userId: user.id, // userId 추가
+        writer: user.username || user.userId // writer 추가
       });
       
       if (response.success) {

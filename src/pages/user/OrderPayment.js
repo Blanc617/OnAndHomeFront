@@ -65,17 +65,58 @@ const OrderPayment = () => {
       return;
     }
 
-    // 결제 완료 alert
-    alert('결제가 완료되었습니다');
+    setLoading(true);
 
-    // 결제 완료 페이지로 이동 (주문 정보 전달)
-    navigate('/user/order-complete', {
-      state: {
-        orderInfo: orderInfo,
-        products: products,
-        totalPrice: calculateTotalPrice()
+    try {
+      // 주문 데이터 생성
+      const orderData = {
+        userId: user.id,
+        orderItems: products.map(product => ({
+          productId: product.id,
+          quantity: product.quantity
+        })),
+        recipientName: orderInfo.name,
+        recipientPhone: orderInfo.phone,
+        shippingAddress: orderInfo.address + (orderInfo.detailAddress ? ` ${orderInfo.detailAddress}` : ''),
+        shippingRequest: orderInfo.request
+      };
+
+      console.log('주문 데이터:', orderData);
+
+      // 백엔드 API 호출
+      const response = await fetch('http://localhost:8080/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+      console.log('API 응답:', result);
+
+      if (result.success) {
+        alert('결제가 완료되었습니다');
+        
+        // 결제 완료 페이지로 이동
+        navigate('/user/order-complete', {
+          state: {
+            orderInfo: orderInfo,
+            products: products,
+            totalPrice: calculateTotalPrice(),
+            orderId: result.data.orderId
+          }
+        });
+      } else {
+        alert(result.message || '주문 생성에 실패했습니다.');
       }
-    });
+    } catch (error) {
+      console.error('주문 생성 오류:', error);
+      alert('주문 생성 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatPrice = (price) => {
