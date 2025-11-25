@@ -160,26 +160,76 @@
   word-break: break-word;
 }
 
+/* ====== 버튼 공통 ====== */
 .reply-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
   margin-top: 12px;
 }
 
-.delete-button {
+button {
+  border-radius: 4px;
+  font-weight: 600;
   padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 13px;
+}
+
+/* ====== 수정 버튼 ====== */
+.edit-button {
+  background: #007bff;
+  color: white;
+}
+
+.edit-button:hover {
+  background: #0069d9;
+}
+
+/* ====== 삭제 버튼 ====== */
+.delete-button {
   background: #dc3545;
   color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
 .delete-button:hover {
   background: #c82333;
+}
+
+/* ====== 저장 버튼 ====== */
+.save-button {
+  background: #28a745;
+  color: white;
+}
+
+.save-button:hover {
+  background: #218838;
+}
+
+/* ====== 취소 버튼 ====== */
+.cancel-button {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+}
+
+/* ====== 답변 수정 textarea ====== */
+.reply-edit-textarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: none !important; /* 크기 조절 제거 */
+  min-height: 120px;
+  line-height: 1.6;
+  margin-top: 10px;
 }
 
 /* 답변 등록 폼 */
@@ -209,8 +259,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
+  resize: none !important; /* 등록 textarea도 조절 제거 */
   min-height: 150px;
   line-height: 1.6;
 }
@@ -224,43 +273,6 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-}
-
-.cancel-button {
-  padding: 12px 28px;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.cancel-button:hover {
-  background: #5a6268;
-}
-
-.submit-button {
-  padding: 12px 28px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.submit-button:hover:not(:disabled) {
-  background: #218838;
-}
-
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 /* 로딩 & 에러 */

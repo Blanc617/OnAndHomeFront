@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../components/admin/AdminSidebar';
-import axios from 'axios';
-import './QnaDetail.css';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import AdminSidebar from "../../components/admin/AdminSidebar";
+import "./QnaDetail.css";
 
 const QnaDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   const [qna, setQna] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [replyContent, setReplyContent] = useState('');
+
+  // 답변 등록용
+  const [replyContent, setReplyContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // 답변 수정용
+  const [editingReplyId, setEditingReplyId] = useState(null);
+  const [editReplyContent, setEditReplyContent] = useState("");
 
   useEffect(() => {
     fetchQnaDetail();
@@ -21,119 +27,142 @@ const QnaDetail = () => {
   const fetchQnaDetail = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/qna/${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('Q&A 상세 응답:', response.data);
-
-      if (response.data && response.data.success) {
-        setQna(response.data.data);
-      } else if (response.data) {
-        setQna(response.data);
-      }
-    } catch (error) {
-      console.error('Q&A 상세 조회 실패:', error);
-      alert('Q&A 정보를 불러오는데 실패했습니다.');
-      navigate('/admin/qna');
+      const response = await axios.get(`${API_BASE_URL}/api/qna/${id}`);
+      const data = response.data.data || response.data;
+      setQna(data);
+    } catch {
+      alert("Q&A 정보 조회 실패");
+      navigate("/admin/qna");
     } finally {
       setLoading(false);
     }
   };
 
+  // -------------------------
+  // 답변 등록
+  // -------------------------
   const handleSubmitReply = async () => {
-    if (!replyContent.trim()) {
-      alert('답변 내용을 입력해주세요.');
-      return;
-    }
+    if (!replyContent.trim()) return alert("답변을 입력하세요.");
 
-    if (!window.confirm('답변을 등록하시겠습니까?')) {
-      return;
-    }
+    if (!window.confirm("답변을 등록하시겠습니까?")) return;
 
     setSubmitting(true);
-
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `${API_BASE_URL}/api/admin/qna/${id}/reply`,
         {
           content: replyContent,
-          responder: 'Admin' // 관리자 이름 (실제로는 세션에서 가져와야 함)
+          responder: "Admin",
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
-      console.log('답변 등록 응답:', response.data);
-
-      if (response.data && response.data.success) {
-        alert('답변이 등록되었습니다.');
-        setReplyContent('');
-        fetchQnaDetail(); // 새로고침
-      } else {
-        alert(response.data.message || '답변 등록에 실패했습니다.');
+      if (res.data.success) {
+        alert("답변 등록 완료");
+        setReplyContent("");
+        fetchQnaDetail();
       }
-    } catch (error) {
-      console.error('답변 등록 실패:', error);
-      alert('답변 등록 중 오류가 발생했습니다.');
+    } catch {
+      alert("답변 등록 중 오류 발생");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeleteReply = async (replyId) => {
-    if (!window.confirm('답변을 삭제하시겠습니까?')) {
+  // -------------------------
+  // 답변 수정 시작
+  // -------------------------
+  const handleEditReply = (reply) => {
+    setEditingReplyId(reply.id);
+    setEditReplyContent(reply.content);
+  };
+
+  // -------------------------
+  // 답변 수정 저장
+  // -------------------------
+  const handleSaveReply = async (replyId) => {
+    if (!editReplyContent.trim()) {
+      alert("답변 내용을 입력하세요.");
       return;
     }
 
     try {
-      const response = await axios.delete(
+      const res = await axios.put(
         `${API_BASE_URL}/api/admin/qna/reply/${replyId}`,
+        { content: editReplyContent },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
         }
       );
 
-      if (response.data && response.data.success) {
-        alert('답변이 삭제되었습니다.');
-        fetchQnaDetail(); // 새로고침
-      } else {
-        alert(response.data.message || '답변 삭제에 실패했습니다.');
+      if (res.data.success) {
+        alert("답변 수정 완료");
+        setEditingReplyId(null);
+        fetchQnaDetail();
       }
-    } catch (error) {
-      console.error('답변 삭제 실패:', error);
-      alert('답변 삭제 중 오류가 발생했습니다.');
+    } catch (e) {
+      alert("답변 수정 실패");
+    }
+  };
+
+  // -------------------------
+  // 답변 수정 취소
+  // -------------------------
+  const handleCancelReply = () => {
+    setEditingReplyId(null);
+    setEditReplyContent("");
+  };
+
+  // -------------------------
+  // 답변 삭제
+  // -------------------------
+  const handleDeleteReply = async (replyId) => {
+    if (!window.confirm("답변을 삭제하시겠습니까?")) return;
+
+    try {
+      const res = await axios.delete(
+        `${API_BASE_URL}/api/admin/qna/reply/${replyId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        alert("삭제 성공");
+        fetchQnaDetail();
+      }
+    } catch {
+      alert("삭제 실패");
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    
+    if (!dateString) return "-";
+
     try {
       const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(date.getDate()).padStart(2, "0")} ${String(
+        date.getHours()
+      ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
     } catch {
       return dateString;
     }
   };
 
   const handleGoToProduct = () => {
-    if (qna && qna.productId) {
-      window.open(`/products/${qna.productId}`, '_blank');
+    if (qna?.productId) {
+      window.open(`/products/${qna.productId}`, "_blank");
     }
   };
 
@@ -148,129 +177,155 @@ const QnaDetail = () => {
     );
   }
 
-  if (!qna) {
-    return (
-      <div className="admin-qna-detail">
-        <AdminSidebar />
-        <div className="qna-detail-main">
-          <div className="no-data">Q&A를 찾을 수 없습니다.</div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="admin-qna-detail">
       <AdminSidebar />
-      
       <div className="qna-detail-main">
+        {/* 헤더 */}
         <div className="page-header">
           <h1>Q&A 상세</h1>
-          <button onClick={() => navigate('/admin/qna')} className="back-button">
+          <button
+            className="back-button"
+            onClick={() => navigate("/admin/qna")}
+          >
             목록으로
           </button>
         </div>
 
-      {/* Q&A 정보 */}
-      <div className="qna-detail-card">
-        <table className="detail-table">
-          <tbody>
-            <tr>
-              <th>번호</th>
-              <td>{qna.id}</td>
-            </tr>
-            <tr>
-              <th>상품명</th>
-              <td>
-                {qna.productName ? (
-                  <span 
-                    onClick={handleGoToProduct}
-                    className="product-link"
-                  >
-                    {qna.productName}
-                    <span className="link-icon">🔗</span>
-                  </span>
-                ) : (
-                  '-'
-                )}
-              </td>
-            </tr>
-            <tr>
-              <th>작성일자</th>
-              <td>{formatDate(qna.createdAt)}</td>
-            </tr>
-            <tr>
-              <th>작성자</th>
-              <td>{qna.writer || '-'}</td>
-            </tr>
-            <tr>
-              <th>제목</th>
-              <td>{qna.title || '상품 문의'}</td>
-            </tr>
-            <tr>
-              <th>질문 내용</th>
-              <td className="content-cell">
-                <div className="content-box">
-                  {qna.question || '-'}
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      {/* 답변 목록 */}
-      {qna.replies && qna.replies.length > 0 && (
-        <div className="replies-section">
-          <h3>답변 목록</h3>
-          {qna.replies.map((reply, index) => (
-            <div key={reply.id || index} className="reply-card">
-              <div className="reply-header">
-                <span className="reply-author">{reply.responder || reply.author || 'Admin'}</span>
-                <span className="reply-date">{formatDate(reply.createdAt)}</span>
-              </div>
-              <div className="reply-content">
-                {reply.content}
-              </div>
-              <div className="reply-actions">
-                <button
-                  onClick={() => handleDeleteReply(reply.id)}
-                  className="delete-button"
-                >
-                  삭제
-                </button>
-              </div>
-            </div>
-          ))}
+        {/* Q&A 본문 카드 */}
+        <div className="qna-detail-card">
+          <table className="detail-table">
+            <tbody>
+              <tr>
+                <th>번호</th>
+                <td>{qna.id}</td>
+              </tr>
+              <tr>
+                <th>상품명</th>
+                <td>
+                  {qna.productName ? (
+                    <span className="product-link" onClick={handleGoToProduct}>
+                      {qna.productName} <span className="link-icon">🔗</span>
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <th>작성일자</th>
+                <td>{formatDate(qna.createdAt)}</td>
+              </tr>
+              <tr>
+                <th>작성자</th>
+                <td>{qna.writer}</td>
+              </tr>
+              <tr>
+                <th>제목</th>
+                <td>{qna.title}</td>
+              </tr>
+              <tr>
+                <th>질문 내용</th>
+                <td className="content-cell">
+                  <div className="content-box">{qna.question}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      )}
 
-      {/* 답변 등록 폼 */}
-      <div className="reply-form-section">
-        <h3>답변 등록</h3>
-        <div className="reply-form">
-          <textarea
-            placeholder="답변을 입력하세요"
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            rows="6"
-            className="reply-textarea"
-          />
-          <div className="form-actions">
-            <button
-              onClick={() => navigate('/admin/qna')}
-              className="cancel-button"
-            >
-              목록
-            </button>
-            <button
-              onClick={handleSubmitReply}
-              disabled={submitting}
-              className="submit-button"
-            >
-              {submitting ? '등록 중...' : '답변등록'}
-            </button>
+        {/* 답변 목록 */}
+        {qna.replies?.length > 0 && (
+          <div className="replies-section">
+            <h3>답변 목록</h3>
+
+            {qna.replies.map((reply) => (
+              <div className="reply-card" key={reply.id}>
+                <div className="reply-header">
+                  <span className="reply-author">
+                    {reply.responder || "Admin"}
+                  </span>
+                  <span className="reply-date">
+                    {formatDate(reply.createdAt)}
+                  </span>
+                </div>
+
+                {/* 수정 모드 */}
+                {editingReplyId === reply.id ? (
+                  <>
+                    <textarea
+                      className="reply-edit-textarea"
+                      value={editReplyContent}
+                      onChange={(e) => setEditReplyContent(e.target.value)}
+                      rows={4}
+                    />
+
+                    <div className="reply-actions">
+                      <button
+                        className="cancel-button"
+                        onClick={handleCancelReply}
+                      >
+                        취소
+                      </button>
+                      <button
+                        className="save-button"
+                        onClick={() => handleSaveReply(reply.id)}
+                      >
+                        저장
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="reply-content">{reply.content}</div>
+
+                    <div className="reply-actions">
+                      <button
+                        className="edit-button"
+                        onClick={() => handleEditReply(reply)}
+                      >
+                        수정
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={() => handleDeleteReply(reply.id)}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
+        )}
+
+        {/* 답변 등록 */}
+        <div className="reply-form-section">
+          <h3>답변 등록</h3>
+          <div className="reply-form">
+            <textarea
+              placeholder="답변을 입력하세요"
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              rows="6"
+              className="reply-textarea"
+            />
+            <div className="form-actions">
+              <button
+                className="cancel-button"
+                onClick={() => navigate("/admin/qna")}
+              >
+                목록
+              </button>
+              <button
+                className="submit-button"
+                disabled={submitting}
+                onClick={handleSubmitReply}
+              >
+                {submitting ? "등록 중..." : "답변등록"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
