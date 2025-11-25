@@ -240,6 +240,84 @@
   flex: 1;
 }
 
+/* 입금 계좌 정보 */
+.bank-info-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #fff8e1;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+}
+
+.bank-info-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f57c00;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bank-info-content {
+  background: white;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.bank-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.bank-detail:last-child {
+  border-bottom: none;
+}
+
+.bank-detail.highlight {
+  background: #fff3cd;
+  padding: 12px;
+  margin: 8px -16px -16px;
+  border-radius: 0 0 6px 6px;
+  border-bottom: none;
+}
+
+.bank-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.bank-value {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.bank-value.amount {
+  font-size: 18px;
+  color: #f57c00;
+  font-weight: 700;
+}
+
+.bank-notice {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #ffc107;
+}
+
+.bank-notice p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: #856404;
+  line-height: 1.6;
+}
+
 /* 주문 총액 */
 .order-total {
   display: flex;
@@ -387,5 +465,37 @@
 
   .total-amount {
     font-size: 18px;
+  }
+  
+  /* 입금 계좌 정보 모바일 */
+  .bank-info-section {
+    padding: 16px;
+  }
+  
+  .bank-info-title {
+    font-size: 14px;
+  }
+  
+  .bank-info-content {
+    padding: 12px;
+  }
+  
+  .bank-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 0;
+  }
+  
+  .bank-detail.highlight {
+    padding: 10px;
+  }
+  
+  .bank-value.amount {
+    font-size: 16px;
+  }
+  
+  .bank-notice p {
+    font-size: 12px;
   }
 }

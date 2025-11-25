@@ -124,12 +124,16 @@ const MyOrders = () => {
 
   const getStatusText = (status) => {
     const statusMap = {
+      'PAYMENT_PENDING': '입금대기',
+      'ORDERED': '결제완료',
       'PENDING': '결제대기',
       'PAID': '결제완료',
       'PREPARING': '상품준비중',
       'SHIPPING': '배송중',
+      'DELIVERING': '배송중',
       'DELIVERED': '배송완료',
       'CANCELLED': '주문취소',
+      'CANCELED': '주문취소',
       'CONFIRMED': '주문확인'
     };
     return statusMap[status] || status || '상태없음';
@@ -137,12 +141,16 @@ const MyOrders = () => {
 
   const getStatusClass = (status) => {
     const classMap = {
+      'PAYMENT_PENDING': 'status-pending',
+      'ORDERED': 'status-paid',
       'PENDING': 'status-pending',
       'PAID': 'status-paid',
       'PREPARING': 'status-preparing',
       'SHIPPING': 'status-shipping',
+      'DELIVERING': 'status-shipping',
       'DELIVERED': 'status-delivered',
       'CANCELLED': 'status-cancelled',
+      'CANCELED': 'status-cancelled',
       'CONFIRMED': 'status-paid'
     };
     return classMap[status] || 'status-pending';
@@ -268,6 +276,35 @@ const MyOrders = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* 입금 대기 상태일 때 계좌 정보 표시 */}
+                    {order.status === 'PAYMENT_PENDING' && (
+                      <div className="bank-info-section">
+                        <h3 className="bank-info-title">⚠️ 입금 계좌 정보</h3>
+                        <div className="bank-info-content">
+                          <div className="bank-detail">
+                            <span className="bank-label">은행:</span>
+                            <span className="bank-value">국민은행</span>
+                          </div>
+                          <div className="bank-detail">
+                            <span className="bank-label">계좌번호:</span>
+                            <span className="bank-value">123-456-789012</span>
+                          </div>
+                          <div className="bank-detail">
+                            <span className="bank-label">예금주:</span>
+                            <span className="bank-value">(주)온앤홈</span>
+                          </div>
+                          <div className="bank-detail highlight">
+                            <span className="bank-label">입금금액:</span>
+                            <span className="bank-value amount">{formatPrice(order.totalPrice)}</span>
+                          </div>
+                        </div>
+                        <div className="bank-notice">
+                          <p>• 입금자명은 주문자명({order.recipientName || order.username})과 동일하게 입력해주세요.</p>
+                          <p>• 입금 확인 후 배송이 시작됩니다.</p>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="order-total">
                       <span className="total-label">총 결제금액</span>
