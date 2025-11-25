@@ -12,6 +12,7 @@ import UserLayout from './components/layout/UserLayout';
 import Cart from './pages/user/Cart';
 import Home from './pages/user/Home';
 import Login from './pages/user/Login';
+import KakaoCallback from './pages/user/KakaoCallback';
 import MyInfo from './pages/user/MyInfo';
 import MyOrders from './pages/user/MyOrders';
 import MyPage from './pages/user/MyPage';
@@ -101,6 +102,7 @@ const AppContent = () => {
         <Route path="/" element={<UserLayout />}>
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
+          <Route path="auth/kakao/callback" element={<KakaoCallback />} />
           <Route path="signup" element={<Signup />} />
           
           {/* 상품 */}

@@ -146,6 +146,28 @@ const LoginPage = () => {
           </Button>
         </form>
 
+        <div className="social-login">
+          <div className="divider">
+            <span>또는</span>
+          </div>
+          <button 
+            className="kakao-login-btn"
+            onClick={async () => {
+              try {
+                const response = await fetch('http://localhost:8080/api/auth/kakao/login-url');
+                const data = await response.json();
+                window.location.href = data.loginUrl;
+              } catch (error) {
+                console.error('카카오 로그인 URL 가져오기 실패:', error);
+                alert('카카오 로그인을 시작할 수 없습니다.');
+              }
+            }}
+          >
+            <img src="/images/kakao-logo.png" alt="카카오" />
+            카카오로 시작하기
+          </button>
+        </div>
+
         <div className="login-footer">
           <p>
             아직 회원이 아니신가요?{' '}

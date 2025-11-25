@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 import './OrderPayment.css';
 
 const OrderPayment = () => {
@@ -17,22 +18,24 @@ const OrderPayment = () => {
     email: user?.email || '',
     address: '',
     detailAddress: '',
-    request: ''
+    request: '',
+    paymentMethod: 'CARD' // 기본값: 카드 결제
   });
 
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // ✅ 추가
 
   useEffect(() => {
     // 인증 확인
     if (!isAuthenticated) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       navigate('/login');
       return;
     }
 
     // 상품 정보 확인
     if (!products || products.length === 0) {
-      alert('주문할 상품이 없습니다.');
+      toast.error('주문할 상품이 없습니다.');
       navigate('/');
       return;
     }
@@ -56,12 +59,12 @@ const OrderPayment = () => {
   const handlePayment = async () => {
     // 필수 입력 검증
     if (!orderInfo.address || orderInfo.address.trim() === '') {
-      alert('주소를 입력해주세요.');
+      toast.error('주소를 입력해주세요.');
       return;
     }
 
     if (!orderInfo.name || !orderInfo.phone) {
-      alert('이름과 연락처를 입력해주세요.');
+      toast.error('이름과 연락처를 입력해주세요.');
       return;
     }
 
@@ -75,13 +78,19 @@ const OrderPayment = () => {
           productId: product.id,
           quantity: product.quantity
         })),
+        paymentMethod: orderInfo.paymentMethod,
         recipientName: orderInfo.name,
         recipientPhone: orderInfo.phone,
         shippingAddress: orderInfo.address + (orderInfo.detailAddress ? ` ${orderInfo.detailAddress}` : ''),
         shippingRequest: orderInfo.request
       };
 
-      console.log('주문 데이터:', orderData);
+      console.log('=== 주문 데이터 확인 ===');
+      console.log('User ID:', user.id);
+      console.log('Payment Method:', orderInfo.paymentMethod);
+      console.log('Recipient Name:', orderInfo.name);
+      console.log('Products:', products);
+      console.log('전체 주문 데이터:', JSON.stringify(orderData, null, 2));
 
       // 백엔드 API 호출
       const response = await fetch('http://localhost:8080/api/orders/create', {
@@ -97,24 +106,41 @@ const OrderPayment = () => {
       console.log('API 응답:', result);
 
       if (result.success) {
-        alert('결제가 완료되었습니다');
+        // ✅ 로딩 끄고 성공 화면 표시
+        setLoading(false);
+        setShowSuccess(true);
         
-        // 결제 완료 페이지로 이동
-        navigate('/user/order-complete', {
-          state: {
-            orderInfo: orderInfo,
-            products: products,
-            totalPrice: calculateTotalPrice(),
-            orderId: result.data.orderId
-          }
-        });
+        // ✅ 1.3초 후 주문 완료 페이지로 이동
+        setTimeout(() => {
+          navigate('/user/order-complete', {
+            state: {
+              orderInfo: orderInfo,
+              products: products,
+              totalPrice: calculateTotalPrice(),
+              orderId: result.data.orderId
+            }
+          });
+        }, 1300);
       } else {
-        alert(result.message || '주문 생성에 실패했습니다.');
+        console.error('주문 실패:', result.message);
+        toast.error(result.message || '주문 생성에 실패했습니다.');
+        setLoading(false);
       }
     } catch (error) {
-      console.error('주문 생성 오류:', error);
-      alert('주문 생성 중 오류가 발생했습니다.');
-    } finally {
+      console.error('=== 주문 생성 오류 ===');
+      console.error('오류 내용:', error);
+      console.error('응답 데이터:', error.response?.data);
+      console.error('응답 상태:', error.response?.status);
+      
+      let errorMessage = '주문 생성 중 오류가 발생했습니다.';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage += ' (' + error.message + ')';
+      }
+      
+      toast.error(errorMessage);
       setLoading(false);
     }
   };
@@ -123,6 +149,7 @@ const OrderPayment = () => {
     return price ? price.toLocaleString() + '원' : '0원';
   };
 
+  // ✅ 로딩 화면
   if (loading) {
     return (
       <div className="order-payment-container">
@@ -131,8 +158,75 @@ const OrderPayment = () => {
     );
   }
 
+  // ✅ 결제 완료 화면 (2초간 표시)
+  if (showSuccess) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999
+      }}>
+        <div style={{
+          fontSize: '48px',
+          marginBottom: '20px'
+        }}>
+          ✅
+        </div>
+        <div style={{
+          fontSize: '32px',
+          fontWeight: 'bold',
+          color: '#4ade80'
+        }}>
+          {orderInfo.paymentMethod === 'BANK_TRANSFER' ? '주문 완료!' : '결제 완료!'}
+        </div>
+        {orderInfo.paymentMethod === 'BANK_TRANSFER' && (
+          <div style={{
+            fontSize: '16px',
+            color: '#666',
+            marginTop: '10px'
+          }}>
+            입금 확인 후 배송이 시작됩니다
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="order-payment-container">
+      {/* Toaster 컴포넌트 */}
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+            fontSize: '16px',
+            padding: '16px',
+          },
+          success: {
+            style: {
+              background: '#4ade80',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+            },
+          },
+        }}
+      />
+
       <div className="order-payment-content">
         <h1>주문/결제</h1>
 
@@ -217,6 +311,50 @@ const OrderPayment = () => {
           </table>
         </section>
 
+        {/* 결제 방법 선택 */}
+        <section className="order-section">
+          <h2>결제 방법</h2>
+          <div className="payment-method-container">
+            <label className="payment-method-option">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="CARD"
+                checked={orderInfo.paymentMethod === 'CARD'}
+                onChange={handleInputChange}
+              />
+              <span>카드 결제</span>
+            </label>
+            <label className="payment-method-option">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="BANK_TRANSFER"
+                checked={orderInfo.paymentMethod === 'BANK_TRANSFER'}
+                onChange={handleInputChange}
+              />
+              <span>무통장 입금</span>
+            </label>
+          </div>
+          
+          {/* 무통장 입금 선택 시 계좌 정보 표시 */}
+          {orderInfo.paymentMethod === 'BANK_TRANSFER' && (
+            <div className="bank-info-container">
+              <h3 style={{ marginTop: '20px', marginBottom: '10px', color: '#333' }}>입금 계좌 정보</h3>
+              <div className="bank-info">
+                <p><strong>은행:</strong> 국민은행</p>
+                <p><strong>계좌번호:</strong> 123-456-789012</p>
+                <p><strong>예금주:</strong> (주)온앤홈</p>
+                <p><strong>입금금액:</strong> {formatPrice(calculateTotalPrice())}</p>
+              </div>
+              <div className="bank-notice">
+                <p>⚠️ 입금자명은 주문자명과 동일하게 입력해주세요.</p>
+                <p>⚠️ 입금 확인 후 주문이 확정됩니다.</p>
+              </div>
+            </div>
+          )}
+        </section>
+
         {/* 주문정보 */}
         <section className="order-section">
           <h2>주문정보</h2>
@@ -255,7 +393,7 @@ const OrderPayment = () => {
             onClick={handlePayment}
             disabled={loading}
           >
-            결제하기
+            {orderInfo.paymentMethod === 'BANK_TRANSFER' ? '주문하기 (입금 대기)' : '결제하기'}
           </button>
         </div>
       </div>

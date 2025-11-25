@@ -133,6 +133,83 @@ const Login = () => {
             </div>
           )}
           
+          {/* 소셜 로그인 */}
+          <div style={{ margin: '30px 0', textAlign: 'center' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              margin: '20px 0' 
+            }}>
+              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
+              <span style={{ padding: '0 15px', color: '#666', fontSize: '14px' }}>또는</span>
+              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
+            </div>
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('카카오 로그인 버튼 클릭');
+                
+                try {
+                  const apiUrl = 'http://localhost:8080/api/auth/kakao/login-url';
+                  console.log('API 호출:', apiUrl);
+                  
+                  const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                  
+                  console.log('응답 상태:', response.status);
+                  
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+                  
+                  const data = await response.json();
+                  console.log('받은 데이터:', data);
+                  console.log('로그인 URL:', data.loginUrl);
+                  
+                  if (data.loginUrl) {
+                    console.log('카카오 로그인 페이지로 이동:', data.loginUrl);
+                    window.location.href = data.loginUrl;
+                  } else {
+                    throw new Error('로그인 URL이 없습니다.');
+                  }
+                } catch (error) {
+                  console.error('카카오 로그인 오류:', error);
+                  alert('카카오 로그인을 시작할 수 없습니다: ' + error.message);
+                }
+              }}
+              style={{
+                width: '100%',
+                height: '50px',
+                backgroundColor: '#FEE500',
+                border: 'none',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#000000',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FDD835'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FEE500'}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 3C7.03125 3 3 6.33984 3 10.5C3 12.8672 4.24219 14.9648 6.17578 16.3125L5.28906 19.9805C5.23828 20.168 5.35547 20.3555 5.53125 20.4258C5.59375 20.4492 5.66016 20.4609 5.72656 20.4609C5.85938 20.4609 5.98828 20.4023 6.07031 20.2969L9.37109 16.8867C10.207 17.0391 11.0859 17.1094 12 17.1094C16.9688 17.1094 21 13.7695 21 9.60938C21 5.44922 16.9688 2.10938 12 2.10938V3Z" fill="#000000"/>
+              </svg>
+              카카오로 시작하기
+            </button>
+          </div>
+          
           {/* 링크 */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <p>
