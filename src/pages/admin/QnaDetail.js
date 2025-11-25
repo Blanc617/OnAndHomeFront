@@ -64,7 +64,8 @@ const QnaDetail = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
         }
       );
@@ -96,7 +97,8 @@ const QnaDetail = () => {
         `${API_BASE_URL}/api/admin/qna/reply/${replyId}`,
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
         }
       );

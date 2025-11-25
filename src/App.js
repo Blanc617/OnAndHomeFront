@@ -47,6 +47,7 @@ import AdminProductEdit from './pages/admin/ProductEdit';
 import AdminProductList from './pages/admin/ProductList';
 import AdminQnaDetail from './pages/admin/QnaDetail';
 import AdminQnaList from './pages/admin/QnaList';
+import AdminReviewDetail from './pages/admin/ReviewDetail';
 import AdminReviewList from './pages/admin/ReviewList';
 import AdminUserList from './pages/admin/UserList';
 
@@ -244,6 +245,7 @@ const AppContent = () => {
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
           <Route path="reviews" element={<AdminReviewList />} />
+          <Route path="reviews/:id" element={<AdminReviewDetail />} />
         </Route>
         
         {/* 404 페이지 */}

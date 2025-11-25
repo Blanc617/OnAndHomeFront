@@ -86,11 +86,10 @@ const AdminSidebar = () => {
       </div>
 
       <div className="sidebar-user">
-        <span className="user-label">관리자</span>
+        <span className="user-label">Admin</span>
       </div>
 
       <div className="breadcrumb">
-        <span>admin8 관리자홈으로</span>
         <Link to="/" className="logout-link">메인으로</Link>
       </div>
 

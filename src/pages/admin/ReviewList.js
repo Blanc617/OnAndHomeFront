@@ -24,7 +24,8 @@ const ReviewList = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/reviews`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
 
@@ -91,7 +92,8 @@ const ReviewList = () => {
         { ids: reviewIds },
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
         }
       );
@@ -109,6 +111,10 @@ const ReviewList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRowClick = (reviewId) => {
+    navigate(`/admin/reviews/${reviewId}`);
   };
 
   const formatDate = (dateString) => {
@@ -224,8 +230,12 @@ const ReviewList = () => {
                 </tr>
               ) : (
                 currentItems.map((review, index) => (
-                  <tr key={review.id}>
-                    <td>
+                  <tr 
+                    key={review.id}
+                    onClick={() => handleRowClick(review.id)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={review.checked || false}

@@ -23,7 +23,8 @@ const QnaList = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/qna`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
 
