@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { logout } from '../../store/slices/userSlice';
-import './UserLayout.css';
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { logout } from "../../store/slices/userSlice";
+import CompareFloatingButton from "../common/CompareFloatingButton";
+import "./UserLayout.css";
 
 const UserLayout = () => {
   const navigate = useNavigate();
@@ -20,56 +21,56 @@ const UserLayout = () => {
   // 카테고리 구조 정의
   const categories = [
     {
-      id: 'tv-audio',
-      name: 'TV/오디오',
+      id: "tv-audio",
+      name: "TV/오디오",
       subCategories: [
-        { name: 'TV', link: '/products/category/TV' },
-        { name: '오디오', link: '/products/category/오디오' }
-      ]
+        { name: "TV", link: "/products/category/TV" },
+        { name: "오디오", link: "/products/category/오디오" },
+      ],
     },
     {
-      id: 'kitchen',
-      name: '주방가전',
+      id: "kitchen",
+      name: "주방가전",
       subCategories: [
-        { name: '냉장고', link: '/products/category/냉장고' },
-        { name: '전자렌지', link: '/products/category/전자렌지' },
-        { name: '식기세척기', link: '/products/category/식기세척기' }
-      ]
+        { name: "냉장고", link: "/products/category/냉장고" },
+        { name: "전자렌지", link: "/products/category/전자렌지" },
+        { name: "식기세척기", link: "/products/category/식기세척기" },
+      ],
     },
     {
-      id: 'living',
-      name: '생활가전',
+      id: "living",
+      name: "생활가전",
       subCategories: [
-        { name: '세탁기', link: '/products/category/세탁기' },
-        { name: '청소기', link: '/products/category/청소기' }
-      ]
+        { name: "세탁기", link: "/products/category/세탁기" },
+        { name: "청소기", link: "/products/category/청소기" },
+      ],
     },
     {
-      id: 'air',
-      name: '에어컨/공기청정기',
+      id: "air",
+      name: "에어컨/공기청정기",
       subCategories: [
-        { name: '에어컨', link: '/products/category/에어컨' },
-        { name: '공기청정기', link: '/products/category/공기청정기' },
-        { name: '정수기', link: '/products/category/정수기' }
-      ]
+        { name: "에어컨", link: "/products/category/에어컨" },
+        { name: "공기청정기", link: "/products/category/공기청정기" },
+        { name: "정수기", link: "/products/category/정수기" },
+      ],
     },
     {
-      id: 'etc',
-      name: '기타',
+      id: "etc",
+      name: "기타",
       subCategories: [
-        { name: '안마의자', link: '/products/category/안마의자' },
-        { name: 'PC', link: '/products/category/PC' }
-      ]
-    }
+        { name: "안마의자", link: "/products/category/안마의자" },
+        { name: "PC", link: "/products/category/PC" },
+      ],
+    },
   ];
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userInfo');
-    navigate('/');
-    alert('로그아웃되었습니다.');
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userInfo");
+    navigate("/");
+    alert("로그아웃되었습니다.");
   };
 
   const toggleMyPageDropdown = () => {
@@ -110,25 +111,35 @@ const UserLayout = () => {
               {isAuthenticated ? (
                 <>
                   <span className="user-name">{user?.username}님</span>
-                  <Link to="/mypage" onClick={closeDropdowns}>마이페이지</Link>
+                  <Link to="/mypage" onClick={closeDropdowns}>
+                    마이페이지
+                  </Link>
                   {isAdmin() && (
-                    <Link 
-                      to="/admin/dashboard" 
+                    <Link
+                      to="/admin/dashboard"
                       onClick={closeDropdowns}
-                      style={{ color: '#ff6b00', fontWeight: 'bold' }}
+                      style={{ color: "#ff6b00", fontWeight: "bold" }}
                     >
                       관리자페이지
                     </Link>
                   )}
-                  <button onClick={handleLogout} className="logout-button">로그아웃</button>
+                  <button onClick={handleLogout} className="logout-button">
+                    로그아웃
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={closeDropdowns}>로그인</Link>
-                  <Link to="/signup" onClick={closeDropdowns}>회원가입</Link>
+                  <Link to="/login" onClick={closeDropdowns}>
+                    로그인
+                  </Link>
+                  <Link to="/signup" onClick={closeDropdowns}>
+                    회원가입
+                  </Link>
                 </>
               )}
-              <Link to="/notices" onClick={closeDropdowns}>공지사항</Link>
+              <Link to="/notices" onClick={closeDropdowns}>
+                공지사항
+              </Link>
             </div>
           </div>
         </div>
@@ -171,20 +182,22 @@ const UserLayout = () => {
                   )}
 
                   {/* 소카테고리 드롭다운 */}
-                  {category.subCategories && category.subCategories.length > 0 && hoveredCategory === category.id && (
-                    <div className="sub-category-dropdown">
-                      {category.subCategories.map((subCategory, index) => (
-                        <Link
-                          key={index}
-                          to={subCategory.link}
-                          className="sub-category-item"
-                          onClick={closeDropdowns}
-                        >
-                          {subCategory.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                  {category.subCategories &&
+                    category.subCategories.length > 0 &&
+                    hoveredCategory === category.id && (
+                      <div className="sub-category-dropdown">
+                        {category.subCategories.map((subCategory, index) => (
+                          <Link
+                            key={index}
+                            to={subCategory.link}
+                            className="sub-category-item"
+                            onClick={closeDropdowns}
+                          >
+                            {subCategory.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                 </div>
               ))}
             </nav>
@@ -197,6 +210,9 @@ const UserLayout = () => {
         <Outlet />
       </main>
 
+      {/* 상품 비교 플로팅 버튼 - 여기에 추가! */}
+      <CompareFloatingButton />
+
       {/* 푸터 */}
       <footer className="user-footer">
         <div className="footer-container">
@@ -206,9 +222,15 @@ const UserLayout = () => {
             <p>© 2024 On&Home. All rights reserved.</p>
           </div>
           <div className="footer-links">
-            <Link to="/notices" onClick={closeDropdowns}>공지사항</Link>
-            <Link to="/qna" onClick={closeDropdowns}>Q&A</Link>
-            <Link to="/review" onClick={closeDropdowns}>리뷰</Link>
+            <Link to="/notices" onClick={closeDropdowns}>
+              공지사항
+            </Link>
+            <Link to="/qna" onClick={closeDropdowns}>
+              Q&A
+            </Link>
+            <Link to="/review" onClick={closeDropdowns}>
+              리뷰
+            </Link>
           </div>
         </div>
       </footer>
