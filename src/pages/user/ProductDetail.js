@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { productAPI, cartAPI, reviewAPI, qnaAPI } from '../../api';
+import { productAPI, cartAPI, reviewAPI, qnaAPI, favoriteAPI } from '../../api';
 import ReviewItem from '../../components/review/ReviewItem';
 import QnaItem from '../../components/qna/QnaItem';
 import './ProductDetail.css';
@@ -19,10 +19,25 @@ const ProductDetail = () => {
   const [reviewContent, setReviewContent] = useState('');
   const [qnaTitle, setQnaTitle] = useState('');
   const [qnaContent, setQnaContent] = useState('');
+  const [isFavorite, setIsFavorite] = useState(false);
   
   useEffect(() => {
     loadProductDetail();
+    checkInitialFavoriteStatus();
   }, [id]);
+
+  // 초기 찜 상태 확인
+  const checkInitialFavoriteStatus = async () => {
+    try {
+      const result = await favoriteAPI.check(id);
+      if (result.success) {
+        setIsFavorite(result.isFavorite);
+      }
+    } catch (error) {
+      console.error('찜 상태 확인 오류:', error);
+      // 에러 시 기본값 false 유지
+    }
+  };
   
   useEffect(() => {
     if (product) {
@@ -147,6 +162,19 @@ const ProductDetail = () => {
     } catch (error) {
       console.error('장바구니 추가 오류:', error);
       alert('장바구니에 상품을 추가하는 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 찜하기 토글
+  const handleFavoriteToggle = async () => {
+    try {
+      const result = await favoriteAPI.toggle(product.id);
+      
+      if (result.success) {
+        setIsFavorite(result.isFavorite);
+      }
+    } catch (error) {
+      console.error('찜하기 오류:', error);
     }
   };
   
@@ -344,6 +372,9 @@ const ProductDetail = () => {
             </table>
             
             <div className="action-buttons">
+              <button className="btn btn-favorite" onClick={handleFavoriteToggle}>
+                {isFavorite ? '❤️' : '🤍'}
+              </button>
               <button className="btn btn-buy" onClick={handleBuyNow}>
                 바로구매
               </button>

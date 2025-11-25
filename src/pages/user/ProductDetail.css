@@ -121,6 +121,23 @@
   background-color: #d43d2f;
 }
 
+.btn-favorite {
+  background-color: #ff4757;
+  color: white;
+  font-size: 24px;
+  flex: 0 0 60px;
+  padding: 15px 10px;
+}
+
+.btn-favorite:hover {
+  background-color: #ff3838;
+  transform: scale(1.1);
+}
+
+.btn-favorite:active {
+  transform: scale(0.95);
+}
+
 /* 주문 요약 */
 .order-summary {
   margin-top: 30px;
