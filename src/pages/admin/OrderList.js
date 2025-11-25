@@ -20,7 +20,11 @@ const OrderList = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/orders`);
+      const response = await axios.get(`${API_BASE_URL}/api/admin/orders`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
       if (response.data && Array.isArray(response.data)) {
         setOrders(response.data);
       } else {

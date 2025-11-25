@@ -280,6 +280,147 @@
   border-radius: 4px;
 }
 
+/* 리뷰 작성 폼 스타일 */
+.review-write-form {
+  background: white;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.form-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.rating-selector {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.rating-selector label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  min-width: 50px;
+}
+
+.rating-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  background: white;
+  transition: border-color 0.3s;
+}
+
+.rating-select:focus {
+  outline: none;
+  border-color: #58995a;
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none; /* ⚠️ 크기 조절 금지 */
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: #58995a;
+}
+
+.review-textarea::placeholder {
+  color: #999;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+/* Q&A 작성 폼 스타일 */
+.qna-write-form {
+  background: white;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 25px;
+  margin-top: 20px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.qna-title-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.qna-title-input:focus {
+  outline: none;
+  border-color: #58995a;
+}
+
+.qna-title-input::placeholder {
+  color: #999;
+}
+
+.qna-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: none; /* ⚠️ 크기 조절 금지 */
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.qna-textarea:focus {
+  outline: none;
+  border-color: #58995a;
+}
+
+.qna-textarea::placeholder {
+  color: #999;
+}
+
 /* 작성 폼 */
 .review-write,
 .qna-write {
@@ -372,5 +513,25 @@
 
   .qna-reply {
     margin-left: 20px;
+  }
+
+  /* 리뷰 작성 폼 반응형 */
+  .review-write-form,
+  .qna-write-form {
+    padding: 20px;
+  }
+
+  .rating-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .rating-selector label {
+    min-width: auto;
+  }
+
+  .rating-select {
+    width: 100%;
   }
 }

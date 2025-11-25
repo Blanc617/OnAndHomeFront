@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [qnas, setQnas] = useState([]);
   const [reviewContent, setReviewContent] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
   const [qnaTitle, setQnaTitle] = useState('');
   const [qnaContent, setQnaContent] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
@@ -194,13 +195,14 @@ const ProductDetail = () => {
       const response = await reviewAPI.createReview({
         productId: product.id,
         content: reviewContent,
-        rating: 5,
+        rating: reviewRating,
         userId: user.id
       });
       
       if (response.success) {
         alert('리뷰가 등록되었습니다.');
         setReviewContent('');
+        setReviewRating(5);
         loadReviews();
       } else {
         alert(response.message || '리뷰 등록에 실패했습니다.');
@@ -426,16 +428,36 @@ const ProductDetail = () => {
             )}
           </div>
           {isAuthenticated && (
-            <div className="review-write">
+            <div className="review-write-form">
+              <div className="form-header">
+                <h3>리뷰 작성</h3>
+              </div>
+              <div className="rating-selector">
+                <label>평점</label>
+                <select 
+                  className="rating-select"
+                  value={reviewRating || 5}
+                  onChange={(e) => setReviewRating(parseInt(e.target.value))}
+                >
+                  <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+                  <option value="4">⭐⭐⭐⭐ (4점)</option>
+                  <option value="3">⭐⭐⭐ (3점)</option>
+                  <option value="2">⭐⭐ (2점)</option>
+                  <option value="1">⭐ (1점)</option>
+                </select>
+              </div>
               <textarea
-                className="textarea"
-                placeholder="리뷰를 작성해주세요"
+                className="review-textarea"
+                placeholder="상품에 대한 리뷰를 작성해주세요."
                 value={reviewContent}
                 onChange={(e) => setReviewContent(e.target.value)}
+                rows="5"
               />
-              <button className="btn btn-submit" onClick={handleSubmitReview}>
-                저장
-              </button>
+              <div className="form-actions">
+                <button className="btn btn-submit" onClick={handleSubmitReview}>
+                  리뷰 등록
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -457,23 +479,35 @@ const ProductDetail = () => {
             )}
           </div>
           {isAuthenticated && (
-            <div className="qna-write">
-              <input
-                type="text"
-                className="input-title"
-                placeholder="문의 제목을 입력해주세요"
-                value={qnaTitle}
-                onChange={(e) => setQnaTitle(e.target.value)}
-              />
-              <textarea
-                className="textarea"
-                placeholder="문의 내용을 입력해주세요"
-                value={qnaContent}
-                onChange={(e) => setQnaContent(e.target.value)}
-              />
-              <button className="btn btn-submit" onClick={handleSubmitQna}>
-                작성
-              </button>
+            <div className="qna-write-form">
+              <div className="form-header">
+                <h3>문의 작성</h3>
+              </div>
+              <div className="input-group">
+                <label>제목</label>
+                <input
+                  type="text"
+                  className="qna-title-input"
+                  placeholder="문의 제목을 입력해주세요"
+                  value={qnaTitle}
+                  onChange={(e) => setQnaTitle(e.target.value)}
+                />
+              </div>
+              <div className="input-group">
+                <label>내용</label>
+                <textarea
+                  className="qna-textarea"
+                  placeholder="상품에 대한 문의 내용을 입력해주세요."
+                  value={qnaContent}
+                  onChange={(e) => setQnaContent(e.target.value)}
+                  rows="5"
+                />
+              </div>
+              <div className="form-actions">
+                <button className="btn btn-submit" onClick={handleSubmitQna}>
+                  문의 등록
+                </button>
+              </div>
             </div>
           )}
         </div>
