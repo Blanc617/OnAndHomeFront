@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import './ProductList.css';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCompare,
+  removeFromCompare,
+} from "../../store/slices/compareSlice";
+import "./ProductList.css";
 
 const ProductList = () => {
   const { category } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const compareItems = useSelector((state) => state.compare.items);
   const [searchParams] = useSearchParams();
-  const keyword = searchParams.get('keyword');
+  const keyword = searchParams.get("keyword");
 
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]); // 전체 데이터 저장
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
-  // 카테고리 또는 검색어 변경 시 데이터 다시 불러오기
   useEffect(() => {
-    setCurrentPage(0); // 페이지 초기화
+    setCurrentPage(0);
     fetchProducts();
   }, [category, keyword]);
 
-  // 페이지 변경 시 현재 데이터에서 페이지네이션
   useEffect(() => {
     if (allProducts.length > 0) {
       paginateProducts();
@@ -32,11 +37,15 @@ const ProductList = () => {
     setLoading(true);
     try {
       let url = `http://localhost:8080/user/product/api/all`;
-      
+
       if (category) {
-        url = `http://localhost:8080/user/product/api/category/${encodeURIComponent(category)}`;
+        url = `http://localhost:8080/user/product/api/category/${encodeURIComponent(
+          category
+        )}`;
       } else if (keyword) {
-        url = `http://localhost:8080/user/product/api/search?keyword=${encodeURIComponent(keyword)}`;
+        url = `http://localhost:8080/user/product/api/search?keyword=${encodeURIComponent(
+          keyword
+        )}`;
       }
 
       const response = await fetch(url);
@@ -46,23 +55,21 @@ const ProductList = () => {
         const fetchedProducts = data.products || [];
         setAllProducts(fetchedProducts);
         setTotalElements(fetchedProducts.length);
-        
-        // 페이지네이션 계산
+
         const itemsPerPage = 12;
         setTotalPages(Math.ceil(fetchedProducts.length / itemsPerPage));
-        
-        // 첫 페이지 표시
+
         const paginatedProducts = fetchedProducts.slice(0, itemsPerPage);
         setProducts(paginatedProducts);
       } else {
-        console.error('상품 로드 실패:', data.message);
+        console.error("상품 로드 실패:", data.message);
         setAllProducts([]);
         setProducts([]);
         setTotalPages(0);
         setTotalElements(0);
       }
     } catch (error) {
-      console.error('상품 로드 오류:', error);
+      console.error("상품 로드 오류:", error);
       setAllProducts([]);
       setProducts([]);
       setTotalPages(0);
@@ -81,17 +88,14 @@ const ProductList = () => {
   };
 
   const formatPrice = (price) => {
-    return price?.toLocaleString() || '0';
+    return price?.toLocaleString() || "0";
   };
 
-  // 이미지 URL 생성 함수
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/images/placeholder.png';
-    // 이미지 경로가 uploads/로 시작하면 백엔드 서버 URL 사용
-    if (imagePath.startsWith('uploads/') || imagePath.startsWith('/uploads/')) {
-      return `http://localhost:8080/${imagePath.replace(/^\//, '')}`;
+    if (!imagePath) return "/images/placeholder.png";
+    if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
+      return `http://localhost:8080/${imagePath.replace(/^\//, "")}`;
     }
-    // 그렇지 않으면 static 경로로 처리
     return imagePath;
   };
 
@@ -104,25 +108,51 @@ const ProductList = () => {
     window.scrollTo(0, 0);
   };
 
+  const handleCompareToggle = (e, product) => {
+    e.stopPropagation();
+
+    const isInCompare = compareItems.some((item) => item.id === product.id);
+
+    if (isInCompare) {
+      dispatch(removeFromCompare(product.id));
+    } else {
+      if (compareItems.length >= 4) {
+        alert("최대 4개 상품까지 비교할 수 있습니다.");
+        return;
+      }
+
+      const compareProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        salePrice: product.salePrice,
+        category: product.category,
+        brand: product.brand,
+        stock: product.stock,
+        image: product.thumbnailImage,
+      };
+
+      dispatch(addToCompare(compareProduct));
+    }
+  };
+
   const getPageTitle = () => {
     if (category) {
       return `${category} 카테고리`;
     } else if (keyword) {
       return `'${keyword}' 검색 결과`;
     }
-    return '전체 상품';
+    return "전체 상품";
   };
 
   return (
     <div className="product-list-page">
       <div className="product-list-container">
-        {/* 헤더 */}
         <div className="product-list-header">
           <h1 className="product-list-title">{getPageTitle()}</h1>
           <p className="product-list-count">총 {totalElements}개의 상품</p>
         </div>
 
-        {/* 로딩 */}
         {loading ? (
           <div className="loading-container">
             <p>상품을 불러오는 중...</p>
@@ -133,48 +163,89 @@ const ProductList = () => {
           </div>
         ) : (
           <>
-            {/* 상품 그리드 */}
             <div className="product-grid">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="product-card"
-                  onClick={() => handleProductClick(product.id)}
-                >
-                  <div className="product-image-wrapper">
-                    <img
-                      src={getImageUrl(product.thumbnailImage)}
-                      alt={product.name}
-                      onError={(e) => {
-                        e.target.src = '/images/placeholder.png';
-                        e.target.onerror = null;
-                      }}
-                    />
-                  </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <div className="product-category">{product.category}</div>
-                    <div className="product-prices">
-                      <span className="original-price">
-                        {formatPrice(product.price)}원
-                      </span>
-                      {product.salePrice && product.salePrice < product.price && (
-                        <span className="sale-price">
-                          {formatPrice(product.salePrice)}원
-                        </span>
-                      )}
+              {products.map((product) => {
+                const isInCompare = compareItems.some(
+                  (item) => item.id === product.id
+                );
+
+                return (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => handleProductClick(product.id)}
+                  >
+                    <div className="product-image-wrapper">
+                      <img
+                        src={getImageUrl(product.thumbnailImage)}
+                        alt={product.name}
+                        onError={(e) => {
+                          e.target.src = "/images/placeholder.png";
+                          e.target.onerror = null;
+                        }}
+                      />
                     </div>
-                    {product.salePrice && product.price > product.salePrice && (
-                      <div className="discount-rate">
-                        {Math.round(((product.price - product.salePrice) / product.price) * 100)}% 할인
+                    <div className="product-info">
+                      <h3 className="product-name">{product.name}</h3>
+                      <div className="product-category">{product.category}</div>
+
+                      <div className="product-prices">
+                        {product.salePrice &&
+                        product.salePrice < product.price ? (
+                          <>
+                            <span className="original-price">
+                              {formatPrice(product.price)}원
+                            </span>
+                            <div className="price-row">
+                              <span className="sale-price">
+                                {formatPrice(product.salePrice)}원
+                              </span>
+                              <div className="discount-rate">
+                                {Math.round(
+                                  ((product.price - product.salePrice) /
+                                    product.price) *
+                                    100
+                                )}
+                                % 할인
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="sale-price">
+                            {formatPrice(product.price)}원
+                          </span>
+                        )}
                       </div>
-                    )}
+
+                      <button
+                        className={`compare-btn-bottom ${
+                          isInCompare ? "active" : ""
+                        }`}
+                        onClick={(e) => handleCompareToggle(e, product)}
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          {isInCompare ? (
+                            <path d="M9 12l2 2 4-4" />
+                          ) : (
+                            <path d="M12 8v8M8 12h8" />
+                          )}
+                        </svg>
+                        <span>{isInCompare ? "비교중" : "비교하기"}</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* 페이지네이션 */}
             {totalPages > 1 && (
               <div className="pagination">
                 <button
@@ -191,12 +262,14 @@ const ProductList = () => {
                 >
                   이전
                 </button>
-                
+
                 {Array.from({ length: totalPages }, (_, i) => i)
-                  .filter(page => {
-                    return page === 0 || 
-                           page === totalPages - 1 || 
-                           (page >= currentPage - 2 && page <= currentPage + 2);
+                  .filter((page) => {
+                    return (
+                      page === 0 ||
+                      page === totalPages - 1 ||
+                      (page >= currentPage - 2 && page <= currentPage + 2)
+                    );
                   })
                   .map((page, index, array) => (
                     <React.Fragment key={page}>
@@ -204,14 +277,16 @@ const ProductList = () => {
                         <span className="page-ellipsis">...</span>
                       )}
                       <button
-                        className={`page-btn ${currentPage === page ? 'active' : ''}`}
+                        className={`page-btn ${
+                          currentPage === page ? "active" : ""
+                        }`}
                         onClick={() => handlePageChange(page)}
                       >
                         {page + 1}
                       </button>
                     </React.Fragment>
                   ))}
-                
+
                 <button
                   className="page-btn"
                   onClick={() => handlePageChange(currentPage + 1)}

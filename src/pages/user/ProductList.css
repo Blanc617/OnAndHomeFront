@@ -56,6 +56,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .product-card:hover {
@@ -64,6 +66,7 @@
 }
 
 .product-image-wrapper {
+  position: relative;
   width: 100%;
   height: 280px;
   overflow: hidden;
@@ -78,6 +81,9 @@
 
 .product-info {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .product-name {
@@ -103,7 +109,13 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .original-price {
@@ -126,6 +138,56 @@
   font-size: 13px;
   font-weight: 600;
   border-radius: 4px;
+}
+
+/* 하단 비교 버튼 스타일 */
+.compare-btn-bottom {
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.compare-btn-bottom span {
+  display: inline-block;
+}
+
+.compare-btn-bottom svg {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.compare-btn-bottom:hover {
+  background: #f8f8f8;
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.compare-btn-bottom:hover svg {
+  color: #ff4444;
+}
+
+.compare-btn-bottom.active {
+  background: #ff4444;
+  border-color: #ff4444;
+  color: #fff;
+}
+
+.compare-btn-bottom.active svg {
+  color: #fff;
 }
 
 /* 페이지네이션 */
