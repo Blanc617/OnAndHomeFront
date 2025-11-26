@@ -130,7 +130,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-
+          
           {/* 주문 */}
           <Route
             path="order"
@@ -138,7 +138,7 @@ const AppContent = () => {
               <ProtectedRoute>
                 <Order />
               </ProtectedRoute>
-            }
+            } 
           />
           <Route
             path="user/order-payment"
@@ -164,7 +164,17 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-          
+
+          {/* 알림 */}
+          <Route
+            path="notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+
           {/* 마이페이지 */}
           <Route
             path="mypage"
@@ -191,6 +201,14 @@ const AppContent = () => {
             }
           />
           <Route
+            path="order/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="mypage/qna"
             element={
               <ProtectedRoute>
@@ -206,21 +224,21 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-
+          
           {/* 게시판 - 공지사항 */}
           <Route path="notices" element={<NoticeList />} />
           <Route path="notices/:id" element={<NoticeDetail />} />
-
+          
           {/* 게시판 - Q&A */}
           <Route path="qna" element={<QnaList />} />
           <Route path="qna/:id" element={<QnaDetail />} />
-          <Route
-            path="qna/write"
+          <Route 
+            path="qna/write" 
             element={
               <ProtectedRoute>
                 <QnaWrite />
               </ProtectedRoute>
-            }
+            } 
           />
           
           {/* 게시판 - 리뷰 */}

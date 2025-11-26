@@ -181,6 +181,36 @@ const MyOrders = () => {
     }
   };
 
+  const handleHideOrder = async (orderId, orderNumber) => {
+    if (!window.confirm(`주문번호 ${orderNumber}를 숨김 처리하시겠습니까?\n\n숨긴 주문은 목록에서 표시되지 않습니다.`)) {
+      return;
+    }
+
+    try {
+      console.log('주문 숨김 요청:', orderId);
+      const response = await axios.post(
+        `${API_BASE_URL}/api/orders/${orderId}/hide`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        alert('주문이 숨검지되었습니다.');
+        fetchOrders(); // 목록 새로고침
+      } else {
+        alert(response.data.message || '주문 숨김에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('주문 숨김 실패:', error);
+      alert('주문 숨김 중 오류가 발생했습니다.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="my-orders-container">
@@ -235,6 +265,13 @@ const MyOrders = () => {
                     <div className={`order-status ${getStatusClass(order.status)}`}>
                       {getStatusText(order.status)}
                     </div>
+                    <button 
+                      className="hide-order-btn"
+                      onClick={() => handleHideOrder(order.orderId, order.orderNumber || order.orderId)}
+                      title="주문 숨김"
+                    >
+                      🚫 숨김
+                    </button>
                   </div>
 
                   <div className="order-body">

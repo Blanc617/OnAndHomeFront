@@ -148,6 +148,33 @@
   font-weight: 600;
 }
 
+/* 주문 숨김 버튼 */
+.hide-order-btn {
+  padding: 6px 14px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hide-order-btn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.hide-order-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 .status-pending {
   background: #fff3cd;
   color: #856404;
@@ -417,6 +444,11 @@
 
   .order-status {
     align-self: flex-end;
+  }
+
+  .hide-order-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .order-body {
