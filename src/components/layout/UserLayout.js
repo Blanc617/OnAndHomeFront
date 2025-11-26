@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/userSlice";
 import CompareFloatingButton from "../common/CompareFloatingButton";
+import CartFloatingButton from "../cart/CartFloatingButton";
 import "./UserLayout.css";
 
 const UserLayout = () => {
@@ -213,6 +214,9 @@ const UserLayout = () => {
       {/* 상품 비교 플로팅 버튼 - 여기에 추가! */}
       <CompareFloatingButton />
 
+      {/* 장바구니 플로팅 버튼 - 추가 */}
+      <CartFloatingButton />
+      
       {/* 푸터 */}
       <footer className="user-footer">
         <div className="footer-container">
