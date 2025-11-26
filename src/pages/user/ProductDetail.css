@@ -349,13 +349,15 @@
 
 .review-write {
   display: flex;
+  flex-direction: column;
   gap: 15px;
-  align-items: flex-start;
 }
 
 
 .star-rating-container {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   width: 100%;
   margin-top: 15px;
   padding: 15px;
@@ -364,7 +366,7 @@
 }
 
 .star-icon {
-  font-size: 18px;
+  font-size: 24px;
   color: #828282ff;
   cursor: pointer;
   transition: color 0.2s;
@@ -378,7 +380,21 @@
   color: #ffc107;
 }
 
-// 제품명 하단 별점 총합
+.rating-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-right: 5px;
+}
+
+.rating-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-left: 10px;
+}
+
+/* 제품명 하단 별점 총합 */
 .product-rating {
   display: flex;
   justify-content: left;
@@ -443,6 +459,7 @@
   cursor: pointer;
   transition: background-color 0.3s;
   white-space: nowrap;
+  align-self: flex-end;
 }
 
 .btn-submit:hover {
