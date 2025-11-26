@@ -54,6 +54,8 @@ import AdminQnaDetail from "./pages/admin/QnaDetail";
 import AdminQnaList from "./pages/admin/QnaList";
 import AdminReviewList from "./pages/admin/ReviewList";
 import AdminUserList from "./pages/admin/UserList";
+import Notifications from "./pages/user/Notifications";
+import OrderDetail from "./pages/user/OrderDetail";
 
 // ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 분기 제외)
 const ProtectedRoute = ({
@@ -271,7 +273,7 @@ const AppContent = () => {
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
           <Route path="reviews" element={<AdminReviewList />} />
-          <Route path="reviews/:id" element={<AdminReviewDetail />} />
+          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
         </Route>
         
         {/* 404 페이지 */}
