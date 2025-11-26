@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { productAPI, cartAPI, reviewAPI, qnaAPI, favoriteAPI } from '../../api';
-import ReviewItem from '../../components/review/ReviewItem';
-import QnaItem from '../../components/qna/QnaItem';
-import './ProductDetail.css';
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { productAPI, cartAPI, reviewAPI, qnaAPI, favoriteAPI } from "../../api";
+import ReviewItem from "../../components/review/ReviewItem";
+import QnaItem from "../../components/qna/QnaItem";
+import "./ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -19,6 +19,7 @@ const ProductDetail = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [qnaTitle, setQnaTitle] = useState("");
   const [qnaContent, setQnaContent] = useState("");
+  const [qnaIsPrivate, setQnaIsPrivate] = useState(false); // 비밀글 체크박스
   const [activeTab, setActiveTab] = useState("detail");
   const [timeRemaining, setTimeRemaining] = useState("");
 
@@ -35,7 +36,6 @@ const ProductDetail = () => {
     checkInitialFavoriteStatus();
   }, [id]);
 
-
   // 초기 찜 상태 확인
   const checkInitialFavoriteStatus = async () => {
     try {
@@ -44,8 +44,7 @@ const ProductDetail = () => {
         setIsFavorite(result.isFavorite);
       }
     } catch (error) {
-      console.error('찜 상태 확인 오류:', error);
-      // 에러 시 기본값 false 유지
+      console.error("찜 상태 확인 오류:", error);
     }
   };
 
@@ -69,7 +68,6 @@ const ProductDetail = () => {
         0
       );
 
-      // 현재 시간이 12시 이후면 다음날 12시로 설정
       if (now.getHours() >= 12) {
         today.setDate(today.getDate() + 1);
       }
@@ -145,18 +143,14 @@ const ProductDetail = () => {
   };
 
   const getImageUrl = (imagePath) => {
-    console.log("원본 imagePath:", imagePath);
-
     if (!imagePath) return "/images/no-image.png";
 
-    // uploads/ 경로면 백엔드 서버에서 가져오기
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
       return `http://localhost:8080${
         imagePath.startsWith("/") ? "" : "/"
       }${imagePath}`;
     }
 
-    // 짧은 이름이면 public/product_img/ 폴더에서 가져오기
     if (!imagePath.includes("/") && !imagePath.startsWith("http")) {
       return `/product_img/${imagePath}.jpg`;
     }
@@ -266,7 +260,6 @@ const ProductDetail = () => {
     }
   };
 
-  // 찜하기 토글
   const handleFavoriteToggle = async () => {
     try {
       const result = await favoriteAPI.toggle(product.id);
@@ -275,7 +268,7 @@ const ProductDetail = () => {
         setIsFavorite(result.isFavorite);
       }
     } catch (error) {
-      console.error('찜하기 오류:', error);
+      console.error("찜하기 오류:", error);
     }
   };
 
@@ -295,7 +288,7 @@ const ProductDetail = () => {
       const response = await reviewAPI.createReview({
         productId: product.id,
         content: reviewContent,
-        rating: 5,
+        rating: reviewRating,
         userId: user.id,
       });
 
@@ -335,6 +328,7 @@ const ProductDetail = () => {
         productId: product.id,
         title: qnaTitle,
         question: qnaContent,
+        isPrivate: qnaIsPrivate, // 비밀글 여부 추가
         userId: user.id,
         writer: user.username || user.userId,
       });
@@ -343,6 +337,7 @@ const ProductDetail = () => {
         alert("문의가 등록되었습니다.");
         setQnaTitle("");
         setQnaContent("");
+        setQnaIsPrivate(false); // 초기화
         loadQnas();
       } else {
         alert(response.message || "문의 등록에 실패했습니다.");
@@ -478,8 +473,11 @@ const ProductDetail = () => {
             </table>
 
             <div className="action-buttons">
-              <button className="btn btn-favorite" onClick={handleFavoriteToggle}>
-                {isFavorite ? '❤️' : '🤍'}
+              <button
+                className="btn btn-favorite"
+                onClick={handleFavoriteToggle}
+              >
+                {isFavorite ? "❤️" : "🤍"}
               </button>
               <button className="btn btn-buy" onClick={handleBuyNow}>
                 바로구매
@@ -609,6 +607,8 @@ const ProductDetail = () => {
         {/* QnA 섹션 */}
         <div ref={qnaRef} className="qna-section">
           <h2 className="section-title">Q&A {qnas.length}</h2>
+
+          {/* QnA 목록 */}
           <div className="qna-list">
             {qnas.length === 0 ? (
               <div className="empty-message">등록된 문의가 없습니다.</div>
@@ -623,6 +623,8 @@ const ProductDetail = () => {
               ))
             )}
           </div>
+
+          {/* 문의 작성 폼 - 목록 아래에 위치 */}
           {isAuthenticated && (
             <div className="qna-write-form">
               <div className="form-header">
@@ -648,6 +650,19 @@ const ProductDetail = () => {
                   rows="5"
                 />
               </div>
+
+              {/* 비밀글 체크박스 추가 */}
+              <div className="input-group">
+                <label className="qna-private-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={qnaIsPrivate}
+                    onChange={(e) => setQnaIsPrivate(e.target.checked)}
+                  />
+                  <span>비밀글로 작성</span>
+                </label>
+              </div>
+
               <div className="form-actions">
                 <button className="btn btn-submit" onClick={handleSubmitQna}>
                   문의 등록
