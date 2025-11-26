@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../store/slices/userSlice';
-import { setUnreadCount } from '../../store/slices/notificationSlice';
-import { authAPI } from '../../api';
-import notificationApi from '../../api/notificationApi';
-import NotificationBell from '../common/NotificationBell';
-import './Header.css';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { authAPI } from "../../api";
+import notificationApi from "../../api/notificationApi";
+import { setUnreadCount } from "../../store/slices/notificationSlice";
+import { logout } from "../../store/slices/userSlice";
+import NotificationBell from "../common/NotificationBell";
+import "./Header.css";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -14,8 +14,8 @@ const Header = () => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const cartState = useSelector((state) => state.cart);
   const totalCount = cartState?.totalCount || 0;
-  
-  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [openMenu, setOpenMenu] = useState(null);
   const menuTimeoutRef = React.useRef(null);
@@ -23,46 +23,46 @@ const Header = () => {
   // 카테고리 데이터
   const categoryData = [
     {
-      parentName: 'TV/오디오',
-      children: ['TV', '오디오']
+      parentName: "TV/오디오",
+      children: ["TV", "오디오"],
     },
     {
-      parentName: '주방가전',
-      children: ['냉장고', '전자렌지', '식기세척기']
+      parentName: "주방가전",
+      children: ["냉장고", "전자렌지", "식기세척기"],
     },
     {
-      parentName: '생활가전',
-      children: ['세탁기', '청소기']
+      parentName: "생활가전",
+      children: ["세탁기", "청소기"],
     },
     {
-      parentName: '에어컨/공기청정기',
-      children: ['에어컨', '공기청정기', '정수기']
+      parentName: "에어컨/공기청정기",
+      children: ["에어컨", "공기청정기", "정수기"],
     },
     {
-      parentName: '기타',
-      children: ['안마의자', 'PC']
-    }
+      parentName: "기타",
+      children: ["안마의자", "PC"],
+    },
   ];
 
   // 장바구니 개수 업데이트
   useEffect(() => {
     const updateCartCount = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         setCartCount(0);
         return;
       }
 
       try {
-        const response = await fetch('http://localhost:8080/api/cart/count', {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
+        const response = await fetch("http://localhost:8080/api/cart/count", {
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await response.json();
         if (data.success) {
           setCartCount(data.count || 0);
         }
       } catch (error) {
-        console.error('장바구니 개수 조회 실패:', error);
+        console.error("장바구니 개수 조회 실패:", error);
       }
     };
 
@@ -74,7 +74,7 @@ const Header = () => {
   // 알림 개수 업데이트
   useEffect(() => {
     const updateNotificationCount = async () => {
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         dispatch(setUnreadCount(0));
         return;
@@ -86,7 +86,7 @@ const Header = () => {
           dispatch(setUnreadCount(response.count || 0));
         }
       } catch (error) {
-        console.error('알림 개수 조회 실패:', error);
+        console.error("알림 개수 조회 실패:", error);
       }
     };
 
@@ -102,10 +102,10 @@ const Header = () => {
     try {
       await authAPI.logout();
     } catch (error) {
-      console.error('로그아웃 오류:', error);
+      console.error("로그아웃 오류:", error);
     } finally {
       dispatch(logout());
-      navigate('/');
+      navigate("/");
       window.location.reload();
     }
   };
@@ -113,22 +113,35 @@ const Header = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchKeyword.trim()) {
-      alert('검색어를 입력하세요.');
+      alert("검색어를 입력하세요.");
       return;
     }
 
     const categoryMap = {
-      'tv': 'TV', '오디오': '오디오', 'audio': '오디오',
-      '냉장고': '냉장고', 'refrigerator': '냉장고',
-      '전자렌지': '전자렌지', 'microwave': '전자렌지',
-      '식기세척기': '식기세척기', 'dishwasher': '식기세척기',
-      '세탁기': '세탁기', 'washer': '세탁기',
-      '청소기': '청소기', 'vacuum': '청소기',
-      '에어컨': '에어컨', 'airconditioner': '에어컨', 'aircon': '에어컨',
-      '공기청정기': '공기청정기', 'airpurifier': '공기청정기',
-      '정수기': '정수기', 'waterpurifier': '정수기',
-      '안마의자': '안마의자', 'massagechair': '안마의자',
-      'pc': 'PC', '컴퓨터': 'PC'
+      tv: "TV",
+      오디오: "오디오",
+      audio: "오디오",
+      냉장고: "냉장고",
+      refrigerator: "냉장고",
+      전자렌지: "전자렌지",
+      microwave: "전자렌지",
+      식기세척기: "식기세척기",
+      dishwasher: "식기세척기",
+      세탁기: "세탁기",
+      washer: "세탁기",
+      청소기: "청소기",
+      vacuum: "청소기",
+      에어컨: "에어컨",
+      airconditioner: "에어컨",
+      aircon: "에어컨",
+      공기청정기: "공기청정기",
+      airpurifier: "공기청정기",
+      정수기: "정수기",
+      waterpurifier: "정수기",
+      안마의자: "안마의자",
+      massagechair: "안마의자",
+      pc: "PC",
+      컴퓨터: "PC",
     };
 
     const lowerKeyword = searchKeyword.toLowerCase();
@@ -175,16 +188,32 @@ const Header = () => {
         <div className="on-header-inner">
           <div>
             <ul className="sns-list">
-              <a href="https://www.facebook.com/?locale=ko_KR" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://www.facebook.com/?locale=ko_KR"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <li className="sns-obj-fb"></li>
               </a>
-              <a href="https://section.blog.naver.com/" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://section.blog.naver.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <li className="sns-obj-blg"></li>
               </a>
-              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <li className="sns-obj-ins"></li>
               </a>
-              <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://www.youtube.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <li className="sns-obj-ut"></li>
               </a>
             </ul>
@@ -194,14 +223,19 @@ const Header = () => {
               {isAuthenticated ? (
                 <>
                   <li>
-                    <span className="user-name">{user?.username || user?.userId}님</span>
+                    <span className="user-name">
+                      {user?.username || user?.userId}님
+                    </span>
                   </li>
                   <li>
                     <Link to="/mypage">마이페이지</Link>
                   </li>
                   {isAdmin() && (
                     <li>
-                      <Link to="/admin/dashboard" style={{ color: '#ff6b00', fontWeight: 'bold' }}>
+                      <Link
+                        to="/admin/dashboard"
+                        style={{ color: "#ff6b00", fontWeight: "bold" }}
+                      >
                         관리자페이지
                       </Link>
                     </li>
@@ -241,17 +275,21 @@ const Header = () => {
         <div className="nav-container">
           <ul className="gnb">
             {categoryData.map((category, index) => (
-              <li 
+              <li
                 key={index}
                 onMouseEnter={() => handleMenuEnter(index)}
                 onMouseLeave={handleMenuLeave}
-                className={openMenu === index ? 'menu-open' : ''}
+                className={openMenu === index ? "menu-open" : ""}
               >
-                <a href="#" onClick={(e) => e.preventDefault()}>{category.parentName}</a>
-                <ul className={`depth2 ${openMenu === index ? 'show' : ''}`}>
+                <a href="#" onClick={(e) => e.preventDefault()}>
+                  {category.parentName}
+                </a>
+                <ul className={`depth2 ${openMenu === index ? "show" : ""}`}>
                   {category.children.map((child, childIndex) => (
                     <li key={childIndex}>
-                      <Link to={`/products/category/${encodeURIComponent(child)}`}>
+                      <Link
+                        to={`/products/category/${encodeURIComponent(child)}`}
+                      >
                         {child}
                       </Link>
                     </li>
