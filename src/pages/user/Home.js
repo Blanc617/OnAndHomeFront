@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   addToCompare,
   removeFromCompare,
@@ -10,15 +11,78 @@ import { Link } from "react-router-dom";
 import { productAPI } from "../../api";
 import "./Home.css";
 
+const SEARCH_PLACEHOLDER =
+  "상품명 또는 카테고리를 검색해 보세요 (예: TV, 냉장고)";
+
+const POPULAR_KEYWORDS = [
+  "LG 올레드 EVO OLED65C5FNA",
+  "삼성 Neo QLED 4K",
+  "비스포크 냉장고",
+  "LG 트롬 워시타워",
+  "공기청정기",
+];
+
+const POPUP_MODAL1_KEY = "homePopupHideUntil1";
+const POPUP_MODAL2_KEY = "homePopupHideUntil2";
+const POPUP_MODAL3_KEY = "homePopupHideUntil3";
+
+// 슬라이드 이미지
+const HERO_SLIDES = [
+  "/product_img/slide_01.jpg",
+  "/product_img/slide_02.jpg",
+  "/product_img/slide_03.jpg",
+  "/product_img/slide_04.jpg",
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const compareItems = useSelector((state) => state.compare.items);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 검색
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [homePlaceholder, setHomePlaceholder] = useState(SEARCH_PLACEHOLDER);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // 모달
+  const [isModal1Open, setIsModal1Open] = useState(false);
+  const [isModal2Open, setIsModal2Open] = useState(false);
+  const [isModal3Open, setIsModal3Open] = useState(false);
+
+  // 슬라이드
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   useEffect(() => {
     fetchProducts();
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const hide1 = localStorage.getItem(POPUP_MODAL1_KEY);
+    const hide2 = localStorage.getItem(POPUP_MODAL2_KEY);
+    const hide3 = localStorage.getItem(POPUP_MODAL3_KEY);
+
+    if (hide1 === todayStr && hide2 === todayStr && hide3 === todayStr) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      if (hide1 !== todayStr) setIsModal1Open(true);
+      else if (hide2 !== todayStr) setIsModal2Open(true);
+      else if (hide3 !== todayStr) setIsModal3Open(true);
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 자동 슬라이드
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 2000); // 속도 그대로 유지
+
+    return () => clearInterval(timer);
   }, []);
 
   const fetchProducts = async () => {
@@ -41,18 +105,14 @@ const Home = () => {
   };
 
   const getImageUrl = (imagePath) => {
-    console.log("원본 imagePath:", imagePath);
-
     if (!imagePath) return "/images/no-image.png";
 
-    // uploads/ 경로면 백엔드 서버에서 가져오기
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
       return `http://localhost:8080${
         imagePath.startsWith("/") ? "" : "/"
       }${imagePath}`;
     }
 
-    // 짧은 이름이면 public/product_img/ 폴더에서 가져오기
     if (!imagePath.includes("/") && !imagePath.startsWith("http")) {
       return `/product_img/${imagePath}.jpg`;
     }
@@ -73,7 +133,6 @@ const Home = () => {
         alert("최대 4개 상품까지 비교할 수 있습니다.");
         return;
       }
-
       const compareProduct = {
         id: product.id,
         name: product.name,
@@ -84,31 +143,143 @@ const Home = () => {
         stock: product.stock,
         image: product.thumbnailImage,
       };
-
       dispatch(addToCompare(compareProduct));
     }
   };
 
-  if (loading) {
-    return <div className="loading">로딩 중...</div>;
-  }
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = searchKeyword.trim();
+    if (!trimmed) return;
+
+    navigate(`/products?keyword=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleClickPopular = (word) => {
+    setSearchKeyword(word);
+    navigate(`/products?keyword=${encodeURIComponent(word)}`);
+  };
+
+  // 모달 닫기
+  const handleCloseModal1 = () => {
+    setIsModal1Open(false);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(POPUP_MODAL2_KEY) !== todayStr)
+      setIsModal2Open(true);
+  };
+
+  const handleCloseModal2 = () => {
+    setIsModal2Open(false);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(POPUP_MODAL3_KEY) !== todayStr)
+      setIsModal3Open(true);
+  };
+
+  const handleCloseModal3 = () => {
+    setIsModal3Open(false);
+  };
+
+  // 모달 하루 숨기기
+  const handleHideTodayModal1 = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL1_KEY, today);
+    handleCloseModal1();
+  };
+
+  const handleHideTodayModal2 = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL2_KEY, today);
+    handleCloseModal2();
+  };
+
+  const handleHideTodayModal3 = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL3_KEY, today);
+    handleCloseModal3();
+  };
+
+  const handleDotClick = (index) => {
+    setCurrentSlide(index);
+  };
+
+  if (loading) return <div className="loading">로딩 중...</div>;
 
   return (
     <div className="home-container">
-      <section className="hero-section">
-        <div className="hero-slider">
-          <div className="slide">
-            <img
-              src="/product_img/slide_01.jpg"
-              alt="메인 배너"
-              onError={(e) => {
-                e.target.style.display = "none";
+      {/* ===== 홈 검색 ===== */}
+      <section className="home-search-section">
+        <div className="home-search-inner">
+          <form className="home-search-form" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              className="home-search-input"
+              placeholder={homePlaceholder}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onFocus={() => {
+                setHomePlaceholder("");
+                setIsSearchFocused(true);
+              }}
+              onBlur={() => {
+                setHomePlaceholder(SEARCH_PLACEHOLDER);
+                setIsSearchFocused(false);
               }}
             />
+            <button type="submit" className="home-search-button">
+              검색
+            </button>
+          </form>
+
+          {/* 인기 검색어 */}
+          {isSearchFocused && !searchKeyword.trim() && (
+            <div className="home-popular-search">
+              <span className="home-popular-label">인기 검색어</span>
+              <ul className="home-popular-list">
+                {POPULAR_KEYWORDS.map((word, idx) => (
+                  <li key={word} className="home-popular-item">
+                    <button
+                      type="button"
+                      className="home-popular-btn"
+                      onMouseDown={() => handleClickPopular(word)}
+                    >
+                      <span className="home-popular-rank">{idx + 1}.</span>
+                      <span className="home-popular-text">{word}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== 메인 슬라이드 (화살표 제거 버전) ===== */}
+      <section className="hero-section">
+        <div className="hero-slider">
+          {HERO_SLIDES.map((src, idx) => (
+            <div
+              key={src}
+              className={`hero-slide ${idx === currentSlide ? "active" : ""}`}
+            >
+              <img src={src} alt={`배너 ${idx + 1}`} />
+            </div>
+          ))}
+
+          {/* 도트 네비게이션만 표시 */}
+          <div className="hero-dots">
+            {HERO_SLIDES.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`hero-dot ${idx === currentSlide ? "active" : ""}`}
+                onClick={() => handleDotClick(idx)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
+      {/* ===== 추천 상품 ===== */}
       <section className="product-section">
         <h2 className="section-title">추천 상품</h2>
 
@@ -134,10 +305,10 @@ const Home = () => {
                         alt={product.name}
                         onError={(e) => {
                           e.target.src = "/images/item.png";
-                          e.target.onerror = null;
                         }}
                       />
                     </div>
+
                     <div className="product-info">
                       <h3 className="product-name">{product.name}</h3>
 
@@ -148,6 +319,7 @@ const Home = () => {
                             <span className="original-price">
                               {formatPrice(product.price)}원
                             </span>
+
                             <div className="price-row">
                               <span className="sale-price">
                                 {formatPrice(product.salePrice)}원

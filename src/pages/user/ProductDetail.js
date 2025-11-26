@@ -1,10 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { productAPI, cartAPI, reviewAPI, qnaAPI, favoriteAPI } from "../../api";
-import ReviewItem from "../../components/review/ReviewItem";
+import { useNavigate, useParams } from "react-router-dom";
+import { cartAPI, favoriteAPI, productAPI, qnaAPI, reviewAPI } from "../../api";
 import QnaItem from "../../components/qna/QnaItem";
+import ReviewItem from "../../components/review/ReviewItem";
 import "./ProductDetail.css";
+  // 리뷰 - 별점 기능 
+import StarRating from '../../components/StarRating.jsx';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -22,7 +25,9 @@ const ProductDetail = () => {
   const [qnaIsPrivate, setQnaIsPrivate] = useState(false); // 비밀글 체크박스
   const [activeTab, setActiveTab] = useState("detail");
   const [timeRemaining, setTimeRemaining] = useState("");
-
+  // 리뷰 - 별점 기능 
+  const [rating, setRating] = useState(0);
+  
   // Refs for scrolling
   const detailRef = useRef(null);
   const reviewRef = useRef(null);
@@ -284,25 +289,33 @@ const ProductDetail = () => {
       return;
     }
 
+       // 별점 유효성 검증
+    if (rating === 0) {
+      alert('별점을 선택해주세요.');
+      return;
+    }
+      
     try {
       const response = await reviewAPI.createReview({
         productId: product.id,
         content: reviewContent,
-        rating: reviewRating,
-        userId: user.id,
+        rating: rating,
+        userId: user.id
       });
-
+      
       if (response.success) {
-        alert("리뷰가 등록되었습니다.");
-        setReviewContent("");
-        setReviewRating(5);
+        alert('리뷰가 등록되었습니다.');
+        setReviewContent('');
         loadReviews();
+        setRating(0);
+        loadReviews();
+        loadProductDetail();
       } else {
-        alert(response.message || "리뷰 등록에 실패했습니다.");
+        alert(response.message || '리뷰 등록에 실패했습니다.');
       }
     } catch (error) {
-      console.error("리뷰 작성 오류:", error);
-      alert("리뷰 작성 중 오류가 발생했습니다.");
+      console.error('리뷰 작성 오류:', error);
+      alert('리뷰 작성 중 오류가 발생했습니다.');
     }
   };
 
@@ -354,6 +367,7 @@ const ProductDetail = () => {
       if (response.success) {
         alert("리뷰가 수정되었습니다.");
         loadReviews();
+        loadProductDetail(); 
       } else {
         alert(response.message || "리뷰 수정에 실패했습니다.");
       }
@@ -368,6 +382,7 @@ const ProductDetail = () => {
       const response = await reviewAPI.deleteReview(reviewId);
       if (response.success) {
         alert("리뷰가 삭제되었습니다.");
+        loadProductDetail(); 
         loadReviews();
       } else {
         alert(response.message || "리뷰 삭제에 실패했습니다.");
@@ -434,9 +449,31 @@ const ProductDetail = () => {
             />
           </div>
 
-          <div className="product-info-wrapper">
-            <h2 className="product-title">{product.name}</h2>
-
+              <div className="product-info-wrapper">
+     <h2 className="product-title">{product.name}</h2>        
+      <div className="product-rating-sum">
+        <div className="product-rating">
+          <span className="rating-stars">
+            {(() => {
+              const rating = product.averageRating || 0;
+              const fullStars = Math.floor(rating);
+              const hasHalfStar = (rating - fullStars) >= 0.5;
+              const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+              
+              return (
+                <>
+                  {Array(fullStars).fill().map((_, i) => <FaStar key={`full-${i}`} />)}
+                  {hasHalfStar && <FaStarHalfAlt key="half" />}
+                  {Array(emptyStars).fill().map((_, i) => <FaRegStar key={`empty-${i}`} />)}
+                </>
+              );
+            })()}
+            {(product.averageRating || 0).toFixed(1)}
+            <span className="rating-sum">({product.reviewCount || 0}개 리뷰)</span>
+          </span>
+        </div>
+      </div>
+      
             <table className="product-info-table">
               <tbody>
                 <tr>
@@ -571,34 +608,22 @@ const ProductDetail = () => {
           </div>
           {isAuthenticated && (
             <div className="review-write-form">
-              <div className="form-header">
-                <h3>리뷰 작성</h3>
-              </div>
-              <div className="rating-selector">
-                <label>평점</label>
-                <select
-                  className="rating-select"
-                  value={reviewRating || 5}
-                  onChange={(e) => setReviewRating(parseInt(e.target.value))}
-                >
-                  <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
-                  <option value="4">⭐⭐⭐⭐ (4점)</option>
-                  <option value="3">⭐⭐⭐ (3점)</option>
-                  <option value="2">⭐⭐ (2점)</option>
-                  <option value="1">⭐ (1점)</option>
-                </select>
-              </div>
+                         <div className="review-write">
               <textarea
                 className="textarea"
                 placeholder="리뷰를 작성해주세요"
                 value={reviewContent}
                 onChange={(e) => setReviewContent(e.target.value)}
-                rows="5"
               />
-              <div className="form-actions">
-                <button className="btn btn-submit" onClick={handleSubmitReview}>
-                  리뷰 등록
-                </button>
+
+               {/* 별점 선택 컴포넌트 */} 
+                <StarRating
+                  rating={rating}
+                  onRatingChange={setRating}
+                />
+              <button className="btn btn-submit" onClick={handleSubmitReview}>
+                저장
+              </button>
               </div>
             </div>
           )}
