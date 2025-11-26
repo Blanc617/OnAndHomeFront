@@ -22,7 +22,8 @@ const OrderDetail = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/orders/${id}`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
 
@@ -49,7 +50,8 @@ const OrderDetail = () => {
         { status: newStatus },
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
           }
         }
       );

@@ -43,7 +43,11 @@ const ProductCreate = () => {
   // 카테고리 데이터 가져오기
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/products/categories`);
+      const response = await axios.get(`${API_BASE_URL}/api/admin/products/categories`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
       setCategories(response.data);
       console.log('카테고리 데이터 로드 성공:', response.data);
     } catch (error) {

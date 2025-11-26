@@ -45,7 +45,8 @@ const ProductList = () => {
       const response = await axios.get(url, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         }
       });
       

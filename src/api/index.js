@@ -7,6 +7,7 @@ import userApi from './userApi';
 import reviewApi from './reviewApi';
 import qnaApi from './qnaApi';
 import noticeApi from './noticeApi';
+import { favoriteAPI } from './favoriteApi';
 
 // 대문자 export도 추가 (기존 코드 호환성)
 export const authAPI = authApi;
@@ -17,6 +18,7 @@ export const userAPI = userApi;
 export const reviewAPI = reviewApi;
 export const qnaAPI = qnaApi;
 export const noticeAPI = noticeApi;
+export { favoriteAPI };
 
 // 소문자 export (새 코드용)
 export {
