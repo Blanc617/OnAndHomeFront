@@ -19,19 +19,30 @@ const Login = () => {
   // 로그인 페이지 접속 시 기존 인증 정보 정리 (선택적)
   React.useEffect(() => {
     // 이미 로그인된 상태면 홈으로 이동
+<<<<<<<<< Temporary merge branch 1
     const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
+    
+=========
+    const accessToken = localStorage.getItem("accessToken");
+    const userInfo = localStorage.getItem("userInfo");
 
+>>>>>>>>> Temporary merge branch 2
     if (accessToken && userInfo) {
       try {
         const user = JSON.parse(userInfo);
         if (user && user.userId) {
           // 유효한 사용자 정보가 있으면 홈으로 이동
+<<<<<<<<< Temporary merge branch 1
           console.log('이미 로그인된 사용자:', user.userId);
+=========
+          console.log("이미 로그인된 사용자:", user.userId);
+>>>>>>>>> Temporary merge branch 2
           // navigate('/'); // 원한다면 주석 해제
         }
       } catch (error) {
         // 잘못된 사용자 정보는 제거
+<<<<<<<<< Temporary merge branch 1
         console.log('잘못된 인증 정보 정리');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -39,7 +50,17 @@ const Login = () => {
       }
     }
   }, []);
+  
+=========
+        console.log("잘못된 인증 정보 정리");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
+      }
+    }
+  }, []);
 
+>>>>>>>>> Temporary merge branch 2
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
