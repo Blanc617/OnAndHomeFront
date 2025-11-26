@@ -7,6 +7,9 @@ import {
 } from "../../store/slices/compareSlice";
 import "./ProductList.css";
 
+const SEARCH_PLACEHOLDER =
+  "상품명 또는 카테고리를 검색해 보세요 (예: TV, 냉장고)";
+
 const ProductList = () => {
   const { category } = useParams();
   const navigate = useNavigate();
@@ -22,10 +25,19 @@ const ProductList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
+  // 페이지 상단 검색 input 값
+  const [searchInput, setSearchInput] = useState(keyword || "");
+  const [listPlaceholder, setListPlaceholder] = useState(SEARCH_PLACEHOLDER);
+
   useEffect(() => {
     setCurrentPage(0);
     fetchProducts();
   }, [category, keyword]);
+
+  useEffect(() => {
+    // URL keyword 변경 시 input 값도 동기화
+    setSearchInput(keyword || "");
+  }, [keyword]);
 
   useEffect(() => {
     if (allProducts.length > 0) {
@@ -157,12 +169,43 @@ const ProductList = () => {
     return "전체 상품";
   };
 
+  // 상단 검색창 제출
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = searchInput.trim();
+    if (!trimmed) {
+      // 공백이면 전체 상품 페이지로 이동할지, 그대로 둘지 선택 가능
+      return;
+    }
+    navigate(`/products?keyword=${encodeURIComponent(trimmed)}`);
+  };
+
   return (
     <div className="product-list-page">
       <div className="product-list-container">
         <div className="product-list-header">
-          <h1 className="product-list-title">{getPageTitle()}</h1>
-          <p className="product-list-count">총 {totalElements}개의 상품</p>
+          <div className="product-list-header-top">
+            <div>
+              <h1 className="product-list-title">{getPageTitle()}</h1>
+              <p className="product-list-count">총 {totalElements}개의 상품</p>
+            </div>
+
+            {/* 상단 검색창 */}
+            <form className="product-search-form" onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                className="product-search-input"
+                placeholder={listPlaceholder}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onFocus={() => setListPlaceholder("")}
+                onBlur={() => setListPlaceholder(SEARCH_PLACEHOLDER)}
+              />
+              <button type="submit" className="product-search-button">
+                검색
+              </button>
+            </form>
+          </div>
         </div>
 
         {loading ? (
