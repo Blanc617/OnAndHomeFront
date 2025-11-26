@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
-import axios from 'axios';
+import apiClient from '../../api/axiosConfig';
 import './ProductForm.css';
 
 const ProductEdit = () => {
@@ -42,7 +42,7 @@ const ProductEdit = () => {
   // 카테고리 데이터 가져오기
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/products/categories`);
+      const response = await apiClient.get('/api/admin/products/categories');
       setCategories(response.data);
       console.log('카테고리 데이터 로드 성공:', response.data);
     } catch (error) {
@@ -54,7 +54,7 @@ const ProductEdit = () => {
   const fetchProductData = async () => {
     setFetchLoading(true);
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/products/${id}`);
+      const response = await apiClient.get(`/api/admin/products/${id}`);
       const product = response.data;
 
       console.log('Fetched product:', product);
@@ -221,8 +221,8 @@ const ProductEdit = () => {
         console.log(pair[0] + ': ' + pair[1]);
       }
 
-      const response = await axios.put(
-        `${API_BASE_URL}/api/admin/products/${id}`,
+      const response = await apiClient.put(
+        `/api/admin/products/${id}`,
         submitData,
         {
           headers: {
