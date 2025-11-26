@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { productAPI, cartAPI, reviewAPI, qnaAPI } from "../../api";
@@ -19,6 +19,14 @@ const ProductDetail = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [qnaTitle, setQnaTitle] = useState("");
   const [qnaContent, setQnaContent] = useState("");
+  const [activeTab, setActiveTab] = useState("detail");
+  const [timeRemaining, setTimeRemaining] = useState("");
+
+  // Refs for scrolling
+  const detailRef = useRef(null);
+  const reviewRef = useRef(null);
+  const qnaRef = useRef(null);
+  const returnRef = useRef(null);
 
   useEffect(() => {
     loadProductDetail();
@@ -30,6 +38,49 @@ const ProductDetail = () => {
       loadQnas();
     }
   }, [product]);
+
+  // 남은 시간 계산
+  useEffect(() => {
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        12,
+        0,
+        0
+      );
+
+      // 현재 시간이 12시 이후면 다음날 12시로 설정
+      if (now.getHours() >= 12) {
+        today.setDate(today.getDate() + 1);
+      }
+
+      const diff = today - now;
+
+      if (diff <= 0) {
+        return "00:00:00";
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+        2,
+        "0"
+      )}:${String(seconds).padStart(2, "0")}`;
+    };
+
+    setTimeRemaining(calculateTimeRemaining());
+
+    const timer = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const loadProductDetail = async () => {
     try {
@@ -81,19 +132,48 @@ const ProductDetail = () => {
 
     if (!imagePath) return "/images/no-image.png";
 
-    // uploads/ 경로면 백엔드 서버에서 가져오기
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
       return `http://localhost:8080${
         imagePath.startsWith("/") ? "" : "/"
       }${imagePath}`;
     }
 
-    // 짧은 이름이면 public/product_img/ 폴더에서 가져오기
     if (!imagePath.includes("/") && !imagePath.startsWith("http")) {
       return `/product_img/${imagePath}.jpg`;
     }
 
     return imagePath;
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+
+    let targetRef;
+    switch (tab) {
+      case "detail":
+        targetRef = detailRef;
+        break;
+      case "review":
+        targetRef = reviewRef;
+        break;
+      case "qna":
+        targetRef = qnaRef;
+        break;
+      case "return":
+        targetRef = returnRef;
+        break;
+      default:
+        return;
+    }
+
+    if (targetRef && targetRef.current) {
+      const yOffset = -200;
+      const element = targetRef.current;
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
   };
 
   const increaseQuantity = () => {
@@ -394,8 +474,37 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {product.detailImage && (
-          <div className="product-detail-image-section">
+        {/* 탭 메뉴 */}
+        <div className="tab-menu">
+          <button
+            className={`tab-button ${activeTab === "detail" ? "active" : ""}`}
+            onClick={() => handleTabClick("detail")}
+          >
+            상세정보
+          </button>
+          <button
+            className={`tab-button ${activeTab === "review" ? "active" : ""}`}
+            onClick={() => handleTabClick("review")}
+          >
+            리뷰 {reviews.length}
+          </button>
+          <button
+            className={`tab-button ${activeTab === "qna" ? "active" : ""}`}
+            onClick={() => handleTabClick("qna")}
+          >
+            Q&A {qnas.length}
+          </button>
+          <button
+            className={`tab-button ${activeTab === "return" ? "active" : ""}`}
+            onClick={() => handleTabClick("return")}
+          >
+            반품/교환정보
+          </button>
+        </div>
+
+        {/* 상세정보 섹션 */}
+        <div ref={detailRef} className="detail-section">
+          {product.detailImage ? (
             <img
               src={getImageUrl(product.detailImage)}
               alt="상세 이미지"
@@ -404,11 +513,14 @@ const ProductDetail = () => {
                 e.target.style.display = "none";
               }}
             />
-          </div>
-        )}
+          ) : (
+            <div className="empty-message">등록된 상세 이미지가 없습니다.</div>
+          )}
+        </div>
 
-        <div className="review-section">
-          <h2 className="section-title">Review</h2>
+        {/* 리뷰 섹션 */}
+        <div ref={reviewRef} className="review-section">
+          <h2 className="section-title">리뷰 {reviews.length}</h2>
           <div className="review-list">
             {reviews.length === 0 ? (
               <div className="empty-message">등록된 리뷰가 없습니다.</div>
@@ -438,8 +550,9 @@ const ProductDetail = () => {
           )}
         </div>
 
-        <div className="qna-section">
-          <h2 className="section-title">Q&A</h2>
+        {/* QnA 섹션 */}
+        <div ref={qnaRef} className="qna-section">
+          <h2 className="section-title">Q&A {qnas.length}</h2>
           <div className="qna-list">
             {qnas.length === 0 ? (
               <div className="empty-message">등록된 문의가 없습니다.</div>
@@ -474,6 +587,92 @@ const ProductDetail = () => {
               </button>
             </div>
           )}
+        </div>
+
+        {/* 반품/교환정보 섹션 */}
+        <div ref={returnRef} className="return-section">
+          <h2 className="section-title">반품/교환정보</h2>
+          <div className="return-info-content">
+            <div className="info-box">
+              <h3>배송기간</h3>
+              <p>오늘 바로 발송 시 도착</p>
+              <p>
+                <strong style={{ color: "#e94738", fontSize: "18px" }}>
+                  {timeRemaining}
+                </strong>{" "}
+                내에 결제 시 오늘 바로 발송됩니다.
+              </p>
+              <p style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+                * 오늘 낮 12:00 이전까지 결제 시 당일 발송
+              </p>
+            </div>
+
+            <div className="info-box">
+              <h3>상품정보</h3>
+              <table className="info-table">
+                <tbody>
+                  <tr>
+                    <th>상품번호</th>
+                    <td>{product.id}</td>
+                    <th>상품상태</th>
+                    <td>신상품</td>
+                  </tr>
+                  <tr>
+                    <th>제조사</th>
+                    <td>{product.manufacturer || "-"}</td>
+                    <th>브랜드</th>
+                    <td>{product.brand || "-"}</td>
+                  </tr>
+                  <tr>
+                    <th>원산지</th>
+                    <td colSpan="3">{product.country || "-"}</td>
+                  </tr>
+                  <tr>
+                    <th>카테고리</th>
+                    <td>{product.category || "-"}</td>
+                    <th>재고</th>
+                    <td>{product.stock || 0}개</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="info-box">
+              <h3>반품/교환 안내</h3>
+              <ul>
+                <li>상품 수령 후 7일 이내 반품/교환 가능합니다.</li>
+                <li>단순 변심의 경우 왕복 배송비가 발생할 수 있습니다.</li>
+                <li>
+                  상품의 하자, 오배송의 경우 무료로 반품/교환이 가능합니다.
+                </li>
+                <li>
+                  포장을 개봉하였거나 훼손되어 상품 가치가 상실된 경우
+                  반품/교환이 불가능합니다.
+                </li>
+                <li>
+                  고객님의 책임 있는 사유로 상품이 멸실 또는 훼손된 경우
+                  반품/교환이 불가능합니다.
+                </li>
+              </ul>
+            </div>
+
+            <div className="info-box">
+              <h3>교환/반품 제한사항</h3>
+              <ul>
+                <li>
+                  주문/제작 상품의 경우, 상품 제작이 시작된 후 취소 및 반품이
+                  불가능합니다.
+                </li>
+                <li>
+                  전자제품의 경우, 포장 개봉 시 반품/교환이 제한될 수 있습니다.
+                </li>
+                <li>
+                  가전제품의 A/S 및 품질보증 기준은
+                  소비자분쟁해결기준(공정거래위원회 고시)에 따릅니다.
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
