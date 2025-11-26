@@ -49,6 +49,12 @@ const Header = () => {
   // 장바구니 개수 업데이트
   useEffect(() => {
     const updateCartCount = async () => {
+      // 로그인하지 않은 경우 카운트 0으로 설정
+      if (!isAuthenticated) {
+        setCartCount(0);
+        return;
+      }
+
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         setCartCount(0);
@@ -59,23 +65,38 @@ const Header = () => {
         const response = await fetch("http://localhost:8080/api/cart/count", {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
+        
+        if (!response.ok) {
+          // 인증 오류 등의 경우 조용히 처리
+          setCartCount(0);
+          return;
+        }
+        
         const data = await response.json();
         if (data.success) {
           setCartCount(data.count || 0);
+        } else {
+          setCartCount(0);
         }
       } catch (error) {
-        console.error("장바구니 개수 조회 실패:", error);
+        // 에러 발생 시 조용히 처리 (콘솔에만 로그)
+        console.debug("장바구니 개수 조회 실패:", error.message);
+        setCartCount(0);
       }
     };
 
-    if (isAuthenticated) {
-      updateCartCount();
-    }
+    updateCartCount();
   }, [isAuthenticated]);
 
   // 알림 개수 업데이트
   useEffect(() => {
     const updateNotificationCount = async () => {
+      // 로그인하지 않은 경우 카운트 0으로 설정
+      if (!isAuthenticated) {
+        dispatch(setUnreadCount(0));
+        return;
+      }
+
       const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         dispatch(setUnreadCount(0));
@@ -86,9 +107,13 @@ const Header = () => {
         const response = await notificationApi.getUnreadCount();
         if (response.success) {
           dispatch(setUnreadCount(response.count || 0));
+        } else {
+          dispatch(setUnreadCount(0));
         }
       } catch (error) {
-        console.error("알림 개수 조회 실패:", error);
+        // 에러 발생 시 조용히 처리
+        console.debug("알림 개수 조회 실패:", error.message);
+        dispatch(setUnreadCount(0));
       }
     };
 
@@ -97,6 +122,8 @@ const Header = () => {
       // 30초마다 알림 개수 갱신
       const interval = setInterval(updateNotificationCount, 30000);
       return () => clearInterval(interval);
+    } else {
+      dispatch(setUnreadCount(0));
     }
   }, [isAuthenticated, dispatch]);
 

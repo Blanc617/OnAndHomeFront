@@ -53,6 +53,100 @@
   margin: 30px 0;
 }
 
+/* 이메일 인증 컨테이너 */
+.email-verification-container {
+  display: flex;
+  gap: 10px;
+}
+
+.email-input {
+  flex: 1;
+}
+
+.verification-btn {
+  min-width: 100px;
+  white-space: nowrap;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 인증 코드 섹션 */
+.verification-code-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 2px solid #667eea;
+}
+
+.login-label-small {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.verification-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.verification-code-input {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 3px;
+}
+
+.verification-confirm-btn {
+  min-width: 80px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.timer-display {
+  text-align: center;
+  color: #ff6b6b;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 에러 메시지 (작은 크기) */
+.error-message-small {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* 성공 메시지 */
+.success-message {
+  color: #388e3c;
+  background-color: #e8f5e9;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 500;
+  border-left: 4px solid #4caf50;
+}
+
+/* 에러 알림 */
+.error-alert {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 500;
+  border-left: 4px solid #f44336;
+}
+
 .form-group {
   margin-bottom: 20px;
 }

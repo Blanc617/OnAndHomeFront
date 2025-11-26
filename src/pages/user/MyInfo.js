@@ -30,6 +30,26 @@ const MyInfo = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  
+  // 이메일 인증 상태 (비밀번호 변경용)
+  const [passwordEmailVerification, setPasswordEmailVerification] = useState({
+    codeSent: false,
+    code: '',
+    verified: false,
+    timer: 0,
+    timerInterval: null,
+  });
+  
+  // 이메일 인증 상태 (회원 탈퇴용)
+  const [deleteEmailVerification, setDeleteEmailVerification] = useState({
+    codeSent: false,
+    code: '',
+    verified: false,
+    timer: 0,
+    timerInterval: null,
+  });
+  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // 사용자 정보 조회
   useEffect(() => {
@@ -58,6 +78,219 @@ const MyInfo = () => {
       setLoading(false);
     }
   };
+  
+  // 타이머 시작 (비밀번호 변경용)
+  const startPasswordTimer = () => {
+    if (passwordEmailVerification.timerInterval) {
+      clearInterval(passwordEmailVerification.timerInterval);
+    }
+    
+    setPasswordEmailVerification(prev => ({ ...prev, timer: 300 }));
+    
+    const interval = setInterval(() => {
+      setPasswordEmailVerification(prev => {
+        if (prev.timer <= 1) {
+          clearInterval(interval);
+          return { ...prev, timer: 0, timerInterval: null, codeSent: false };
+        }
+        return { ...prev, timer: prev.timer - 1 };
+      });
+    }, 1000);
+    
+    setPasswordEmailVerification(prev => ({ ...prev, timerInterval: interval }));
+  };
+  
+  // 타이머 시작 (회원 탈퇴용)
+  const startDeleteTimer = () => {
+    if (deleteEmailVerification.timerInterval) {
+      clearInterval(deleteEmailVerification.timerInterval);
+    }
+    
+    setDeleteEmailVerification(prev => ({ ...prev, timer: 300 }));
+    
+    const interval = setInterval(() => {
+      setDeleteEmailVerification(prev => {
+        if (prev.timer <= 1) {
+          clearInterval(interval);
+          return { ...prev, timer: 0, timerInterval: null, codeSent: false };
+        }
+        return { ...prev, timer: prev.timer - 1 };
+      });
+    }, 1000);
+    
+    setDeleteEmailVerification(prev => ({ ...prev, timerInterval: interval }));
+  };
+  
+  // 타이머 포맷팅
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // 비밀번호 변경 인증 코드 전송
+  const handleSendPasswordCode = async () => {
+    if (!userInfo.email) {
+      alert('이메일 정보가 없습니다.');
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:8080/api/email/send-password-reset-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userInfo.email }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setPasswordEmailVerification(prev => ({
+          ...prev,
+          codeSent: true,
+          verified: false,
+        }));
+        startPasswordTimer();
+        alert('인증 코드가 이메일로 전송되었습니다.');
+      } else {
+        alert(data.message || '인증 코드 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('인증 코드 전송 오류:', error);
+      alert('인증 코드 전송 중 오류가 발생했습니다.');
+    }
+  };
+  
+  // 비밀번호 변경 인증 코드 확인
+  const handleVerifyPasswordCode = async () => {
+    if (!passwordEmailVerification.code) {
+      alert('인증 코드를 입력해주세요.');
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:8080/api/email/verify-password-reset-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userInfo.email,
+          code: passwordEmailVerification.code,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (passwordEmailVerification.timerInterval) {
+          clearInterval(passwordEmailVerification.timerInterval);
+        }
+        setPasswordEmailVerification(prev => ({
+          ...prev,
+          verified: true,
+          timer: 0,
+          timerInterval: null,
+        }));
+        alert('인증이 완료되었습니다!');
+      } else {
+        alert(data.message || '인증 코드가 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('인증 코드 확인 오류:', error);
+      alert('인증 코드 확인 중 오류가 발생했습니다.');
+    }
+  };
+  
+  // 회원 탈퇴 인증 코드 전송
+  const handleSendDeleteCode = async () => {
+    if (!userInfo.email) {
+      alert('이메일 정보가 없습니다.');
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:8080/api/email/send-account-deletion-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userInfo.email }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setDeleteEmailVerification(prev => ({
+          ...prev,
+          codeSent: true,
+          verified: false,
+        }));
+        startDeleteTimer();
+        alert('인증 코드가 이메일로 전송되었습니다.');
+      } else {
+        alert(data.message || '인증 코드 전송에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('인증 코드 전송 오류:', error);
+      alert('인증 코드 전송 중 오류가 발생했습니다.');
+    }
+  };
+  
+  // 회원 탈퇴 인증 코드 확인
+  const handleVerifyDeleteCode = async () => {
+    if (!deleteEmailVerification.code) {
+      alert('인증 코드를 입력해주세요.');
+      return;
+    }
+    
+    try {
+      const response = await fetch('http://localhost:8080/api/email/verify-account-deletion-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userInfo.email,
+          code: deleteEmailVerification.code,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        if (deleteEmailVerification.timerInterval) {
+          clearInterval(deleteEmailVerification.timerInterval);
+        }
+        setDeleteEmailVerification(prev => ({
+          ...prev,
+          verified: true,
+          timer: 0,
+          timerInterval: null,
+        }));
+        alert('인증이 완료되었습니다!');
+      } else {
+        alert(data.message || '인증 코드가 올바르지 않습니다.');
+      }
+    } catch (error) {
+      console.error('인증 코드 확인 오류:', error);
+      alert('인증 코드 확인 중 오류가 발생했습니다.');
+    }
+  };
+  
+  // 모달 닫기 시 cleanup
+  useEffect(() => {
+    return () => {
+      if (passwordEmailVerification.timerInterval) {
+        clearInterval(passwordEmailVerification.timerInterval);
+      }
+      if (deleteEmailVerification.timerInterval) {
+        clearInterval(deleteEmailVerification.timerInterval);
+      }
+    };
+  }, []);
 
   // 수정 모드 전환
   const handleEditToggle = () => {
@@ -101,6 +334,12 @@ const MyInfo = () => {
 
   // 비밀번호 변경
   const handlePasswordChange = async () => {
+    // 이메일 인증 확인
+    if (!passwordEmailVerification.verified) {
+      alert('먼저 이메일 인증을 완료해주세요.');
+      return;
+    }
+    
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       alert('새 비밀번호가 일치하지 않습니다.');
       return;
@@ -114,7 +353,8 @@ const MyInfo = () => {
     try {
       const response = await userApi.changePassword({
         oldPassword: passwordForm.oldPassword,
-        newPassword: passwordForm.newPassword
+        newPassword: passwordForm.newPassword,
+        verificationCode: passwordEmailVerification.code
       });
       
       if (response.success) {
@@ -125,6 +365,13 @@ const MyInfo = () => {
           newPassword: '',
           confirmPassword: ''
         });
+        setPasswordEmailVerification({
+          codeSent: false,
+          code: '',
+          verified: false,
+          timer: 0,
+          timerInterval: null,
+        });
       }
     } catch (err) {
       console.error('비밀번호 변경 실패:', err);
@@ -134,9 +381,15 @@ const MyInfo = () => {
 
   // 회원 탈퇴
   const handleDeleteAccount = async () => {
+    // 이메일 인증 확인
+    if (!deleteEmailVerification.verified) {
+      alert('먼저 이메일 인증을 완료해주세요.');
+      return;
+    }
+    
     if (window.confirm('정말로 회원 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.')) {
       try {
-        const response = await userApi.deleteAccount();
+        const response = await userApi.deleteAccount(deleteEmailVerification.code);
         if (response.success) {
           alert('회원 탈퇴가 완료되었습니다.');
           
@@ -309,14 +562,32 @@ const MyInfo = () => {
           <div className="account-actions">
             <button 
               className="btn-password-change"
-              onClick={() => setShowPasswordModal(true)}
+              onClick={() => {
+                setShowPasswordModal(true);
+                setPasswordEmailVerification({
+                  codeSent: false,
+                  code: '',
+                  verified: false,
+                  timer: 0,
+                  timerInterval: null,
+                });
+              }}
             >
               비밀번호 변경
             </button>
             
             <button 
               className="btn-delete-account"
-              onClick={handleDeleteAccount}
+              onClick={() => {
+                setShowDeleteModal(true);
+                setDeleteEmailVerification({
+                  codeSent: false,
+                  code: '',
+                  verified: false,
+                  timer: 0,
+                  timerInterval: null,
+                });
+              }}
             >
               회원 탈퇴
             </button>
@@ -331,6 +602,45 @@ const MyInfo = () => {
             <h2>비밀번호 변경</h2>
             
             <div className="modal-form">
+              {/* 이메일 인증 섹션 */}
+              <div className="form-group email-verification-section">
+                <label>이메일 인증</label>
+                <div className="email-display">
+                  <span className="email-text">{userInfo.email}</span>
+                </div>
+                <div className="verification-input-group">
+                  <input
+                    type="text"
+                    value={passwordEmailVerification.code}
+                    onChange={(e) => setPasswordEmailVerification(prev => ({
+                      ...prev,
+                      code: e.target.value
+                    }))}
+                    placeholder="인증 코드 6자리"
+                    maxLength="6"
+                    disabled={passwordEmailVerification.verified || !passwordEmailVerification.codeSent}
+                    style={{
+                      backgroundColor: passwordEmailVerification.verified ? '#f0f0f0' : 'white'
+                    }}
+                  />
+                  {passwordEmailVerification.codeSent && passwordEmailVerification.timer > 0 && (
+                    <span className="timer">{formatTime(passwordEmailVerification.timer)}</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={passwordEmailVerification.codeSent ? handleVerifyPasswordCode : handleSendPasswordCode}
+                    className={passwordEmailVerification.verified ? "btn-verified" : "btn-send-code"}
+                    disabled={passwordEmailVerification.verified}
+                  >
+                    {passwordEmailVerification.verified ? '인증완료' : 
+                     passwordEmailVerification.codeSent ? '확인' : '인증'}
+                  </button>
+                </div>
+                {passwordEmailVerification.verified && (
+                  <p className="verification-success">✓ 이메일 인증이 완료되었습니다.</p>
+                )}
+              </div>
+
               <div className="form-group">
                 <label>현재 비밀번호</label>
                 <input
@@ -380,8 +690,81 @@ const MyInfo = () => {
                 <button 
                   className="btn-modal-confirm"
                   onClick={handlePasswordChange}
+                  disabled={!passwordEmailVerification.verified}
                 >
                   변경
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 회원 탈퇴 모달 */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => setShowDeleteModal(false)}>
+          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#dc3545' }}>⚠️ 회원 탈퇴</h2>
+            
+            <div className="modal-form">
+              <div className="warning-message">
+                <p>회원 탈퇴 시 모든 데이터가 <strong>영구적으로 삭제</strong>됩니다.</p>
+                <p>이 작업은 <strong>취소할 수 없습니다.</strong></p>
+              </div>
+
+              {/* 이메일 인증 섹션 */}
+              <div className="form-group email-verification-section">
+                <label>이메일 인증</label>
+                <div className="email-display">
+                  <span className="email-text">{userInfo.email}</span>
+                </div>
+                <div className="verification-input-group">
+                  <input
+                    type="text"
+                    value={deleteEmailVerification.code}
+                    onChange={(e) => setDeleteEmailVerification(prev => ({
+                      ...prev,
+                      code: e.target.value
+                    }))}
+                    placeholder="인증 코드 6자리"
+                    maxLength="6"
+                    disabled={deleteEmailVerification.verified || !deleteEmailVerification.codeSent}
+                    style={{
+                      backgroundColor: deleteEmailVerification.verified ? '#f0f0f0' : 'white'
+                    }}
+                  />
+                  {deleteEmailVerification.codeSent && deleteEmailVerification.timer > 0 && (
+                    <span className="timer">{formatTime(deleteEmailVerification.timer)}</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={deleteEmailVerification.codeSent ? handleVerifyDeleteCode : handleSendDeleteCode}
+                    className={deleteEmailVerification.verified ? "btn-verified" : "btn-send-code"}
+                    disabled={deleteEmailVerification.verified}
+                  >
+                    {deleteEmailVerification.verified ? '인증완료' : 
+                     deleteEmailVerification.codeSent ? '확인' : '인증'}
+                  </button>
+                </div>
+                {deleteEmailVerification.verified && (
+                  <p className="verification-success">✓ 이메일 인증이 완료되었습니다.</p>
+                )}
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  className="btn-modal-cancel"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  취소
+                </button>
+                <button 
+                  className="btn-modal-confirm btn-delete"
+                  onClick={handleDeleteAccount}
+                  disabled={!deleteEmailVerification.verified}
+                  style={{ backgroundColor: '#dc3545' }}
+                >
+                  탈퇴하기
                 </button>
               </div>
             </div>

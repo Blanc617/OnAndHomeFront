@@ -31,8 +31,10 @@ const userApi = {
   /**
    * 회원 탈퇴
    */
-  deleteAccount: async () => {
-    const response = await apiClient.delete('/api/user/account');
+  deleteAccount: async (verificationCode) => {
+    const response = await apiClient.delete('/api/user/account', {
+      data: { verificationCode }
+    });
     return response.data;
   },
 };
