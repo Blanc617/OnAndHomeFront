@@ -45,9 +45,10 @@ apiClient.interceptors.response.use(
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userInfo');
           
-          // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+          // 이미 로그인/회원가입/비밀번호 재설정 페이지에 있으면 리다이렉트하지 않음
           if (!window.location.pathname.includes('/login') && 
               !window.location.pathname.includes('/signup') &&
+              !window.location.pathname.includes('/reset-password') &&
               !window.location.pathname.includes('/auth/kakao')) {
             window.location.href = '/login';
           }
@@ -85,9 +86,10 @@ apiClient.interceptors.response.use(
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userInfo');
         
-        // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+        // 이미 로그인/회원가입/비밀번호 재설정 페이지에 있으면 리다이렉트하지 않음
         if (!window.location.pathname.includes('/login') && 
             !window.location.pathname.includes('/signup') &&
+            !window.location.pathname.includes('/reset-password') &&
             !window.location.pathname.includes('/auth/kakao')) {
           window.location.href = '/login';
         }

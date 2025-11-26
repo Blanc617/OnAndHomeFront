@@ -29,6 +29,7 @@ import OrderPayment from "./pages/user/OrderPayment";
 import ProductDetail from "./pages/user/ProductDetail";
 import ProductList from "./pages/user/ProductList";
 import Signup from "./pages/user/Signup";
+import ResetPassword from "./pages/user/ResetPassword";
 
 // 공지사항, Q&A, 리뷰
 import NoticeDetail from "./pages/user/board/NoticeDetail";
@@ -115,6 +116,7 @@ const AppContent = () => {
           <Route path="login" element={<Login />} />
           <Route path="auth/kakao/callback" element={<KakaoCallback />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           
           {/* 상품 */}
           <Route path="products" element={<ProductList />} />

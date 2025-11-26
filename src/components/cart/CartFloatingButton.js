@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { cartAPI } from "../../api";
 import CartSidePanel from "./CartSidePanel";
 import "./CartFloatingButton.css";
@@ -6,29 +7,39 @@ import "./CartFloatingButton.css";
 const CartFloatingButton = () => {
   const [cartCount, setCartCount] = useState(0);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   // 장바구니 개수 로드
   const loadCartCount = async () => {
+    // 로그인하지 않은 경우 API 호출하지 않음
+    if (!isAuthenticated) {
+      setCartCount(0);
+      return;
+    }
+
     try {
       const response = await cartAPI.getCartCount();
       if (response.success) {
         setCartCount(response.data || response.count || 0);  // data 또는 count 필드 확인
       }
     } catch (error) {
-      console.error('장바구니 개수 조회 실패:', error);
+      console.debug('장바구니 개수 조회 실패:', error.message);
+      setCartCount(0);
     }
   };
 
   useEffect(() => {
     loadCartCount();
     
-    // 5초마다 장바구니 개수 갱신
-    const interval = setInterval(() => {
-      loadCartCount();
-    }, 5000);
+    // 로그인한 경우에만 5초마다 장바구니 개수 갱신
+    if (isAuthenticated) {
+      const interval = setInterval(() => {
+        loadCartCount();
+      }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   const handleClick = () => {
     setIsPanelOpen(true);
