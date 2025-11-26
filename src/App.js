@@ -6,6 +6,7 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import store from "./store";
 import { initializeAuth } from "./store/slices/userSlice";
 
@@ -108,6 +109,7 @@ const AppContent = () => {
   
   return (
     <Router>
+      <Toaster position="top-right" />
       <Routes>
         {/* 사용자 페이지 */}
         <Route path="/" element={<UserLayout />}>

@@ -225,27 +225,6 @@ const OrderDetail = () => {
             </div>
           </div>
         </div>
-
-        {/* 결제 정보 */}
-        <div className="detail-section payment-section">
-          <h3>결제 정보</h3>
-          <div className="payment-summary">
-            <div className="payment-row">
-              <span>상품 금액</span>
-              <span>{formatPrice(order.totalAmount)}원</span>
-            </div>
-            <div className="payment-row">
-              <span>배송비</span>
-              <span>0원</span>
-            </div>
-            <div className="payment-row total">
-              <span>총 결제 금액</span>
-              <span className="total-amount">
-                {formatPrice(order.totalAmount)}원
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

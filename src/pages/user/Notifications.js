@@ -67,6 +67,8 @@ const Notifications = () => {
       // 알림 타입에 따라 페이지 이동
       switch (notification.type) {
         case 'ORDER':
+        case 'ORDER_STATUS':      // 배송 상태 변경 알림
+        case 'PAYMENT_CONFIRMED': // 입금 확인 알림
           // 해당 주문 상세 페이지로 이동
           if (notification.referenceId) {
             const path = `/order/${notification.referenceId}`;
@@ -78,12 +80,35 @@ const Notifications = () => {
           }
           break;
         case 'REVIEW':
-        case 'QNA':
-          // 해당 상품 상세 페이지로 이동 (referenceId = productId)
+          // 해당 상품 상세 페이지로 이동
           if (notification.referenceId) {
             const path = `/products/${notification.referenceId}`;
             console.log('🚀 상품 상세로 이동:', path);
             navigate(path, { state: { from: 'notifications', type: notification.type } });
+          }
+          break;
+        case 'REVIEW_REPLY':
+          // 리뷰 답변 - 리뷰 상세 페이지로 이동
+          if (notification.referenceId) {
+            const path = `/review/${notification.referenceId}`;
+            console.log('🚀 리뷰 상세로 이동:', path);
+            navigate(path, { state: { from: 'notifications' } });
+          }
+          break;
+        case 'QNA':
+          // Q&A - 상품 상세 페이지로 이동
+          if (notification.referenceId) {
+            const path = `/products/${notification.referenceId}`;
+            console.log('🚀 상품 상세로 이동:', path);
+            navigate(path, { state: { from: 'notifications', type: notification.type } });
+          }
+          break;
+        case 'QNA_REPLY':
+          // Q&A 답변 - Q&A 상세 페이지로 이동
+          if (notification.referenceId) {
+            const path = `/qna/${notification.referenceId}`;
+            console.log('🚀 Q&A 상세로 이동:', path);
+            navigate(path, { state: { from: 'notifications' } });
           }
           break;
         case 'NOTICE':
@@ -156,17 +181,23 @@ const Notifications = () => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'ORDER':
-        return '📦';
+        return '📦'; // 주문 완료
+      case 'ORDER_STATUS':
+        return '🚚'; // 배송 상태 변경
+      case 'PAYMENT_CONFIRMED':
+        return '💳'; // 입금 확인
       case 'REVIEW':
-        return '⭐';
+      case 'REVIEW_REPLY':
+        return '⭐'; // 리뷰
       case 'QNA':
-        return '❓';
+      case 'QNA_REPLY':
+        return '❓'; // Q&A
       case 'NOTICE':
-        return '📢';
+        return '📢'; // 공지사항
       case 'SYSTEM':
-        return '⚙️';
+        return '⚙️'; // 시스템
       default:
-        return '📌';
+        return '📌'; // 기본
     }
   };
 
