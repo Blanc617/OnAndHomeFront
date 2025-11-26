@@ -1,58 +1,68 @@
-import { useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import store from './store';
-import { initializeAuth } from './store/slices/userSlice';
+import { useEffect } from "react";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import store from "./store";
+import { initializeAuth } from "./store/slices/userSlice";
 
 // 레이아웃
-import AdminLayout from './components/layout/AdminLayout';
-import UserLayout from './components/layout/UserLayout';
+import AdminLayout from "./components/layout/AdminLayout";
+import UserLayout from "./components/layout/UserLayout";
 
 // 사용자 페이지
-import Cart from './pages/user/Cart';
-import Home from './pages/user/Home';
-import Login from './pages/user/Login';
-import KakaoCallback from './pages/user/KakaoCallback';
-import MyInfo from './pages/user/MyInfo';
-import MyOrders from './pages/user/MyOrders';
-import MyPage from './pages/user/MyPage';
-import MyQna from './pages/user/MyQna';
-import MyReviews from './pages/user/MyReviews';
-import Order from './pages/user/Order';
-import OrderComplete from './pages/user/OrderComplete';
-import OrderPayment from './pages/user/OrderPayment';
-import ProductDetail from './pages/user/ProductDetail';
-import ProductList from './pages/user/ProductList';
-import Signup from './pages/user/Signup';
+import Cart from "./pages/user/Cart";
+import Home from "./pages/user/Home";
+import Login from "./pages/user/Login";
+import KakaoCallback from "./pages/user/KakaoCallback";
+import MyInfo from "./pages/user/MyInfo";
+import MyOrders from "./pages/user/MyOrders";
+import MyPage from "./pages/user/MyPage";
+import MyQna from "./pages/user/MyQna";
+import MyReviews from "./pages/user/MyReviews";
+import Order from "./pages/user/Order";
+import OrderComplete from "./pages/user/OrderComplete";
+import OrderPayment from "./pages/user/OrderPayment";
+import ProductDetail from "./pages/user/ProductDetail";
+import ProductList from "./pages/user/ProductList";
+import Signup from "./pages/user/Signup";
 
 // 공지사항, Q&A, 리뷰
-import NoticeDetail from './pages/user/board/NoticeDetail';
-import NoticeList from './pages/user/board/NoticeList';
-import QnaDetail from './pages/user/board/QnaDetail';
-import QnaList from './pages/user/board/QnaList';
-import QnaWrite from './pages/user/board/QnaWrite';
-import ReviewDetail from './pages/user/board/ReviewDetail';
-import ReviewList from './pages/user/board/ReviewList';
+import NoticeDetail from "./pages/user/board/NoticeDetail";
+import NoticeList from "./pages/user/board/NoticeList";
+import QnaDetail from "./pages/user/board/QnaDetail";
+import QnaList from "./pages/user/board/QnaList";
+import QnaWrite from "./pages/user/board/QnaWrite";
+import ReviewDetail from "./pages/user/board/ReviewDetail";
+import ReviewList from "./pages/user/board/ReviewList";
 
 // 관리자 페이지
-import AdminDashboard from './pages/admin/Dashboard';
-import AdminNoticeDetail from './pages/admin/NoticeDetail';
-import AdminNoticeEdit from './pages/admin/NoticeEdit';
-import AdminNoticeList from './pages/admin/NoticeList';
-import AdminNoticeWrite from './pages/admin/NoticeWrite';
-import AdminOrderDetail from './pages/admin/OrderDetail';
-import AdminOrderList from './pages/admin/OrderList';
-import AdminProductCreate from './pages/admin/ProductCreate';
-import AdminProductEdit from './pages/admin/ProductEdit';
-import AdminProductList from './pages/admin/ProductList';
-import AdminQnaDetail from './pages/admin/QnaDetail';
-import AdminQnaList from './pages/admin/QnaList';
-import AdminReviewDetail from './pages/admin/ReviewDetail';
-import AdminReviewList from './pages/admin/ReviewList';
-import AdminUserList from './pages/admin/UserList';
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminNoticeDetail from "./pages/admin/NoticeDetail";
+import AdminNoticeEdit from "./pages/admin/NoticeEdit";
+import AdminNoticeList from "./pages/admin/NoticeList";
+import AdminNoticeWrite from "./pages/admin/NoticeWrite";
+import AdminOrderDetail from "./pages/admin/OrderDetail";
+import AdminOrderList from "./pages/admin/OrderList";
+import AdminProductCreate from "./pages/admin/ProductCreate";
+import AdminProductEdit from "./pages/admin/ProductEdit";
+import AdminProductList from "./pages/admin/ProductList";
+import AdminQnaDetail from "./pages/admin/QnaDetail";
+import AdminQnaList from "./pages/admin/QnaList";
+import AdminReviewList from "./pages/admin/ReviewList";
+import AdminUserList from "./pages/admin/UserList";
+import Notifications from "./pages/user/Notifications";
+import OrderDetail from "./pages/user/OrderDetail";
 
 // ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 분기 제외)
-const ProtectedRoute = ({ children, requireAuth = true, requireAdmin = false }) => {
+const ProtectedRoute = ({
+  children,
+  requireAuth = true,
+  requireAdmin = false,
+}) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   
   // 관리자 페이지는 인증 체크 없이 바로 통과
@@ -77,21 +87,21 @@ const AppContent = () => {
   
   useEffect(() => {
     // 최초 접속 시 localStorage에서 토큰과 사용자 정보 확인하여 인증 상태 초기화
-    const accessToken = localStorage.getItem('accessToken');
-    const userInfo = localStorage.getItem('userInfo');
-    
+    const accessToken = localStorage.getItem("accessToken");
+    const userInfo = localStorage.getItem("userInfo");
+
     if (accessToken && userInfo) {
       try {
         const user = JSON.parse(userInfo);
         // Redux store에 로그인 상태 복원
         dispatch(initializeAuth());
-        console.log('로그인 상태 복원:', user);
+        console.log("로그인 상태 복원:", user);
       } catch (error) {
-        console.error('사용자 정보 파싱 오류:', error);
+        console.error("사용자 정보 파싱 오류:", error);
         // 잘못된 데이터면 제거
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('userInfo');
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
       }
     }
   }, [dispatch]);
@@ -112,89 +122,107 @@ const AppContent = () => {
           <Route path="products/:id" element={<ProductDetail />} />
           
           {/* 장바구니 */}
-          <Route 
-            path="cart" 
+          <Route
+            path="cart"
             element={
               <ProtectedRoute>
                 <Cart />
               </ProtectedRoute>
-            } 
+            }
           />
           
           {/* 주문 */}
-          <Route 
-            path="order" 
+          <Route
+            path="order"
             element={
               <ProtectedRoute>
                 <Order />
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="user/order-payment" 
+          <Route
+            path="user/order-payment"
             element={
               <ProtectedRoute>
                 <OrderPayment />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="user/order-complete" 
+          <Route
+            path="user/order-complete"
             element={
               <ProtectedRoute>
                 <OrderComplete />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="user/my-orders" 
+          <Route
+            path="user/my-orders"
             element={
               <ProtectedRoute>
                 <MyOrders />
               </ProtectedRoute>
-            } 
+            }
           />
-          
+
+          {/* 알림 */}
+          <Route
+            path="notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
+
           {/* 마이페이지 */}
-          <Route 
-            path="mypage" 
+          <Route
+            path="mypage"
             element={
               <ProtectedRoute>
                 <MyPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="mypage/info" 
+          <Route
+            path="mypage/info"
             element={
               <ProtectedRoute>
                 <MyInfo />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="mypage/orders" 
+          <Route
+            path="mypage/orders"
             element={
               <ProtectedRoute>
                 <MyOrders />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="mypage/qna" 
+          <Route
+            path="order/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="mypage/qna"
             element={
               <ProtectedRoute>
                 <MyQna />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="mypage/reviews" 
+          <Route
+            path="mypage/reviews"
             element={
               <ProtectedRoute>
                 <MyReviews />
               </ProtectedRoute>
-            } 
+            }
           />
           
           {/* 게시판 - 공지사항 */}
@@ -245,7 +273,7 @@ const AppContent = () => {
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
           <Route path="reviews" element={<AdminReviewList />} />
-          <Route path="reviews/:id" element={<AdminReviewDetail />} />
+          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
         </Route>
         
         {/* 404 페이지 */}

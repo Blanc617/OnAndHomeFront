@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/userSlice';
+import { setUnreadCount } from '../../store/slices/notificationSlice';
 import { authAPI } from '../../api';
+import notificationApi from '../../api/notificationApi';
+import NotificationBell from '../common/NotificationBell';
 import './Header.css';
 
 const Header = () => {
@@ -67,6 +70,33 @@ const Header = () => {
       updateCartCount();
     }
   }, [isAuthenticated]);
+
+  // 알림 개수 업데이트
+  useEffect(() => {
+    const updateNotificationCount = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        dispatch(setUnreadCount(0));
+        return;
+      }
+
+      try {
+        const response = await notificationApi.getUnreadCount();
+        if (response.success) {
+          dispatch(setUnreadCount(response.count || 0));
+        }
+      } catch (error) {
+        console.error('알림 개수 조회 실패:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      updateNotificationCount();
+      // 30초마다 알림 개수 갱신
+      const interval = setInterval(updateNotificationCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -192,6 +222,7 @@ const Header = () => {
                 <Link to="/notices">공지사항</Link>
               </li>
             </ul>
+            {isAuthenticated && <NotificationBell />}
           </div>
         </div>
       </div>

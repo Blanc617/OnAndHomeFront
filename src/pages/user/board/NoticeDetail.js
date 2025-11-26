@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import noticeApi from '../../../api/noticeApi';
 import './NoticeDetail.css';
@@ -7,9 +7,16 @@ import './NoticeDetail.css';
 const NoticeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector((state) => state.user);
   const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // 알림에서 온 경우
+  const fromNotifications = location.state?.from === 'notifications';
+
+  console.log('📢 NoticeDetail 마운트, id:', id);
+  console.log('📍 알림에서 왔는가?', fromNotifications);
 
   useEffect(() => {
     fetchNoticeDetail();
@@ -30,7 +37,13 @@ const NoticeDetail = () => {
   };
 
   const handleList = () => {
-    navigate('/notices');
+    if (fromNotifications) {
+      console.log('🚀 알림 목록으로 이동');
+      navigate('/notifications');
+    } else {
+      console.log('🚀 공지사항 목록으로 이동');
+      navigate('/notices');
+    }
   };
 
   const handleEdit = () => {
@@ -129,7 +142,7 @@ const NoticeDetail = () => {
           {/* 액션 버튼 */}
           <div className="detail-actions">
             <button className="btn-list" onClick={handleList}>
-              목록으로
+              {fromNotifications ? '알림 목록으로' : '목록으로'}
             </button>
             {isAdmin() && (
               <div className="admin-actions">
