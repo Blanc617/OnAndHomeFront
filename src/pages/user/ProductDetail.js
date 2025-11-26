@@ -16,9 +16,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
   const [qnas, setQnas] = useState([]);
-  const [reviewContent, setReviewContent] = useState("");
-  const [qnaTitle, setQnaTitle] = useState("");
-  const [qnaContent, setQnaContent] = useState("");
+
 
   const [reviewContent, setReviewContent] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
