@@ -14,24 +14,46 @@ import "./Home.css";
 const SEARCH_PLACEHOLDER =
   "상품명 또는 카테고리를 검색해 보세요 (예: TV, 냉장고)";
 
-// 모달별로 개별 localStorage 키 사용
+const POPULAR_KEYWORDS = [
+  "LG 올레드 EVO OLED65C5FNA",
+  "삼성 Neo QLED 4K",
+  "비스포크 냉장고",
+  "LG 트롬 워시타워",
+  "공기청정기",
+];
+
 const POPUP_MODAL1_KEY = "homePopupHideUntil1";
 const POPUP_MODAL2_KEY = "homePopupHideUntil2";
 const POPUP_MODAL3_KEY = "homePopupHideUntil3";
+
+// 슬라이드 이미지
+const HERO_SLIDES = [
+  "/product_img/slide_01.jpg",
+  "/product_img/slide_02.jpg",
+  "/product_img/slide_03.jpg",
+  "/product_img/slide_04.jpg",
+];
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const compareItems = useSelector((state) => state.compare.items);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // 검색
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [homePlaceholder, setHomePlaceholder] = useState(SEARCH_PLACEHOLDER);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  // 모달
   const [isModal1Open, setIsModal1Open] = useState(false);
   const [isModal2Open, setIsModal2Open] = useState(false);
   const [isModal3Open, setIsModal3Open] = useState(false);
 
-  // 홈 상단 검색어
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [homePlaceholder, setHomePlaceholder] = useState(SEARCH_PLACEHOLDER);
+  // 슬라이드
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     fetchProducts();
@@ -41,23 +63,26 @@ const Home = () => {
     const hide2 = localStorage.getItem(POPUP_MODAL2_KEY);
     const hide3 = localStorage.getItem(POPUP_MODAL3_KEY);
 
-    // 세 모달 모두 오늘 숨기기로 되어 있으면 아무 것도 띄우지 않음
     if (hide1 === todayStr && hide2 === todayStr && hide3 === todayStr) {
       return;
     }
 
     const timer = setTimeout(() => {
-      // 숨기기 설정이 안 된 첫 번째 모달부터 보여줌
-      if (hide1 !== todayStr) {
-        setIsModal1Open(true);
-      } else if (hide2 !== todayStr) {
-        setIsModal2Open(true);
-      } else if (hide3 !== todayStr) {
-        setIsModal3Open(true);
-      }
-    }, 1000);
+      if (hide1 !== todayStr) setIsModal1Open(true);
+      else if (hide2 !== todayStr) setIsModal2Open(true);
+      else if (hide3 !== todayStr) setIsModal3Open(true);
+    }, 700);
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // 자동 슬라이드
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 2000); // 속도 그대로 유지
+
+    return () => clearInterval(timer);
   }, []);
 
   const fetchProducts = async () => {
@@ -80,8 +105,6 @@ const Home = () => {
   };
 
   const getImageUrl = (imagePath) => {
-    console.log("원본 imagePath:", imagePath);
-
     if (!imagePath) return "/images/no-image.png";
 
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
@@ -110,7 +133,6 @@ const Home = () => {
         alert("최대 4개 상품까지 비교할 수 있습니다.");
         return;
       }
-
       const compareProduct = {
         id: product.id,
         name: product.name,
@@ -121,246 +143,143 @@ const Home = () => {
         stock: product.stock,
         image: product.thumbnailImage,
       };
-
       dispatch(addToCompare(compareProduct));
     }
   };
 
-  // ===== 검색창 제출 핸들러 =====
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const trimmed = searchKeyword.trim();
     if (!trimmed) return;
 
-    // 키워드 검색 페이지로 이동
     navigate(`/products?keyword=${encodeURIComponent(trimmed)}`);
   };
 
-  // 모달 닫기(단순 닫기) 핸들러
+  const handleClickPopular = (word) => {
+    setSearchKeyword(word);
+    navigate(`/products?keyword=${encodeURIComponent(word)}`);
+  };
+
+  // 모달 닫기
   const handleCloseModal1 = () => {
     setIsModal1Open(false);
-
     const todayStr = new Date().toISOString().slice(0, 10);
-    const hide2 = localStorage.getItem(POPUP_MODAL2_KEY);
-
-    // 2번이 오늘 숨김이 아니면 이어서 2번 모달 표시
-    if (hide2 !== todayStr) {
+    if (localStorage.getItem(POPUP_MODAL2_KEY) !== todayStr)
       setIsModal2Open(true);
-    }
   };
 
   const handleCloseModal2 = () => {
     setIsModal2Open(false);
-
     const todayStr = new Date().toISOString().slice(0, 10);
-    const hide3 = localStorage.getItem(POPUP_MODAL3_KEY);
-
-    if (hide3 !== todayStr) {
+    if (localStorage.getItem(POPUP_MODAL3_KEY) !== todayStr)
       setIsModal3Open(true);
-    }
   };
 
   const handleCloseModal3 = () => {
     setIsModal3Open(false);
   };
 
-  // 모달별 "오늘 하루 보지 않기" 핸들러
+  // 모달 하루 숨기기
   const handleHideTodayModal1 = () => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    localStorage.setItem(POPUP_MODAL1_KEY, todayStr);
-    setIsModal1Open(false);
-
-    const hide2 = localStorage.getItem(POPUP_MODAL2_KEY);
-    if (hide2 !== todayStr) {
-      setIsModal2Open(true);
-    }
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL1_KEY, today);
+    handleCloseModal1();
   };
 
   const handleHideTodayModal2 = () => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    localStorage.setItem(POPUP_MODAL2_KEY, todayStr);
-    setIsModal2Open(false);
-
-    const hide3 = localStorage.getItem(POPUP_MODAL3_KEY);
-    if (hide3 !== todayStr) {
-      setIsModal3Open(true);
-    }
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL2_KEY, today);
+    handleCloseModal2();
   };
 
   const handleHideTodayModal3 = () => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    localStorage.setItem(POPUP_MODAL3_KEY, todayStr);
-    setIsModal3Open(false);
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem(POPUP_MODAL3_KEY, today);
+    handleCloseModal3();
   };
 
-  if (loading) {
-    return <div className="loading">로딩 중...</div>;
-  }
+  const handleDotClick = (index) => {
+    setCurrentSlide(index);
+  };
 
-  if (loading) {
-    return <div className="loading">로딩 중...</div>;
-  }
+  if (loading) return <div className="loading">로딩 중...</div>;
 
   return (
     <div className="home-container">
-      {/* ===== 검색 영역 ===== */}
+      {/* ===== 홈 검색 ===== */}
       <section className="home-search-section">
-        <form className="home-search-form" onSubmit={handleSearchSubmit}>
-          <input
-            type="text"
-            className="home-search-input"
-            placeholder={homePlaceholder}
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            onFocus={() => setHomePlaceholder("")}
-            onBlur={() => setHomePlaceholder(SEARCH_PLACEHOLDER)}
-          />
-          <button type="submit" className="home-search-button">
-            검색
-          </button>
-        </form>
-      </section>
-
-      {/* 1. 모달 1 */}
-      {isModal1Open && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">첫 번째 혜택</h4>
-              <button
-                className="modal-close-btn"
-                onClick={handleCloseModal1}
-                aria-label="닫기"
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-divider" />
-
-            <div className="modal-body">
-              <div className="modal-main-title">
-                <span className="modal-emoji">🎁</span>
-                <span className="modal-main-text">첫 번째 특별 혜택!</span>
-              </div>
-              <p className="modal-sub-text">
-                전 상품 10% 할인 쿠폰을 드립니다!
-              </p>
-              <button className="modal-main-btn" onClick={handleCloseModal1}>
-                다음 혜택 보기
-              </button>
-            </div>
-
-            <div className="modal-footer">
-              <button className="modal-sub-btn" onClick={handleHideTodayModal1}>
-                오늘 하루 보지 않기
-              </button>
-              <button className="modal-sub-btn" onClick={handleCloseModal1}>
-                닫기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2. 모달 2 */}
-      {isModal2Open && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">두 번째 혜택</h4>
-              <button
-                className="modal-close-btn"
-                onClick={handleCloseModal2}
-                aria-label="닫기"
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-divider" />
-
-            <div className="modal-body">
-              <div className="modal-main-title">
-                <span className="modal-emoji">🚀</span>
-                <span className="modal-main-text">
-                  지금 가입하면 추가 5,000원 적립!
-                </span>
-              </div>
-              <p className="modal-sub-text">
-                오늘의 핫딜 상품을 놓치지 마세요.
-              </p>
-              <button className="modal-main-btn" onClick={handleCloseModal2}>
-                다음 광고 보기
-              </button>
-            </div>
-
-            <div className="modal-footer">
-              <button className="modal-sub-btn" onClick={handleHideTodayModal2}>
-                오늘 하루 보지 않기
-              </button>
-              <button className="modal-sub-btn" onClick={handleCloseModal2}>
-                닫기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 3. 모달 3 */}
-      {isModal3Open && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">세 번째 혜택</h4>
-              <button
-                className="modal-close-btn"
-                onClick={handleCloseModal3}
-                aria-label="닫기"
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-divider" />
-
-            <div className="modal-body">
-              <div className="modal-main-title">
-                <span className="modal-emoji">📣</span>
-                <span className="modal-main-text">신규 입점 브랜드!</span>
-              </div>
-              <p className="modal-sub-text">
-                오늘의 추천 상품 목록을 확인해보세요.
-              </p>
-              <button className="modal-main-btn" onClick={handleCloseModal3}>
-                메인 페이지로 돌아가기
-              </button>
-            </div>
-
-            <div className="modal-footer">
-              <button className="modal-sub-btn" onClick={handleHideTodayModal3}>
-                오늘 하루 보지 않기
-              </button>
-              <button className="modal-sub-btn" onClick={handleCloseModal3}>
-                닫기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 메인 배너 + 추천상품 */}
-      <section className="hero-section">
-        <div className="hero-slider">
-          <div className="slide">
-            <img
-              src="/product_img/slide_01.jpg"
-              alt="메인 배너"
-              onError={(e) => {
-                e.target.style.display = "none";
+        <div className="home-search-inner">
+          <form className="home-search-form" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              className="home-search-input"
+              placeholder={homePlaceholder}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onFocus={() => {
+                setHomePlaceholder("");
+                setIsSearchFocused(true);
+              }}
+              onBlur={() => {
+                setHomePlaceholder(SEARCH_PLACEHOLDER);
+                setIsSearchFocused(false);
               }}
             />
+            <button type="submit" className="home-search-button">
+              검색
+            </button>
+          </form>
+
+          {/* 인기 검색어 */}
+          {isSearchFocused && !searchKeyword.trim() && (
+            <div className="home-popular-search">
+              <span className="home-popular-label">인기 검색어</span>
+              <ul className="home-popular-list">
+                {POPULAR_KEYWORDS.map((word, idx) => (
+                  <li key={word} className="home-popular-item">
+                    <button
+                      type="button"
+                      className="home-popular-btn"
+                      onMouseDown={() => handleClickPopular(word)}
+                    >
+                      <span className="home-popular-rank">{idx + 1}.</span>
+                      <span className="home-popular-text">{word}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== 메인 슬라이드 (화살표 제거 버전) ===== */}
+      <section className="hero-section">
+        <div className="hero-slider">
+          {HERO_SLIDES.map((src, idx) => (
+            <div
+              key={src}
+              className={`hero-slide ${idx === currentSlide ? "active" : ""}`}
+            >
+              <img src={src} alt={`배너 ${idx + 1}`} />
+            </div>
+          ))}
+
+          {/* 도트 네비게이션만 표시 */}
+          <div className="hero-dots">
+            {HERO_SLIDES.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className={`hero-dot ${idx === currentSlide ? "active" : ""}`}
+                onClick={() => handleDotClick(idx)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
+      {/* ===== 추천 상품 ===== */}
       <section className="product-section">
         <h2 className="section-title">추천 상품</h2>
 
@@ -386,10 +305,10 @@ const Home = () => {
                         alt={product.name}
                         onError={(e) => {
                           e.target.src = "/images/item.png";
-                          e.target.onerror = null;
                         }}
                       />
                     </div>
+
                     <div className="product-info">
                       <h3 className="product-name">{product.name}</h3>
 
@@ -400,6 +319,7 @@ const Home = () => {
                             <span className="original-price">
                               {formatPrice(product.price)}원
                             </span>
+
                             <div className="price-row">
                               <span className="sale-price">
                                 {formatPrice(product.salePrice)}원
