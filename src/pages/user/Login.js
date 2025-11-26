@@ -21,7 +21,7 @@ const Login = () => {
     // 이미 로그인된 상태면 홈으로 이동
     const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
-
+    
     if (accessToken && userInfo) {
       try {
         const user = JSON.parse(userInfo);
@@ -39,7 +39,7 @@ const Login = () => {
       }
     }
   }, []);
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -152,34 +152,21 @@ const Login = () => {
           
           {/* 에러 메시지 표시 */}
           {error && (
-            <div
-              id="errorMessage"
-              style={{
-                color: "#d32f2f",
-                marginTop: "10px",
-                textAlign: "center",
-              }}
-            >
+            <div id="errorMessage" style={{ color: '#d32f2f', marginTop: '10px', textAlign: 'center' }}>
               {error}
             </div>
           )}
           
           {/* 소셜 로그인 */}
-          <div style={{ margin: "30px 0", textAlign: "center" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                margin: "20px 0",
-              }}
-            >
-              <div style={{ flex: 1, borderBottom: "1px solid #ddd" }}></div>
-              <span
-                style={{ padding: "0 15px", color: "#666", fontSize: "14px" }}
-              >
-                또는
-              </span>
-              <div style={{ flex: 1, borderBottom: "1px solid #ddd" }}></div>
+          <div style={{ margin: '30px 0', textAlign: 'center' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              margin: '20px 0' 
+            }}>
+              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
+              <span style={{ padding: '0 15px', color: '#666', fontSize: '14px' }}>또는</span>
+              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
             </div>
             <button
               type="button"
@@ -263,19 +250,22 @@ const Login = () => {
           </div>
           
           {/* 링크 */}
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <p>
-              계정이 없으신가요?{" "}
-              <Link
-                to="/signup"
-                style={{ color: "#1976d2", textDecoration: "none" }}
-              >
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <p style={{ marginBottom: '10px' }}>
+              계정이 없으신가요?{' '}
+              <Link to="/signup" style={{ color: '#1976d2', textDecoration: 'none' }}>
                 <b>회원가입</b>
               </Link>
             </p>
+            <p style={{ marginTop: '10px' }}>
+              비밀번호를 잊어버리셨나요?{' '}
+              <Link to="/reset-password" style={{ color: '#1976d2', textDecoration: 'none' }}>
+                <b>비밀번호 재설정</b>
+              </Link>
+            </p>
           </div>
-
-          <div className="center mt-20" style={{ fontSize: "xx-small" }}>
+          
+          <div className="center mt-20" style={{ fontSize: 'xx-small' }}>
             ©2025 on&home. All rights reserved.
           </div>
         </div>
