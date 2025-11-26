@@ -21,7 +21,7 @@ const Login = () => {
     // 이미 로그인된 상태면 홈으로 이동
     const accessToken = localStorage.getItem('accessToken');
     const userInfo = localStorage.getItem('userInfo');
-    
+
     if (accessToken && userInfo) {
       try {
         const user = JSON.parse(userInfo);
@@ -39,7 +39,7 @@ const Login = () => {
       }
     }
   }, []);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -152,21 +152,34 @@ const Login = () => {
           
           {/* 에러 메시지 표시 */}
           {error && (
-            <div id="errorMessage" style={{ color: '#d32f2f', marginTop: '10px', textAlign: 'center' }}>
+            <div
+              id="errorMessage"
+              style={{
+                color: "#d32f2f",
+                marginTop: "10px",
+                textAlign: "center",
+              }}
+            >
               {error}
             </div>
           )}
           
           {/* 소셜 로그인 */}
-          <div style={{ margin: '30px 0', textAlign: 'center' }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              margin: '20px 0' 
-            }}>
-              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
-              <span style={{ padding: '0 15px', color: '#666', fontSize: '14px' }}>또는</span>
-              <div style={{ flex: 1, borderBottom: '1px solid #ddd' }}></div>
+          <div style={{ margin: "30px 0", textAlign: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                margin: "20px 0",
+              }}
+            >
+              <div style={{ flex: 1, borderBottom: "1px solid #ddd" }}></div>
+              <span
+                style={{ padding: "0 15px", color: "#666", fontSize: "14px" }}
+              >
+                또는
+              </span>
+              <div style={{ flex: 1, borderBottom: "1px solid #ddd" }}></div>
             </div>
             <button
               type="button"
@@ -224,27 +237,45 @@ const Login = () => {
                 color: '#000000',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FDD835'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FEE500'}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#FDD835")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#FEE500")
+              }
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" clipRule="evenodd" d="M12 3C7.03125 3 3 6.33984 3 10.5C3 12.8672 4.24219 14.9648 6.17578 16.3125L5.28906 19.9805C5.23828 20.168 5.35547 20.3555 5.53125 20.4258C5.59375 20.4492 5.66016 20.4609 5.72656 20.4609C5.85938 20.4609 5.98828 20.4023 6.07031 20.2969L9.37109 16.8867C10.207 17.0391 11.0859 17.1094 12 17.1094C16.9688 17.1094 21 13.7695 21 9.60938C21 5.44922 16.9688 2.10938 12 2.10938V3Z" fill="#000000"/>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12 3C7.03125 3 3 6.33984 3 10.5C3 12.8672 4.24219 14.9648 6.17578 16.3125L5.28906 19.9805C5.23828 20.168 5.35547 20.3555 5.53125 20.4258C5.59375 20.4492 5.66016 20.4609 5.72656 20.4609C5.85938 20.4609 5.98828 20.4023 6.07031 20.2969L9.37109 16.8867C10.207 17.0391 11.0859 17.1094 12 17.1094C16.9688 17.1094 21 13.7695 21 9.60938C21 5.44922 16.9688 2.10938 12 2.10938V3Z"
+                  fill="#000000"
+                />
               </svg>
               카카오로 시작하기
             </button>
           </div>
           
           {/* 링크 */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <div style={{ marginTop: "20px", textAlign: "center" }}>
             <p>
-              계정이 없으신가요?{' '}
-              <Link to="/signup" style={{ color: '#1976d2', textDecoration: 'none' }}>
+              계정이 없으신가요?{" "}
+              <Link
+                to="/signup"
+                style={{ color: "#1976d2", textDecoration: "none" }}
+              >
                 <b>회원가입</b>
               </Link>
             </p>
           </div>
-          
-          <div className="center mt-20" style={{ fontSize: 'xx-small' }}>
+
+          <div className="center mt-20" style={{ fontSize: "xx-small" }}>
             ©2025 on&home. All rights reserved.
           </div>
         </div>

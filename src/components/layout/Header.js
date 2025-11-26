@@ -6,6 +6,8 @@ import notificationApi from "../../api/notificationApi";
 import { setUnreadCount } from "../../store/slices/notificationSlice";
 import { logout } from "../../store/slices/userSlice";
 import NotificationBell from "../common/NotificationBell";
+import webSocketService from "../../utils/webSocketService";
+import toast from "react-hot-toast";
 import "./Header.css";
 
 const Header = () => {
@@ -97,6 +99,53 @@ const Header = () => {
       return () => clearInterval(interval);
     }
   }, [isAuthenticated, dispatch]);
+
+  // WebSocket 연결 및 실시간 알림
+  useEffect(() => {
+    console.log('🔍 WebSocket useEffect 실행:', { isAuthenticated, user });
+    
+    if (isAuthenticated && user?.userId) {
+      console.log('✅ WebSocket 연결 조건 충족 - userId:', user.userId);
+      
+      // 알림 수신 콜백
+      const handleNotification = (notification) => {
+        console.log('🔔 실시간 알림 수신:', notification);
+        
+        // 읽지 않은 알림 개수 업데이트
+        dispatch(setUnreadCount((prev) => (prev || 0) + 1));
+        
+        // Toast 알림 표시
+        toast.success(
+          <div onClick={() => navigate('/notifications')} style={{ cursor: 'pointer' }}>
+            <strong>{notification.title}</strong>
+            <br />
+            <span>{notification.content}</span>
+          </div>,
+          {
+            duration: 3000,
+            position: 'top-right',
+            icon: '🔔',
+          }
+        );
+      };
+
+      // WebSocket 연결
+      console.log('🔌 WebSocket 연결 호출...');
+      webSocketService.connect(
+        user.userId,
+        handleNotification,
+        () => console.log('✅ WebSocket 연결 완료 콜백 실행')
+      );
+
+      // 컴포넌트 언마운트 시 연결 해제
+      return () => {
+        console.log('🔌 WebSocket 연결 해제');
+        webSocketService.disconnect();
+      };
+    } else {
+      console.log('❌ WebSocket 연결 조건 불충족:', { isAuthenticated, userId: user?.userId });
+    }
+  }, [isAuthenticated, user, dispatch, navigate]);
 
   const handleLogout = async () => {
     try {
