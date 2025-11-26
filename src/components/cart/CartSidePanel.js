@@ -21,15 +21,15 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
     setLoading(true);
     try {
       const response = await cartAPI.getCartItems();
-      console.log('=== 장바구니 API 응답 ===', response);
-      
+      console.log("=== 장바구니 API 응답 ===", response);
+
       if (response.success && response.data) {
         setCartItems(response.data);
       } else {
         setCartItems([]);
       }
     } catch (error) {
-      console.error('장바구니 조회 오류:', error);
+      console.error("장바구니 조회 오류:", error);
       setCartItems([]);
     } finally {
       setLoading(false);
@@ -53,19 +53,19 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
         await loadCartItems();
         if (onCartUpdate) onCartUpdate();
       } else {
-        alert(response.message || '삭제에 실패했습니다.');
+        alert(response.message || "삭제에 실패했습니다.");
       }
     } catch (error) {
-      console.error('삭제 오류:', error);
-      alert('삭제 중 오류가 발생했습니다.');
+      console.error("삭제 오류:", error);
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 
   const handleQuantityChange = async (cartItemId, currentQuantity, change) => {
     const newQuantity = currentQuantity + change;
-    
+
     if (newQuantity < 1) {
-      alert('수량은 1개 이상이어야 합니다.');
+      alert("수량은 1개 이상이어야 합니다.");
       return;
     }
 
@@ -75,11 +75,11 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
         await loadCartItems();
         if (onCartUpdate) onCartUpdate();
       } else {
-        alert(response.message || '수량 변경에 실패했습니다.');
+        alert(response.message || "수량 변경에 실패했습니다.");
       }
     } catch (error) {
-      console.error('수량 변경 오류:', error);
-      alert('수량 변경 중 오류가 발생했습니다.');
+      console.error("수량 변경 오류:", error);
+      alert("수량 변경 중 오류가 발생했습니다.");
     }
   };
 
@@ -109,20 +109,23 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
   };
 
   const getImageUrl = (product) => {
-    let imagePath = product?.thumbnailImage || product?.imageUrl || product?.mainImage;
-    
+    let imagePath =
+      product?.thumbnailImage || product?.imageUrl || product?.mainImage;
+
     if (!imagePath) {
       return "/images/no-image.png";
     }
-    
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
       return imagePath;
     }
-    
-    if (imagePath.startsWith('uploads/') || imagePath.startsWith('/uploads/')) {
-      return `http://localhost:8080/${imagePath.startsWith('/') ? imagePath.substring(1) : imagePath}`;
+
+    if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
+      return `http://localhost:8080/${
+        imagePath.startsWith("/") ? imagePath.substring(1) : imagePath
+      }`;
     }
-    
+
     return `http://localhost:8080/uploads/${imagePath}`;
   };
 
@@ -131,7 +134,7 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
       const originalPrice = item.product?.price || 0;
       const salePrice = item.product?.salePrice || 0;
       const finalPrice = salePrice > 0 ? salePrice : originalPrice;
-      return total + (finalPrice * (item.quantity || 0));
+      return total + finalPrice * (item.quantity || 0);
     }, 0);
   };
 
@@ -184,10 +187,13 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
                   const originalPrice = product.price || 0;
                   const salePrice = product.salePrice || 0;
                   const finalPrice = salePrice > 0 ? salePrice : originalPrice;
-                  const discountRate = calculateDiscountRate(originalPrice, salePrice);
+                  const discountRate = calculateDiscountRate(
+                    originalPrice,
+                    salePrice
+                  );
                   const quantity = item.quantity || 0;
                   const itemTotal = finalPrice * quantity;
-                  const productName = product.name || '상품명 없음';
+                  const productName = product.name || "상품명 없음";
 
                   return (
                     <div key={item.id} className="cart-item-card">
@@ -233,17 +239,21 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
                           <div className="item-quantity-control">
                             <span className="label">수량</span>
                             <div className="quantity-buttons">
-                              <button 
+                              <button
                                 className="quantity-btn minus"
-                                onClick={() => handleQuantityChange(item.id, quantity, -1)}
+                                onClick={() =>
+                                  handleQuantityChange(item.id, quantity, -1)
+                                }
                                 disabled={quantity <= 1}
                               >
                                 −
                               </button>
                               <span className="quantity-value">{quantity}</span>
-                              <button 
+                              <button
                                 className="quantity-btn plus"
-                                onClick={() => handleQuantityChange(item.id, quantity, 1)}
+                                onClick={() =>
+                                  handleQuantityChange(item.id, quantity, 1)
+                                }
                               >
                                 +
                               </button>
