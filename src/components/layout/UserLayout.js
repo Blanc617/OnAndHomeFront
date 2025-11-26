@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/userSlice";
+import { setUnreadCount } from "../../store/slices/notificationSlice";
 import CompareFloatingButton from "../common/CompareFloatingButton";
+import notificationApi from "../../api/notificationApi";
 import "./UserLayout.css";
 
 const UserLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const unreadCount = useSelector((state) => state.notification?.unreadCount || 0);
   const [showMyPageDropdown, setShowMyPageDropdown] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
 
@@ -17,6 +20,32 @@ const UserLayout = () => {
     if (!user) return false;
     return user.role === 0 || user.role === "0" || Number(user.role) === 0;
   };
+
+  // 알림 개수 업데이트
+  useEffect(() => {
+    const updateNotificationCount = async () => {
+      if (!isAuthenticated) {
+        dispatch(setUnreadCount(0));
+        return;
+      }
+
+      try {
+        const response = await notificationApi.getUnreadCount();
+        if (response.success) {
+          dispatch(setUnreadCount(response.count || 0));
+        }
+      } catch (error) {
+        console.error('알림 개수 조회 실패:', error);
+      }
+    };
+
+    if (isAuthenticated) {
+      updateNotificationCount();
+      // 30초마다 알림 개수 갱신
+      const interval = setInterval(updateNotificationCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, dispatch]);
 
   // 카테고리 구조 정의
   const categories = [
@@ -140,6 +169,21 @@ const UserLayout = () => {
               <Link to="/notices" onClick={closeDropdowns}>
                 공지사항
               </Link>
+              {isAuthenticated && (
+                <div 
+                  className="notification-bell-container"
+                  onClick={() => {
+                    closeDropdowns();
+                    navigate('/notifications');
+                  }}
+                  title="알림"
+                >
+                  <span className="bell-icon">🔔</span>
+                  {unreadCount > 0 && (
+                    <span className="bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

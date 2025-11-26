@@ -383,6 +383,52 @@
   cursor: pointer;
 }
 
+/* 알림 아이콘 스타일 */
+.notification-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 0;
+  padding-left: 12px;
+  border-left: 1px solid #ccc;
+  margin-left: 12px;
+  height: 20px;
+}
+
+.notification-bell {
+  font-size: 20px;
+  color: #333;
+  transition: color 0.2s ease;
+  line-height: 1;
+  display: block;
+}
+
+.notification-icon-wrapper:hover .notification-bell {
+  color: #ab1414;
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 0 4px;
+}
+
 /* 반응형 */
 @media (max-width: 1024px) {
   .nav-container > ul.gnb {

@@ -18,8 +18,10 @@ import MyOrders from './pages/user/MyOrders';
 import MyPage from './pages/user/MyPage';
 import MyQna from './pages/user/MyQna';
 import MyReviews from './pages/user/MyReviews';
+import Notifications from './pages/user/Notifications';
 import Order from './pages/user/Order';
 import OrderComplete from './pages/user/OrderComplete';
+import OrderDetail from './pages/user/OrderDetail';
 import OrderPayment from './pages/user/OrderPayment';
 import ProductDetail from './pages/user/ProductDetail';
 import ProductList from './pages/user/ProductList';
@@ -155,6 +157,16 @@ const AppContent = () => {
             } 
           />
           
+          {/* 알림 */}
+          <Route 
+            path="notifications" 
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            } 
+          />
+          
           {/* 마이페이지 */}
           <Route 
             path="mypage" 
@@ -177,6 +189,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <MyOrders />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="order/:orderId" 
+            element={
+              <ProtectedRoute>
+                <OrderDetail />
               </ProtectedRoute>
             } 
           />
