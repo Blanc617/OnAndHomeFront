@@ -353,6 +353,62 @@
   align-items: flex-start;
 }
 
+
+.star-rating-container {
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.star-icon {
+  font-size: 18px;
+  color: #828282ff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-icon:hover {
+  color: #ff9100ff;
+}
+
+.star-filled {
+  color: #ffc107;
+}
+
+// 제품명 하단 별점 총합
+.product-rating {
+  display: flex;
+  justify-content: left;
+  /* align-items: center; */
+  gap: 4px;
+  margin-bottom: 15px;
+}
+
+.rating-stars {
+  font-size: 22px;
+  color: #ffc107;
+}
+
+.rating-sum {
+  font-size: 20px;
+  color: #000000ff;
+}
+
+.rating-score {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.rating-count {
+  font-size: 14px;
+  color: #666;
+}
+
+
 .textarea {
   flex: 1;
   min-height: 100px;
