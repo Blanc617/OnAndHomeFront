@@ -25,6 +25,40 @@ const OrderPayment = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false); // ✅ 추가
 
+  // 카카오 주소 검색 함수
+  const handleAddressSearch = () => {
+    new window.daum.Postcode({
+      oncomplete: function(data) {
+        // 도로명 주소를 기본으로 사용
+        let fullAddress = data.address;
+        let extraAddress = '';
+
+        // 지번 주소가 선택되었을 경우
+        if (data.addressType === 'R') {
+          // 법정동명이 있을 경우 추가
+          if (data.bname !== '') {
+            extraAddress += data.bname;
+          }
+          // 건물명이 있을 경우 추가
+          if (data.buildingName !== '') {
+            extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName);
+          }
+          // 추가주소 정보가 있으면 표시
+          fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
+        }
+
+        // 주소 상태 업데이트
+        setOrderInfo(prev => ({
+          ...prev,
+          address: fullAddress
+        }));
+
+        // 상세주소 입력 필드로 포커스 이동
+        document.getElementById('detailAddress')?.focus();
+      }
+    }).open();
+  };
+
   useEffect(() => {
     // 인증 확인
     if (!isAuthenticated) {
@@ -283,14 +317,34 @@ const OrderPayment = () => {
               <tr>
                 <th>주소 <span className="required">*</span></th>
                 <td colSpan="3">
+                  <div className="address-input-container">
+                    <input
+                      type="text"
+                      name="address"
+                      value={orderInfo.address}
+                      onChange={handleInputChange}
+                      placeholder="주소를 입력하세요"
+                      className="address-input"
+                      onClick={handleAddressSearch}
+                      readOnly
+                      required
+                    />
+                    <button 
+                      type="button" 
+                      className="address-search-btn"
+                      onClick={handleAddressSearch}
+                    >
+                      주소 검색
+                    </button>
+                  </div>
                   <input
                     type="text"
-                    name="address"
-                    value={orderInfo.address}
+                    id="detailAddress"
+                    name="detailAddress"
+                    value={orderInfo.detailAddress}
                     onChange={handleInputChange}
-                    placeholder="주소를 입력하세요"
-                    className="full-width"
-                    required
+                    placeholder="상세주소를 입력하세요 (예: 101동 202호)"
+                    className="detail-address-input"
                   />
                 </td>
               </tr>
