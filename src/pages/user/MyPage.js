@@ -1,17 +1,18 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import './MyPage.css';
+import React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import "./MyPage.css";
 
 const MyPage = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
 
   // 관리자 여부 확인
-  const isAdmin = user && (user.role === 0 || user.role === "0" || Number(user.role) === 0);
+  const isAdmin =
+    user && (user.role === 0 || user.role === "0" || Number(user.role) === 0);
 
   const handleAdminClick = () => {
-    navigate('/admin/dashboard');
+    navigate("/admin/dashboard");
   };
 
   return (
@@ -26,6 +27,7 @@ const MyPage = () => {
       </div>
 
       <div className="mypage-content">
+        {/* 회원 정보 */}
         <div className="mypage-section">
           <h2>회원 정보</h2>
           <div className="mypage-menu">
@@ -39,9 +41,11 @@ const MyPage = () => {
           </div>
         </div>
 
+        {/* 주문 관리 */}
         <div className="mypage-section">
-          <h2>주문 관리</h2>
+          <h2>상품 및 주문 관리</h2>
           <div className="mypage-menu">
+            {/* 주문/배송 조회 */}
             <Link to="/mypage/orders" className="mypage-menu-item">
               <div className="menu-icon">📦</div>
               <div className="menu-text">
@@ -49,9 +53,19 @@ const MyPage = () => {
                 <p>주문 내역 및 배송 상태를 확인할 수 있습니다.</p>
               </div>
             </Link>
+
+            {/* 🔥 여기 새로 추가된 장바구니 카드 */}
+            <Link to="/cart" className="mypage-menu-item">
+              <div className="menu-icon">🛒</div>
+              <div className="menu-text">
+                <h3>장바구니</h3>
+                <p>담아둔 상품을 확인할 수 있습니다.</p>
+              </div>
+            </Link>
           </div>
         </div>
 
+        {/* 게시판 */}
         <div className="mypage-section">
           <h2>게시판</h2>
           <div className="mypage-menu">
@@ -62,6 +76,7 @@ const MyPage = () => {
                 <p>작성한 문의를 확인할 수 있습니다.</p>
               </div>
             </Link>
+
             <Link to="/mypage/reviews" className="mypage-menu-item">
               <div className="menu-icon">⭐</div>
               <div className="menu-text">
