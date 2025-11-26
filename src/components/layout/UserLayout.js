@@ -4,6 +4,7 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/userSlice";
 import { setUnreadCount } from "../../store/slices/notificationSlice";
 import CompareFloatingButton from "../common/CompareFloatingButton";
+import CartFloatingButton from "../cart/CartFloatingButton";
 import notificationApi from "../../api/notificationApi";
 import "./UserLayout.css";
 
@@ -170,7 +171,7 @@ const UserLayout = () => {
                 공지사항
               </Link>
               {isAuthenticated && (
-                <div 
+                <div
                   className="notification-bell-container"
                   onClick={() => {
                     closeDropdowns();
@@ -256,6 +257,9 @@ const UserLayout = () => {
 
       {/* 상품 비교 플로팅 버튼 - 여기에 추가! */}
       <CompareFloatingButton />
+
+      {/* 장바구니 플로팅 버튼 - 추가 */}
+      <CartFloatingButton />
 
       {/* 푸터 */}
       <footer className="user-footer">
