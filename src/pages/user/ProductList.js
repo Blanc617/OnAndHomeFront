@@ -92,10 +92,22 @@ const ProductList = () => {
   };
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder.png";
+    console.log("원본 imagePath:", imagePath);
+
+    if (!imagePath) return "/images/no-image.png";
+
+    // uploads/ 경로면 백엔드 서버에서 가져오기
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
-      return `http://localhost:8080/${imagePath.replace(/^\//, "")}`;
+      return `http://localhost:8080${
+        imagePath.startsWith("/") ? "" : "/"
+      }${imagePath}`;
     }
+
+    // 짧은 이름이면 public/product_img/ 폴더에서 가져오기
+    if (!imagePath.includes("/") && !imagePath.startsWith("http")) {
+      return `/product_img/${imagePath}.jpg`;
+    }
+
     return imagePath;
   };
 
