@@ -16,30 +16,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 로그인 페이지 접속 시 기존 인증 정보 정리 (선택적)
-  React.useEffect(() => {
-    // 이미 로그인된 상태면 홈으로 이동
-    const accessToken = localStorage.getItem("accessToken");
-    const userInfo = localStorage.getItem("userInfo");
-
-    if (accessToken && userInfo) {
-      try {
-        const user = JSON.parse(userInfo);
-        if (user && user.userId) {
-          // 유효한 사용자 정보가 있으면 홈으로 이동
-          console.log("이미 로그인된 사용자:", user.userId);
-          // navigate('/'); // 원한다면 주석 해제
-        }
-      } catch (error) {
-        // 잘못된 사용자 정보는 제거
-        console.log("잘못된 인증 정보 정리");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("userInfo");
-      }
-    }
-  }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({

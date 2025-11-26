@@ -44,15 +44,7 @@ apiClient.interceptors.response.use(
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           localStorage.removeItem("userInfo");
-
-          // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
-          if (
-            !window.location.pathname.includes("/login") &&
-            !window.location.pathname.includes("/signup") &&
-            !window.location.pathname.includes("/auth/kakao")
-          ) {
-            window.location.href = "/login";
-          }
+          window.location.href = "/login";
           return Promise.reject(error);
         }
 
@@ -87,15 +79,7 @@ apiClient.interceptors.response.use(
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("userInfo");
-
-        // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
-        if (
-          !window.location.pathname.includes("/login") &&
-          !window.location.pathname.includes("/signup") &&
-          !window.location.pathname.includes("/auth/kakao")
-        ) {
-          window.location.href = "/login";
-        }
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
