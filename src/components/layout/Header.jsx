@@ -80,31 +80,6 @@ const Header = () => {
     }
   };
 
-  // 관리자 확인 로그 - 더 상세하게
-  useEffect(() => {
-    console.log('=== Header 렌더링 상태 ===');
-    console.log('isAuthenticated:', isAuthenticated);
-    console.log('user 전체:', user);
-    
-    if (isAuthenticated && user) {
-      console.log('=== 사용자 정보 ===');
-      console.log('username:', user.username);
-      console.log('userId:', user.userId);
-      console.log('role:', user.role);
-      console.log('role type:', typeof user.role);
-      console.log('role === 0:', user.role === 0);
-      console.log('role === "0":', user.role === "0");
-      console.log('Number(role) === 0:', Number(user.role) === 0);
-      console.log('full user object:', JSON.stringify(user));
-      
-      // 관리자 여부 확인
-      const isAdmin = user.role === 0 || user.role === "0" || Number(user.role) === 0;
-      console.log('>>> 관리자 여부:', isAdmin);
-    } else {
-      console.log('인증되지 않았거나 user가 없습니다.');
-    }
-  }, [isAuthenticated, user]);
-
   const handleSearch = (e) => {
     e.preventDefault();
     if (!searchKeyword.trim()) {
@@ -189,19 +164,19 @@ const Header = () => {
               {isAuthenticated ? (
                 <>
                   <li>
-                    <span className="user-name">{user?.username || user?.userId}님</span>
-                  </li>
-                  <li>
                     <Link to="/mypage">마이페이지</Link>
                   </li>
                   {isAdmin() && (
                     <li>
-                      <Link to="/admin/dashboard" style={{ color: '#ff6b00', fontWeight: 'bold' }}>
+                      <Link to="/admin/dashboard" className="admin-link">
                         관리자페이지
                       </Link>
                     </li>
                   )}
                   <li onClick={handleLogout} style={{ cursor: 'pointer' }}>로그아웃</li>
+                  <li>
+                    <Link to="/notices">공지사항</Link>
+                  </li>
                 </>
               ) : (
                 <>
@@ -211,7 +186,9 @@ const Header = () => {
                   <li>
                     <Link to="/signup">회원가입</Link>
                   </li>
-                  <li>공지사항</li>
+                  <li>
+                    <Link to="/notices">공지사항</Link>
+                  </li>
                 </>
               )}
             </ul>
