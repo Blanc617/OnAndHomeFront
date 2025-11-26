@@ -116,8 +116,8 @@
 /* 평점 별 */
 .rating-stars {
   display: flex;
-  justify-content: center;
-  gap: 2px;
+  justify-content: left;
+  gap: 8px;
 }
 
 .star {
@@ -126,7 +126,7 @@
 }
 
 .star.filled {
-  color: #ffc107;
+  color: #ffac07ff;
 }
 
 /* 테이블 하단 */

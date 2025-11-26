@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import './ReviewItem.css';
 
@@ -54,18 +54,27 @@ const ReviewItem = ({ review, onEdit, onDelete }) => {
       {isEditing ? (
         <div className="review-edit-form">
           <div className="rating-edit">
-            <label>평점: </label>
-            <select
-              value={editedRating}
-              onChange={(e) => setEditedRating(parseInt(e.target.value))}
-              className="rating-select"
-            >
-              <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
-              <option value="4">⭐⭐⭐⭐ (4점)</option>
-              <option value="3">⭐⭐⭐ (3점)</option>
-              <option value="2">⭐⭐ (2점)</option>
-              <option value="1">⭐ (1점)</option>
-            </select>
+             <span className="rating-label">별점: </span>
+                {/* <span style={{color: 'red'}}>디버그 rating 값: {rating}</span> */}
+                {[1, 2, 3, 4, 5].map(star => (
+                  star <= (hoveredRating || rating) ? (
+                  <FaStar
+                  key={star}
+                  className="star-icon star-filled"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoveredRating(star)}
+                  onMouseLeave={() => setHoveredRating(0)}
+                  />
+                ) : (
+                  <FaRegStar
+                    key={star}
+                    className="star-icon"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                  />
+                )
+            ))}
           </div>
           <textarea
             className="review-edit-textarea"
