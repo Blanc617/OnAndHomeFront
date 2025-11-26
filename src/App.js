@@ -54,8 +54,6 @@ import AdminQnaDetail from "./pages/admin/QnaDetail";
 import AdminQnaList from "./pages/admin/QnaList";
 import AdminReviewList from "./pages/admin/ReviewList";
 import AdminUserList from "./pages/admin/UserList";
-import AdminReviewList from './pages/admin/ReviewList';
-import AdminUserList from './pages/admin/UserList';
 
 // ProtectedRoute 컴포넌트 - 관리자는 role로만 구분 (로그인 분기 제외)
 const ProtectedRoute = ({
