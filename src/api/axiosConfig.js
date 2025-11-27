@@ -41,16 +41,34 @@ apiClient.interceptors.response.use(
         
         if (!refreshToken) {
           // 리프레시 토큰이 없으면 로그인 페이지로
+<<<<<<<<< Temporary merge branch 1
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userInfo');
           
+<<<<<<< HEAD
           // 이미 로그인/회원가입/비밀번호 재설정 페이지에 있으면 리다이렉트하지 않음
+=======
+          // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+>>>>>>> 08b7f3aba410f9aef32abbdbb54bf0c7f7978c18
           if (!window.location.pathname.includes('/login') && 
               !window.location.pathname.includes('/signup') &&
               !window.location.pathname.includes('/reset-password') &&
               !window.location.pathname.includes('/auth/kakao')) {
             window.location.href = '/login';
+=========
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("userInfo");
+
+          // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+          if (
+            !window.location.pathname.includes("/login") &&
+            !window.location.pathname.includes("/signup") &&
+            !window.location.pathname.includes("/auth/kakao")
+          ) {
+            window.location.href = "/login";
+>>>>>>>>> Temporary merge branch 2
           }
           return Promise.reject(error);
         }
@@ -82,16 +100,34 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         // 리프레시 토큰도 만료된 경우 로그인 페이지로
+<<<<<<<<< Temporary merge branch 1
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userInfo');
         
+<<<<<<< HEAD
         // 이미 로그인/회원가입/비밀번호 재설정 페이지에 있으면 리다이렉트하지 않음
+=======
+        // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+>>>>>>> 08b7f3aba410f9aef32abbdbb54bf0c7f7978c18
         if (!window.location.pathname.includes('/login') && 
             !window.location.pathname.includes('/signup') &&
             !window.location.pathname.includes('/reset-password') &&
             !window.location.pathname.includes('/auth/kakao')) {
           window.location.href = '/login';
+=========
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
+
+        // 이미 로그인 페이지에 있으면 리다이렉트하지 않음
+        if (
+          !window.location.pathname.includes("/login") &&
+          !window.location.pathname.includes("/signup") &&
+          !window.location.pathname.includes("/auth/kakao")
+        ) {
+          window.location.href = "/login";
+>>>>>>>>> Temporary merge branch 2
         }
         return Promise.reject(refreshError);
       }
