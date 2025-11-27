@@ -30,6 +30,22 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorAlert, setErrorAlert] = useState('');
+
+  const [passwordValidation, setPasswordValidation] = useState({
+    length: false,
+    hasSpecialChar: false,
+    hasUpperLower: false
+  });
+
+  const validatePassword = (pwd) => {
+    const validation = {
+      length: pwd.length >= 8 && pwd.length <= 16,
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+      hasUpperLower: /[a-z]/.test(pwd) && /[A-Z]/.test(pwd)
+    };
+    setPasswordValidation(validation);
+    return validation.length && validation.hasSpecialChar && validation.hasUpperLower;
+  };
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,6 +53,10 @@ const Signup = () => {
       ...prev,
       [name]: value
     }));
+
+    if (name === 'password') {
+      validatePassword(value);
+    }
     
     setErrors(prev => ({
       ...prev,
@@ -180,6 +200,10 @@ const Signup = () => {
     
     if (!formData.password || formData.password.length < 8) {
       newErrors.password = '비밀번호는 8자 이상이어야 합니다.';
+    }
+
+    if (!validatePassword(formData.password)) {
+      newErrors.password = '비밀번호 조건을 모두 충족해주세요.';
     }
     
     if (formData.password !== formData.passwordConfirm) {
@@ -386,10 +410,27 @@ const Signup = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="8글자 이상"
+                  placeholder="비밀번호"
                   required
                   disabled={loading}
                 />
+                
+                {/* 비밀번호 조건 표시 - 항상 표시 */}
+                <div className="password-requirements">
+                  <p>비밀번호를 입력해 주세요</p>
+                  <ul>
+                    <li className={passwordValidation.length ? 'valid' : 'invalid'}>
+                      8자 이상 16자 이내
+                    </li>
+                    <li className={passwordValidation.hasSpecialChar ? 'valid' : 'invalid'}>
+                      특수문자 포함
+                    </li>
+                    <li className={passwordValidation.hasUpperLower ? 'valid' : 'invalid'}>
+                      대문자 포함
+                    </li>
+                  </ul>
+                </div>
+                
                 {errors.password && (
                   <div className="error-message">{errors.password}</div>
                 )}
