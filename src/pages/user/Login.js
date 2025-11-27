@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import authApi from "../../api/authApi";
-import { login } from "../../store/slices/userSlice";
-import "./Login.css";
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/slices/userSlice';
+import authApi from '../../api/authApi';
+import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  
   const [formData, setFormData] = useState({
-    userId: "",
-    password: "",
+    userId: '',
+    password: '',
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 로그인 페이지 접속 시 기존 인증 정보 확인
@@ -37,65 +37,70 @@ const Login = () => {
     }
   }, []);
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    setError("");
+    setError(''); // 입력 시 에러 메시지 초기화
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
+    setError('');
+    
+    // 입력 검증
     if (!formData.userId.trim() || !formData.password.trim()) {
-      setError("아이디와 비밀번호를 입력하세요.");
+      setError('아이디와 비밀번호를 입력하세요.');
       return;
     }
-
+    
     setLoading(true);
-
+    
     try {
-      console.log("로그인 요청:", formData.userId);
-
+      console.log('로그인 요청:', formData.userId);
+      
+      // Spring Boot API 호출
       const response = await authApi.login(formData);
-
-      console.log("로그인 응답:", response);
-
+      
+      console.log('로그인 응답:', response);
+      
       if (response.success && response.accessToken) {
-        dispatch(
-          login({
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken,
-            user: response.user,
-          })
-        );
-
-        console.log("로그인 성공 - Redux store 업데이트 완료");
-        navigate("/");
+        // Redux store 업데이트
+        dispatch(login({
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: response.user
+        }));
+        
+        console.log('로그인 성공 - Redux store 업데이트 완료');
+        
+        // 모든 사용자를 메인 페이지로 리다이렉트
+        navigate('/');
       } else {
-        setError(response.message || "로그인에 실패했습니다.");
+        setError(response.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
-      console.error("로그인 실패:", error);
-
+      console.error('로그인 실패:', error);
+      
       if (error.response) {
-        const errorMessage =
-          error.response.data?.message ||
-          "아이디 또는 비밀번호가 일치하지 않습니다.";
+        // 서버 응답이 있는 경우
+        const errorMessage = error.response.data?.message || '아이디 또는 비밀번호가 일치하지 않습니다.';
         setError(errorMessage);
       } else if (error.request) {
-        setError("서버와 연결할 수 없습니다. 네트워크를 확인해주세요.");
+        // 요청은 보냈지만 응답을 받지 못한 경우
+        setError('서버와 연결할 수 없습니다. 네트워크를 확인해주세요.');
       } else {
-        setError("로그인 처리 중 오류가 발생했습니다.");
+        // 요청 설정 중 오류가 발생한 경우
+        setError('로그인 처리 중 오류가 발생했습니다.');
       }
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="on-main-wrap">
       <div className="login-wrap_user mt-80 mb-40">
@@ -139,7 +144,7 @@ const Login = () => {
               className="btn btn--blk w-full mt-40"
               disabled={loading}
             >
-              {loading ? "로그인 중..." : "로그인"}
+              {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
 
@@ -156,7 +161,7 @@ const Login = () => {
               {error}
             </div>
           )}
-
+          
           {/* 소셜 로그인 */}
           <div style={{ margin: "30px 0", textAlign: "center" }}>
             <div
@@ -179,40 +184,39 @@ const Login = () => {
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-
-                console.log("카카오 로그인 버튼 클릭");
-
+                
+                console.log('카카오 로그인 버튼 클릭');
+                
                 try {
-                  const apiUrl =
-                    "http://localhost:8080/api/auth/kakao/login-url";
-                  console.log("API 호출:", apiUrl);
-
+                  const apiUrl = 'http://localhost:8080/api/auth/kakao/login-url';
+                  console.log('API 호출:', apiUrl);
+                  
                   const response = await fetch(apiUrl, {
-                    method: "GET",
+                    method: 'GET',
                     headers: {
-                      "Content-Type": "application/json",
+                      'Content-Type': 'application/json',
                     },
                   });
-
-                  console.log("응답 상태:", response.status);
-
+                  
+                  console.log('응답 상태:', response.status);
+                  
                   if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                   }
-
+                  
                   const data = await response.json();
-                  console.log("받은 데이터:", data);
-                  console.log("로그인 URL:", data.loginUrl);
-
+                  console.log('받은 데이터:', data);
+                  console.log('로그인 URL:', data.loginUrl);
+                  
                   if (data.loginUrl) {
-                    console.log("카카오 로그인 페이지로 이동:", data.loginUrl);
+                    console.log('카카오 로그인 페이지로 이동:', data.loginUrl);
                     window.location.href = data.loginUrl;
                   } else {
-                    throw new Error("로그인 URL이 없습니다.");
+                    throw new Error('로그인 URL이 없습니다.');
                   }
                 } catch (error) {
-                  console.error("카카오 로그인 오류:", error);
-                  alert("카카오 로그인을 시작할 수 없습니다: " + error.message);
+                  console.error('카카오 로그인 오류:', error);
+                  alert('카카오 로그인을 시작할 수 없습니다: ' + error.message);
                 }
               }}
               style={{
@@ -277,7 +281,7 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="center mt-20" style={{ fontSize: "xx-small" }}>
+          <div className="center mt-20" style={{ fontSize: 'xx-small' }}>
             ©2025 on&home. All rights reserved.
           </div>
         </div>
