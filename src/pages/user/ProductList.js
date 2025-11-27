@@ -296,7 +296,7 @@ const ProductList = () => {
                 return (
                   <div
                     key={product.id}
-                    className="product-card"
+                    className={`product-card ${(product.stock === 0 || product.stock === null) ? 'out-of-stock' : ''}`}
                     onClick={() => handleProductClick(product.id)}
                   >
                     <div className="product-image-wrapper">
@@ -308,6 +308,15 @@ const ProductList = () => {
                           e.target.onerror = null;
                         }}
                       />
+                      
+                      {/* 품절 표시 */}
+                      {(product.stock === 0 || product.stock === null) && (
+                        <div className="sold-out-overlay">
+                          <div className="sold-out-badge">
+                            <span>SOLD OUT</span>
+                          </div>
+                        </div>
+                      )}
                       
                       {/* 찜하기 버튼 추가 */}
                       <button
