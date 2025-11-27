@@ -84,7 +84,7 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
   };
 
   const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
+    onClose();  // 접기 버튼을 클릭하면 완전히 닫기
   };
 
   const handleOverlayClick = () => {
@@ -121,12 +121,16 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
     }
 
     if (imagePath.startsWith("uploads/") || imagePath.startsWith("/uploads/")) {
-      return `http://localhost:8080/${
-        imagePath.startsWith("/") ? imagePath.substring(1) : imagePath
-      }`;
+      return `http://localhost:8080${
+        imagePath.startsWith("/") ? "" : "/"
+      }${imagePath}`;
     }
 
-    return `http://localhost:8080/uploads/${imagePath}`;
+    if (!imagePath.includes("/") && !imagePath.startsWith("http")) {
+      return `/product_img/${imagePath}.jpg`;
+    }
+  
+    return imagePath;
   };
 
   const getTotalPrice = () => {
