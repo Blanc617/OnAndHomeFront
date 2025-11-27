@@ -383,7 +383,7 @@ useEffect(() => {
         ) : (
           <>
             <div className="product-grid-four">
-              {popularProducts.map((product) => {
+              {popularProducts.map((product, index) => {
                 const isInCompare = compareItems.some(
                   (item) => item.id === product.id
                 );
@@ -392,7 +392,7 @@ useEffect(() => {
                   <Link
                     to={`/products/${product.id}`}
                     key={product.id}
-                    className="product-card"
+                    className={`product-card ${(product.stock === 0 || product.stock === null) ? 'out-of-stock' : ''}`}
                   >
                     <div className="product-image">
                       <img
@@ -402,6 +402,21 @@ useEffect(() => {
                           e.target.src = "/images/item.png";
                         }}
                       />
+
+                      {/* 품절 표시 */}
+                      {(product.stock === 0 || product.stock === null) && (
+                        <div className="sold-out-overlay">
+                          <div className="sold-out-badge">
+                            <span>SOLD OUT</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 순위 배지 */}
+                      <div className={`rank-badge rank-${index + 1}`}>
+                        {index === 0 && <span className="crown">👑</span>}
+                        {index + 1}위
+                      </div>
 
                       {/* 찜하기 버튼 */}
                       <button
@@ -495,7 +510,7 @@ useEffect(() => {
                   <Link
                     to={`/products/${product.id}`}
                     key={product.id}
-                    className="product-card"
+                    className={`product-card ${(product.stock === 0 || product.stock === null) ? 'out-of-stock' : ''}`}
                   >
                     <div className="product-image">
                       <img
@@ -505,6 +520,15 @@ useEffect(() => {
                           e.target.src = "/images/item.png";
                         }}
                       />
+
+                      {/* 품절 표시 */}
+                      {(product.stock === 0 || product.stock === null) && (
+                        <div className="sold-out-overlay">
+                          <div className="sold-out-badge">
+                            <span>SOLD OUT</span>
+                          </div>
+                        </div>
+                      )}
   
                         {/* 찜하기 버튼 추가 */}
                         <button

@@ -273,3 +273,136 @@
   fill: #ff4444;
   stroke: #ff4444;
 }
+
+/* 품절 스타일 */
+.product-card.out-of-stock {
+  position: relative;
+}
+
+.product-card.out-of-stock .product-image img {
+  opacity: 0.4;
+  filter: grayscale(30%);
+}
+
+.sold-out-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+.sold-out-badge {
+  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 3px solid white;
+  letter-spacing: 2px;
+  transform: rotate(-5deg);
+  animation: pulse 2s infinite;
+}
+
+.sold-out-badge span {
+  display: block;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: rotate(-5deg) scale(1);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+}
+
+/* 품절 상태에서 호버 효과 제거 */
+.product-card.out-of-stock:hover {
+  transform: none;
+}
+
+/* 순위 배지 - 프로페셔널 디자인 */
+.rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  letter-spacing: -0.5px;
+}
+
+/* 1위 - 골드 */
+.rank-1 {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.rank-1::before {
+  content: '★';
+  margin-right: 4px;
+  font-size: 16px;
+  color: #FFF;
+}
+
+/* 2위 - 실버 */
+.rank-2 {
+  background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #2c3e50;
+}
+
+/* 3위 - 브론즈 */
+.rank-3 {
+  background: linear-gradient(135deg, #CD7F32 0%, #B8762D 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 4위 - 네이비 */
+.rank-4 {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 왕관 제거 */
+.rank-1 .crown {
+  display: none;
+}
+
+/* 반응형 - 모바일에서 배지 크기 조정 */
+@media (max-width: 768px) {
+  .rank-badge {
+    min-width: 40px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .rank-1::before {
+    font-size: 14px;
+    margin-right: 3px;
+  }
+}

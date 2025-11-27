@@ -44,7 +44,11 @@ const checkFavoriteStatus = async () => {
   }
 };
 
+  // 재고 확인
+  const isOutOfStock = product.stock === 0 || product.stock === null;
+
   const handleClick = () => {
+    // 품절인 경우에도 상세 페이지로 이동 가능
     navigate(`/products/${product.id}`);
   };
 
@@ -89,13 +93,22 @@ const checkFavoriteStatus = async () => {
   };
 
   return (
-    <div className="product-card" onClick={handleClick}>
+    <div className={`product-card ${isOutOfStock ? 'out-of-stock' : ''}`} onClick={handleClick}>
       <div className="product-image-wrapper">
         <img
           src={`http://localhost:8080${product.image}`}
           alt={product.name}
           className="product-image"
         />
+        
+        {/* 품절 표시 */}
+        {isOutOfStock && (
+          <div className="sold-out-overlay">
+            <div className="sold-out-badge">
+              <span>SOLD OUT</span>
+            </div>
+          </div>
+        )}
         
         {/* 찜하기 버튼 */}
         <button
