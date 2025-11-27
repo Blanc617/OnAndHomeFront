@@ -9,6 +9,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import store from "./store";
 import { initializeAuth } from "./store/slices/userSlice";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 // 레이아웃
 import AdminLayout from "./components/layout/AdminLayout";
@@ -89,7 +90,12 @@ const ProtectedRoute = ({
 // App 내부 컴포넌트 (Provider 내부에서 useDispatch 사용)
 const AppContent = () => {
   const dispatch = useDispatch();
-  
+  const user = useSelector((state) => state.user?.user);
+  const userId = user?.userId;
+
+  // 웹소켓 연결
+  const { notifications, isConnected } = useWebSocket(userId);
+
   useEffect(() => {
     // 최초 접속 시 localStorage에서 토큰과 사용자 정보 확인하여 인증 상태 초기화
     const accessToken = localStorage.getItem("accessToken");
@@ -110,7 +116,19 @@ const AppContent = () => {
       }
     }
   }, [dispatch]);
-  
+
+  useEffect(() => {
+    // 브라우저 알림 권한 요청
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("📊 WebSocket 연결 상태:", isConnected);
+    console.log("📬 수신한 알림 개수:", notifications.length);
+  }, [isConnected, notifications]);
+
   return (
     <Router>
       <Toaster position="top-right" />
@@ -239,8 +257,8 @@ const AppContent = () => {
           {/* 게시판 - Q&A */}
           <Route path="qna" element={<QnaList />} />
           <Route path="qna/:id" element={<QnaDetail />} />
-          <Route 
-            path="qna/write" 
+          <Route
+            path="qna/write"
             element={
               <ProtectedRoute>
                 <QnaWrite />
@@ -251,7 +269,7 @@ const AppContent = () => {
           {/* 게시판 - 리뷰 */}
           <Route path="review" element={<ReviewList />} />
           <Route path="review/:id" element={<ReviewDetail />} />
-          
+
           {/* 광고 상세 */}
           <Route path="advertisements/:id" element={<AdvertisementDetail />} />
         </Route>
@@ -283,8 +301,9 @@ const AppContent = () => {
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
           <Route path="reviews" element={<AdminReviewList />} />
+          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/}
           {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
-          
+
           {/* 광고 관리 */}
           <Route path="advertisements" element={<AdvertisementList />} />
           <Route path="advertisements/create" element={<AdvertisementForm />} />

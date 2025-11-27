@@ -84,7 +84,9 @@ const Notifications = () => {
           if (notification.referenceId) {
             const path = `/products/${notification.referenceId}`;
             console.log('🚀 상품 상세로 이동:', path);
-            navigate(path, { state: { from: 'notifications', type: notification.type } });
+            navigate(path, {
+              state: { from: 'notifications', type: notification.type },
+            });
           }
           break;
         case 'REVIEW_REPLY':
@@ -97,10 +99,12 @@ const Notifications = () => {
           break;
         case 'QNA':
           // Q&A - 상품 상세 페이지로 이동
-          if (notification.referenceId) {
-            const path = `/products/${notification.referenceId}`;
+          if (notification.productId) {
+            const path = `/products/${notification.productId}`;
             console.log('🚀 상품 상세로 이동:', path);
-            navigate(path, { state: { from: 'notifications', type: notification.type } });
+            navigate(path, {
+              state: { from: 'notifications', type: notification.type },
+            });
           }
           break;
         case 'QNA_REPLY':
@@ -246,9 +250,11 @@ const Notifications = () => {
         ) : (
           <div className="notifications-list">
             {notifications.map((notification) => (
-              <div 
+              <div
                 key={notification.id}
-                className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
+                className={`notification-item ${
+                  !notification.isRead ? "unread" : ""
+                }`}
                 onClick={() => handleNotificationClick(notification)}
               >
                 <div className="notification-icon">
@@ -257,7 +263,9 @@ const Notifications = () => {
                 <div className="notification-content">
                   <div className="notification-title">
                     {notification.title}
-                    {!notification.isRead && <span className="unread-dot"></span>}
+                    {!notification.isRead && (
+                      <span className="unread-dot"></span>
+                    )}
                   </div>
                   <div className="notification-message">
                     {notification.content}
@@ -266,7 +274,7 @@ const Notifications = () => {
                     {formatDate(notification.createdAt)}
                   </div>
                 </div>
-                <button 
+                <button
                   className="delete-btn"
                   onClick={(e) => handleDelete(e, notification.id)}
                 >
