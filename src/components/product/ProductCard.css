@@ -1,5 +1,7 @@
+/* 상품 카드 기본 */
 .product-card {
-  background: white;
+  position: relative;              /* 찜 버튼 위치 기준 */
+  background: #fff;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -12,10 +14,11 @@
   transform: translateY(-2px);
 }
 
+/* 이미지 영역 */
 .product-image-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 100%;
+  padding-top: 100%;              /* 1:1 비율 */
   overflow: hidden;
   background: #f8f8f8;
 }
@@ -29,15 +32,15 @@
   object-fit: cover;
 }
 
-/* 비교 버튼 스타일 */
-.compare-btn {
+/* 찜하기 버튼 스타일 */
+.favorite-btn {
   position: absolute;
   top: 10px;
   right: 10px;
   width: 36px;
   height: 36px;
   background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -45,43 +48,38 @@
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
-  opacity: 0;
-}
-
-.product-card:hover .compare-btn {
   opacity: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.compare-btn:hover {
+.favorite-btn:hover {
   background: #fff;
-  border-color: #ff4444;
   transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.compare-btn svg {
-  color: #666;
-}
-
-.compare-btn:hover svg {
+.favorite-btn svg {
   color: #ff4444;
+  transition: all 0.3s ease;
 }
 
-.compare-btn.active {
-  background: #ff4444;
-  border-color: #ff4444;
-  opacity: 1;
+.favorite-btn.active svg {
+  color: #ff4444;
+  fill: #ff4444;
 }
 
-.compare-btn.active svg {
-  color: #fff;
+.favorite-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
+/* 상품 정보 */
 .product-info {
   padding: 15px;
 }
 
 .product-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #333;
   margin-bottom: 8px;
@@ -90,8 +88,25 @@
   white-space: nowrap;
 }
 
+.product-original-price {
+  color: #999;
+  font-size: 13px;
+  text-decoration: line-through;
+}
+
 .product-price {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: bold;
   color: #ff4444;
+  margin-top: 3px;
+}
+
+.discount-badge {
+  display: inline-block;
+  margin-top: 6px;
+  background: #ff4444;
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
 }
