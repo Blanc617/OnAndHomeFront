@@ -9,6 +9,7 @@ import {
 import { Toaster } from "react-hot-toast";
 import store from "./store";
 import { initializeAuth } from "./store/slices/userSlice";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 // 레이아웃
 import AdminLayout from "./components/layout/AdminLayout";
@@ -19,11 +20,13 @@ import Cart from "./pages/user/Cart";
 import Home from "./pages/user/Home";
 import Login from "./pages/user/Login";
 import KakaoCallback from "./pages/user/KakaoCallback";
+import NaverCallback from "./pages/auth/NaverCallbackPage";
 import MyInfo from "./pages/user/MyInfo";
 import MyOrders from "./pages/user/MyOrders";
 import MyPage from "./pages/user/MyPage";
 import MyQna from "./pages/user/MyQna";
 import MyReviews from "./pages/user/MyReviews";
+import MyFavorites from "./pages/user/MyFavorites";
 import Order from "./pages/user/Order";
 import OrderComplete from "./pages/user/OrderComplete";
 import OrderPayment from "./pages/user/OrderPayment";
@@ -40,6 +43,7 @@ import QnaList from "./pages/user/board/QnaList";
 import QnaWrite from "./pages/user/board/QnaWrite";
 import ReviewDetail from "./pages/user/board/ReviewDetail";
 import ReviewList from "./pages/user/board/ReviewList";
+import AdvertisementDetail from "./pages/user/board/AdvertisementDetail";
 
 // 관리자 페이지
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -56,6 +60,8 @@ import AdminQnaDetail from "./pages/admin/QnaDetail";
 import AdminQnaList from "./pages/admin/QnaList";
 import AdminReviewList from "./pages/admin/ReviewList";
 import AdminUserList from "./pages/admin/UserList";
+import AdvertisementList from "./pages/admin/AdvertisementList";
+import AdvertisementForm from "./pages/admin/AdvertisementForm";
 import Notifications from "./pages/user/Notifications";
 import OrderDetail from "./pages/user/OrderDetail";
 
@@ -86,7 +92,12 @@ const ProtectedRoute = ({
 // App 내부 컴포넌트 (Provider 내부에서 useDispatch 사용)
 const AppContent = () => {
   const dispatch = useDispatch();
-  
+  const user = useSelector((state) => state.user?.user);
+  const userId = user?.userId;
+
+  // 웹소켓 연결
+  const { notifications, isConnected } = useWebSocket(userId);
+
   useEffect(() => {
     // 최초 접속 시 localStorage에서 토큰과 사용자 정보 확인하여 인증 상태 초기화
     const accessToken = localStorage.getItem("accessToken");
@@ -107,7 +118,19 @@ const AppContent = () => {
       }
     }
   }, [dispatch]);
-  
+
+  useEffect(() => {
+    // 브라우저 알림 권한 요청
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("📊 WebSocket 연결 상태:", isConnected);
+    console.log("📬 수신한 알림 개수:", notifications.length);
+  }, [isConnected, notifications]);
+
   return (
     <Router>
       <Toaster position="top-right" />
@@ -117,6 +140,7 @@ const AppContent = () => {
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="auth/kakao/callback" element={<KakaoCallback />} />
+          <Route path="auth/naver/callback" element={<NaverCallback />} />
           <Route path="signup" element={<Signup />} />
           <Route path="reset-password" element={<ResetPassword />} />
           
@@ -228,6 +252,14 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="mypage/favorites"
+            element={
+              <ProtectedRoute>
+                <MyFavorites />
+              </ProtectedRoute>
+            }
+          />
           
           {/* 게시판 - 공지사항 */}
           <Route path="notices" element={<NoticeList />} />
@@ -236,8 +268,8 @@ const AppContent = () => {
           {/* 게시판 - Q&A */}
           <Route path="qna" element={<QnaList />} />
           <Route path="qna/:id" element={<QnaDetail />} />
-          <Route 
-            path="qna/write" 
+          <Route
+            path="qna/write"
             element={
               <ProtectedRoute>
                 <QnaWrite />
@@ -248,6 +280,9 @@ const AppContent = () => {
           {/* 게시판 - 리뷰 */}
           <Route path="review" element={<ReviewList />} />
           <Route path="review/:id" element={<ReviewDetail />} />
+
+          {/* 광고 상세 */}
+          <Route path="advertisements/:id" element={<AdvertisementDetail />} />
         </Route>
         
         {/* 관리자 페이지 - 인증 불필요 */}
@@ -277,7 +312,13 @@ const AppContent = () => {
           <Route path="qna/:id" element={<AdminQnaDetail />} />
           
           <Route path="reviews" element={<AdminReviewList />} />
+          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/}
           {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
+
+          {/* 광고 관리 */}
+          <Route path="advertisements" element={<AdvertisementList />} />
+          <Route path="advertisements/create" element={<AdvertisementForm />} />
+          <Route path="advertisements/edit/:id" element={<AdvertisementForm />} />
         </Route>
         
         {/* 404 페이지 */}
