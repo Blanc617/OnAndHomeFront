@@ -441,12 +441,20 @@ const ProductDetail = () => {
             <img
               src={getImageUrl(product.thumbnailImage)}
               alt={product.name}
-              className="product-main-image"
+              className={`product-main-image ${product.stock === 0 || product.stock === null ? 'out-of-stock' : ''}`}
               onError={(e) => {
                 e.target.src = "/images/item.png";
                 e.target.onerror = null;
               }}
             />
+            {/* 품절 표시 */}
+            {(product.stock === 0 || product.stock === null) && (
+              <div className="sold-out-overlay">
+                <div className="sold-out-badge">
+                  <span>SOLD OUT</span>
+                </div>
+              </div>
+            )}
           </div>
 
               <div className="product-info-wrapper">
