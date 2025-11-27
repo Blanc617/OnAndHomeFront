@@ -51,27 +51,6 @@ const AdminSidebar = () => {
     }
   ];
 
-  const bottomMenuItems = [
-    {
-      id: 'sales',
-      name: '매출',
-      count: 0,
-      path: '/admin/sales'
-    },
-    {
-      id: 'membership',
-      name: '회원',
-      count: 0,
-      path: '/admin/membership-stats'
-    },
-    {
-      id: 'product-stats',
-      name: '상품',
-      count: 0,
-      path: '/admin/product-stats'
-    }
-  ];
-
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -105,23 +84,6 @@ const AdminSidebar = () => {
           ))}
         </ul>
       </nav>
-
-      <div className="sidebar-footer">
-        <div className="footer-title">관리자 대시보드</div>
-        <ul className="stats-list">
-          {bottomMenuItems.map(item => (
-            <li key={item.id}>
-              <Link to={item.path}>
-                <span className="stat-label">총 {item.name}</span>
-                <span className="stat-count">{item.count}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="footer-note">
-          관리자 대시보드입니다. (개발 중)
-        </div>
-      </div>
     </div>
   );
 };
