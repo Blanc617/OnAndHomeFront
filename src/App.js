@@ -25,6 +25,7 @@ import MyOrders from "./pages/user/MyOrders";
 import MyPage from "./pages/user/MyPage";
 import MyQna from "./pages/user/MyQna";
 import MyReviews from "./pages/user/MyReviews";
+import MyFavorites from "./pages/user/MyFavorites";
 import Order from "./pages/user/Order";
 import OrderComplete from "./pages/user/OrderComplete";
 import OrderPayment from "./pages/user/OrderPayment";
@@ -246,6 +247,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <MyReviews />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="mypage/favorites"
+            element={
+              <ProtectedRoute>
+                <MyFavorites />
               </ProtectedRoute>
             }
           />
