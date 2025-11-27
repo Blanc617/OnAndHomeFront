@@ -616,6 +616,129 @@ useEffect(() => {
           </>
         )}
       </section>
+
+      {/* 1. 모달 1 */}
+      {isModal1Open && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">첫 번째 팝업 혜택</h4>
+              <button
+                className="modal-close-btn"
+                onClick={handleCloseModal1}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-divider" />
+            
+            <div className="modal-body">
+              <div className="modal-main-title">
+                <span className="modal-emoji">🎁</span>
+                <span className="modal-main-text">첫 번째 특별 혜택!</span>
+              </div>
+              <p className="modal-sub-text">
+                신 상품 10% 할인 쿠폰을 드립니다!
+              </p>
+              <button className="modal-main-btn" onClick={handleCloseModal1}>
+                다음 혜택 보기
+              </button>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="modal-sub-btn" onClick={handleHideTodayModal1}>
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-sub-btn" onClick={handleCloseModal1}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. 모달 2 */}
+      {isModal2Open && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">두 번째 팝업 혜택</h4>
+              <button
+                className="modal-close-btn"
+                onClick={handleCloseModal2}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-divider" />
+            
+            <div className="modal-body">
+              <div className="modal-main-title">
+                <span className="modal-emoji">💰</span>
+                <span className="modal-main-text">가입하면 추가 5,000원 적립!</span>
+              </div>
+              <p className="modal-sub-text">
+                오늘의 큰뜻 상품을 놓치지 마세요.
+              </p>
+              <button className="modal-main-btn" onClick={handleCloseModal2}>
+                다음 공지 보기
+              </button>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="modal-sub-btn" onClick={handleHideTodayModal2}>
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-sub-btn" onClick={handleCloseModal2}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. 모달 3 */}
+      {isModal3Open && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">세 번째 팝업 혜택</h4>
+              <button
+                className="modal-close-btn"
+                onClick={handleCloseModal3}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-divider" />
+            
+            <div className="modal-body">
+              <div className="modal-main-title">
+                <span className="modal-emoji">🛍️</span>
+                <span className="modal-main-text">신규 입점 브랜드!</span>
+              </div>
+              <p className="modal-sub-text">
+                오늘의 추천 상품 목록을 확인하세요.
+              </p>
+              <button className="modal-main-btn" onClick={handleCloseModal3}>
+                메인 페이지로 돌아가기
+              </button>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="modal-sub-btn" onClick={handleHideTodayModal3}>
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-sub-btn" onClick={handleCloseModal3}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
