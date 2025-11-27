@@ -17,6 +17,8 @@ const Signup = () => {
     passwordConfirm: '',
     username: '',
     phone: '',
+    marketingConsent: false,
+    privacyConsent: false,
   });
   
   const [emailVerification, setEmailVerification] = useState({
@@ -32,10 +34,10 @@ const Signup = () => {
   const [errorAlert, setErrorAlert] = useState('');
   
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
     
     setErrors(prev => ({
@@ -197,6 +199,11 @@ const Signup = () => {
       }
     }
     
+    // 필수 동의 항목 확인
+    if (!formData.privacyConsent) {
+      newErrors.privacyConsent = '개인정보 수집 및 이용 동의는 필수입니다.';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -221,6 +228,8 @@ const Signup = () => {
         email: formData.email,
         username: formData.username,
         phone: formData.phone || null,
+        marketingConsent: formData.marketingConsent,
+        privacyConsent: formData.privacyConsent,
       };
       
       const response = await authApi.signup(signupData);
@@ -455,6 +464,56 @@ const Signup = () => {
                 {errors.phone && (
                   <div className="error-message">{errors.phone}</div>
                 )}
+              </div>
+              
+              {/* 동의 항목 */}
+              <div className="form-group consent-section">
+                <div className="consent-title">
+                  약관 동의 <span style={{ color: '#d32f2f' }}>*</span>
+                </div>
+                
+                {/* 필수: 개인정보 수집 및 이용 동의 */}
+                <div className="consent-item">
+                  <label className="consent-label">
+                    <input
+                      type="checkbox"
+                      name="privacyConsent"
+                      checked={formData.privacyConsent}
+                      onChange={handleChange}
+                      disabled={loading}
+                      className="consent-checkbox"
+                    />
+                    <span className="consent-text">
+                      [필수] 개인정보 수집 및 이용 동의
+                    </span>
+                  </label>
+                  <div className="consent-description">
+                    회원가입 및 서비스 제공을 위해 개인정보를 수집합니다.
+                  </div>
+                </div>
+                {errors.privacyConsent && (
+                  <div className="error-message">{errors.privacyConsent}</div>
+                )}
+                
+                {/* 선택: 광고성 정보 수신 동의 */}
+                <div className="consent-item">
+                  <label className="consent-label">
+                    <input
+                      type="checkbox"
+                      name="marketingConsent"
+                      checked={formData.marketingConsent}
+                      onChange={handleChange}
+                      disabled={loading}
+                      className="consent-checkbox"
+                    />
+                    <span className="consent-text">
+                      [선택] 광고성 정보 수신 동의
+                    </span>
+                  </label>
+                  <div className="consent-description">
+                    신상품, 이벤트, 특가 정보 등 광고성 정보를 수신합니다. (미동의 시 광고 알림을 받을 수 없습니다)
+                  </div>
+                </div>
               </div>
               
               {successMessage && (

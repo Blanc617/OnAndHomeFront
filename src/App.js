@@ -40,6 +40,7 @@ import QnaList from "./pages/user/board/QnaList";
 import QnaWrite from "./pages/user/board/QnaWrite";
 import ReviewDetail from "./pages/user/board/ReviewDetail";
 import ReviewList from "./pages/user/board/ReviewList";
+import AdvertisementDetail from "./pages/user/board/AdvertisementDetail";
 
 // 관리자 페이지
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -56,6 +57,8 @@ import AdminQnaDetail from "./pages/admin/QnaDetail";
 import AdminQnaList from "./pages/admin/QnaList";
 import AdminReviewList from "./pages/admin/ReviewList";
 import AdminUserList from "./pages/admin/UserList";
+import AdvertisementList from "./pages/admin/AdvertisementList";
+import AdvertisementForm from "./pages/admin/AdvertisementForm";
 import Notifications from "./pages/user/Notifications";
 import OrderDetail from "./pages/user/OrderDetail";
 
@@ -248,6 +251,9 @@ const AppContent = () => {
           {/* 게시판 - 리뷰 */}
           <Route path="review" element={<ReviewList />} />
           <Route path="review/:id" element={<ReviewDetail />} />
+          
+          {/* 광고 상세 */}
+          <Route path="advertisements/:id" element={<AdvertisementDetail />} />
         </Route>
         
         {/* 관리자 페이지 - 인증 불필요 */}
@@ -278,6 +284,11 @@ const AppContent = () => {
           
           <Route path="reviews" element={<AdminReviewList />} />
           {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
+          
+          {/* 광고 관리 */}
+          <Route path="advertisements" element={<AdvertisementList />} />
+          <Route path="advertisements/create" element={<AdvertisementForm />} />
+          <Route path="advertisements/edit/:id" element={<AdvertisementForm />} />
         </Route>
         
         {/* 404 페이지 */}

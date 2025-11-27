@@ -120,6 +120,15 @@ const Notifications = () => {
             navigate('/notices');
           }
           break;
+        case 'MARKETING':
+        case 'ADVERTISEMENT':
+          // 광고 상세 페이지로 이동
+          if (notification.referenceId) {
+            const path = `/advertisements/${notification.referenceId}`;
+            console.log('🚀 광고 상세로 이동:', path);
+            navigate(path, { state: { from: 'notifications' } });
+          }
+          break;
         default:
           console.warn('⚠️ 알 수 없는 타입:', notification.type);
           break;
@@ -194,6 +203,9 @@ const Notifications = () => {
         return '❓'; // Q&A
       case 'NOTICE':
         return '📢'; // 공지사항
+      case 'MARKETING':
+      case 'ADVERTISEMENT':
+        return '📢'; // 광고
       case 'SYSTEM':
         return '⚙️'; // 시스템
       default:
