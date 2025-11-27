@@ -84,7 +84,7 @@ const CartSidePanel = ({ isOpen, onClose, onCartUpdate }) => {
   };
 
   const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
+    onClose();  // 접기 버튼을 클릭하면 완전히 닫기
   };
 
   const handleOverlayClick = () => {
