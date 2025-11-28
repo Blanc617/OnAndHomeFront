@@ -29,8 +29,8 @@
 }
 
 .btn-edit {
-  padding: 10px 24px;
-  background-color: #28a745;
+  padding: 10px 20px;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 6px;
@@ -38,10 +38,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  width: 100px;
 }
 
 .btn-edit:hover {
-  background-color: #218838;
+  background-color: #0056b3;
   transform: translateY(-2px);
 }
 
@@ -53,15 +54,43 @@
   background-color: #5a6268;
 }
 
-.btn-back {
-  padding: 10px 24px;
-  background-color: #6c757d;
+.btn-delete {
+  padding: 10px 20px;
+  background-color: #dc3545;
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s;
+  width: 100px;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.btn-back {
+  /* --- 👇 강제 적용 치트키 (!important) --- */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100px !important;
+  padding: 0 !important; 
+  height: 40px !important; /* 높이도 강제로 맞춰버리기 (다른 버튼이랑 비슷하게) */
+  box-sizing: border-box !important;
+  
+  /* --- 디자인 --- */
+  background-color: #6c757d !important;
+  color: white !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  text-decoration: none !important; /* 링크 밑줄 제거 */
+  cursor: pointer !important;
   transition: all 0.3s;
 }
 
@@ -73,17 +102,17 @@
 /* 컨텐츠 레이아웃 */
 .user-detail-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 450px; /* 오른쪽 카드 너비 고정 */
   gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  /* max-width: 1400px; */ /* 최대 너비 제한 해제하여 꽉 차게 */
+  /* margin: 0 auto; */ /* 중앙 정렬 해제 */
 }
 
 .user-detail-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 40px;
+  padding: 30px;
 }
 
 .detail-section {
@@ -94,6 +123,7 @@
   font-size: 20px;
   font-weight: 600;
   color: #333;
+  margin-top: 0;
   margin-bottom: 24px;
   padding-bottom: 12px;
   border-bottom: 2px solid #f0f0f0;
@@ -213,28 +243,32 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 30px;
   height: fit-content;
+  margin-top: 30px;
 }
 
 .user-stats-card h3 {
   font-size: 18px;
   font-weight: 600;
   color: #333;
+  margin-top: 0;
   margin-bottom: 24px;
   padding-bottom: 12px;
   border-bottom: 2px solid #f0f0f0;
 }
 
 .stats-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
 
 .stat-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  text-align: center;
+  gap: 12px;
+  padding: 20px 16px;
   background: #f8f9fa;
   border-radius: 8px;
   transition: all 0.3s;
@@ -242,29 +276,38 @@
 
 .stat-item:hover {
   background: #e9ecef;
-  transform: translateX(4px);
+  transform: translateY(-4px);
 }
 
 .stat-icon {
-  font-size: 32px;
-  width: 50px;
-  height: 50px;
+  font-size: 36px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  margin-top: 0;
+  color: #555;
 }
 
 .stat-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 0;
+  width: 100%;
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 14px;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .stat-value {
@@ -344,4 +387,19 @@
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.header-buttons button {
+  width: 100px !important;       /* 너비 강제 통일 */
+  height: 40px !important;       /* 높이도 강제 통일 (중요!) */
+  padding: 0 !important;         /* 내부 여백 제거 (글자 정렬 방해꾼 제거) */
+  
+  display: flex !important;      /* 박스 모드 */
+  justify-content: center !important; /* 가로 가운데 정렬 */
+  align-items: center !important;     /* 세로 가운데 정렬 */
+  
+  border-radius: 6px !important; /* 모서리 둥글게 통일 */
+  font-size: 14px !important;    /* 글자 크기 통일 */
+  font-weight: 600 !important;   /* 글자 굵기 통일 */
+  box-sizing: border-box !important; /* 테두리 포함 크기 계산 */
 }

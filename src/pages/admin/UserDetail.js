@@ -186,6 +186,33 @@ const UserDetail = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/admin/users/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (response.data && response.data.success) {
+        alert("회원이 탈퇴 처리되었습니다.");
+        navigate("/admin/users");
+      } else {
+        alert(response.data.message || "회원 탈퇴 처리에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원 탈퇴 처리 실패:", error);
+      alert("오류가 발생했습니다.");
+    }
+  };
+
   const formatGender = (gender) => {
     if (!gender) return "-";
     if (gender === "M" || gender === "MALE" || gender === "남자") return "남성";
@@ -244,6 +271,12 @@ const UserDetail = () => {
               onClick={handleEditToggle}
             >
               {isEditing ? "취소" : "수정"}
+            </button>
+            <button
+              className="btn-delete"
+              onClick={handleDelete}
+            >
+              삭제
             </button>
             <button
               className="btn-back"
