@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import store from "./store";
 import { initializeAuth } from "./store/slices/userSlice";
 import { useWebSocket } from "./hooks/useWebSocket";
+import UserDetail from "./pages/admin/UserDetail";
 
 // 레이아웃
 import AdminLayout from "./components/layout/AdminLayout";
@@ -72,20 +73,20 @@ const ProtectedRoute = ({
   requireAdmin = false,
 }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
-  
+
   // 관리자 페이지는 인증 체크 없이 바로 통과
   if (requireAdmin) {
     return children;
   }
-  
+
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   if (requireAdmin && (!user || user.role !== 0)) {
     return <Navigate to="/" replace />;
   }
-  
+
   return children;
 };
 
@@ -143,12 +144,12 @@ const AppContent = () => {
           <Route path="auth/naver/callback" element={<NaverCallback />} />
           <Route path="signup" element={<Signup />} />
           <Route path="reset-password" element={<ResetPassword />} />
-          
+
           {/* 상품 */}
           <Route path="products" element={<ProductList />} />
           <Route path="products/category/:category" element={<ProductList />} />
           <Route path="products/:id" element={<ProductDetail />} />
-          
+
           {/* 장바구니 */}
           <Route
             path="cart"
@@ -158,7 +159,7 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-          
+
           {/* 주문 */}
           <Route
             path="order"
@@ -166,7 +167,7 @@ const AppContent = () => {
               <ProtectedRoute>
                 <Order />
               </ProtectedRoute>
-            } 
+            }
           />
           <Route
             path="user/order-payment"
@@ -260,11 +261,12 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-          
+          <Route path="/admin/users/:userId" element={<UserDetail />} />
+
           {/* 게시판 - 공지사항 */}
           <Route path="notices" element={<NoticeList />} />
           <Route path="notices/:id" element={<NoticeDetail />} />
-          
+
           {/* 게시판 - Q&A */}
           <Route path="qna" element={<QnaList />} />
           <Route path="qna/:id" element={<QnaDetail />} />
@@ -274,9 +276,9 @@ const AppContent = () => {
               <ProtectedRoute>
                 <QnaWrite />
               </ProtectedRoute>
-            } 
+            }
           />
-          
+
           {/* 게시판 - 리뷰 */}
           <Route path="review" element={<ReviewList />} />
           <Route path="review/:id" element={<ReviewDetail />} />
@@ -284,43 +286,40 @@ const AppContent = () => {
           {/* 광고 상세 */}
           <Route path="advertisements/:id" element={<AdvertisementDetail />} />
         </Route>
-        
+
         {/* 관리자 페이지 - 인증 불필요 */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          
           {/* 회원 관리 */}
           <Route path="users" element={<AdminUserList />} />
-          
           {/* 상품 관리 */}
           <Route path="products" element={<AdminProductList />} />
           <Route path="products/create" element={<AdminProductCreate />} />
           <Route path="products/:id/edit" element={<AdminProductEdit />} />
-          
           {/* 주문 관리 */}
           <Route path="orders" element={<AdminOrderList />} />
           <Route path="orders/:id" element={<AdminOrderDetail />} />
-          
           {/* 게시판 관리 */}
           <Route path="notices" element={<AdminNoticeList />} />
           <Route path="notices/write" element={<AdminNoticeWrite />} />
           <Route path="notices/:id" element={<AdminNoticeDetail />} />
           <Route path="notices/edit/:id" element={<AdminNoticeEdit />} />
-          
           <Route path="qna" element={<AdminQnaList />} />
           <Route path="qna/:id" element={<AdminQnaDetail />} />
-          
           <Route path="reviews" element={<AdminReviewList />} />
           {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/}
-          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/} 해당파일 누락
-
+          {/*<Route path="reviews/:id" element={<AdminReviewDetail />} />*/}{" "}
+          해당파일 누락
           {/* 광고 관리 */}
           <Route path="advertisements" element={<AdvertisementList />} />
           <Route path="advertisements/create" element={<AdvertisementForm />} />
-          <Route path="advertisements/edit/:id" element={<AdvertisementForm />} />
+          <Route
+            path="advertisements/edit/:id"
+            element={<AdvertisementForm />}
+          />
         </Route>
-        
+
         {/* 404 페이지 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -215,7 +215,7 @@
   .user-list-main {
     margin-left: 200px;
   }
-  
+
   .search-box input {
     width: 200px;
   }
@@ -226,25 +226,25 @@
     margin-left: 0;
     padding: 20px;
   }
-  
+
   .page-header {
     flex-direction: column;
     gap: 20px;
     align-items: stretch;
   }
-  
+
   .search-box form {
     width: 100%;
   }
-  
+
   .search-box input {
     width: 100%;
   }
-  
+
   .user-table-container {
     overflow-x: auto;
   }
-  
+
   .user-table {
     min-width: 700px;
   }
@@ -274,4 +274,12 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* 회원 행 호버 효과 */
+.user-row:hover {
+  background-color: #f8f9fa !important;
+  transition: background-color 0.2s;
+}
 
+.user-row td {
+  transition: all 0.2s;
+}

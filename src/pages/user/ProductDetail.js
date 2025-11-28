@@ -22,13 +22,11 @@ const ProductDetail = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [qnaTitle, setQnaTitle] = useState("");
   const [qnaContent, setQnaContent] = useState("");
-  const [qnaIsPrivate, setQnaIsPrivate] = useState(false); // 비밀글 체크박스
+  const [qnaIsPrivate, setQnaIsPrivate] = useState(false);
   const [activeTab, setActiveTab] = useState("detail");
   const [timeRemaining, setTimeRemaining] = useState("");
-  // 리뷰 - 별점 기능
   const [rating, setRating] = useState(0);
 
-  // Refs for scrolling
   const detailRef = useRef(null);
   const reviewRef = useRef(null);
   const qnaRef = useRef(null);
@@ -41,7 +39,6 @@ const ProductDetail = () => {
     checkInitialFavoriteStatus();
   }, [id]);
 
-  // 초기 찜 상태 확인
   const checkInitialFavoriteStatus = async () => {
     try {
       const result = await favoriteAPI.check(id);
@@ -60,7 +57,6 @@ const ProductDetail = () => {
     }
   }, [product]);
 
-  // 남은 시간 계산
   useEffect(() => {
     const calculateTimeRemaining = () => {
       const now = new Date();
@@ -289,7 +285,6 @@ const ProductDetail = () => {
       return;
     }
 
-    // 별점 유효성 검증
     if (rating === 0) {
       alert("별점을 선택해주세요.");
       return;
@@ -341,7 +336,7 @@ const ProductDetail = () => {
         productId: product.id,
         title: qnaTitle,
         question: qnaContent,
-        isPrivate: qnaIsPrivate, // 비밀글 여부 추가
+        isPrivate: qnaIsPrivate,
         userId: user.id,
         writer: user.username || user.userId,
       });
@@ -350,7 +345,7 @@ const ProductDetail = () => {
         alert("문의가 등록되었습니다.");
         setQnaTitle("");
         setQnaContent("");
-        setQnaIsPrivate(false); // 초기화
+        setQnaIsPrivate(false);
         loadQnas();
       } else {
         alert(response.message || "문의 등록에 실패했습니다.");
@@ -437,24 +432,21 @@ const ProductDetail = () => {
         <h2 className="page-title">상품 상세정보</h2>
 
         <div className="product-info-section">
-          <div className="product-image-wrapper">
+          <div style={{ width: "100%" }}>
             <img
               src={getImageUrl(product.thumbnailImage)}
               alt={product.name}
-              className={`product-main-image ${product.stock === 0 || product.stock === null ? 'out-of-stock' : ''}`}
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+                objectFit: "contain",
+              }}
               onError={(e) => {
                 e.target.src = "/images/item.png";
                 e.target.onerror = null;
               }}
             />
-            {/* 품절 표시 */}
-            {(product.stock === 0 || product.stock === null) && (
-              <div className="sold-out-overlay">
-                <div className="sold-out-badge">
-                  <span>SOLD OUT</span>
-                </div>
-              </div>
-            )}
           </div>
 
           <div className="product-info-wrapper">
@@ -633,8 +625,6 @@ const ProductDetail = () => {
                   value={reviewContent}
                   onChange={(e) => setReviewContent(e.target.value)}
                 />
-
-                {/* 별점 선택 컴포넌트 */}
                 <StarRating rating={rating} onRatingChange={setRating} />
                 <button className="btn btn-submit" onClick={handleSubmitReview}>
                   저장
@@ -647,8 +637,6 @@ const ProductDetail = () => {
         {/* QnA 섹션 */}
         <div ref={qnaRef} className="qna-section">
           <h2 className="section-title">Q&A {qnas.length}</h2>
-
-          {/* QnA 목록 */}
           <div className="qna-list">
             {qnas.length === 0 ? (
               <div className="empty-message">등록된 문의가 없습니다.</div>
@@ -663,8 +651,6 @@ const ProductDetail = () => {
               ))
             )}
           </div>
-
-          {/* 문의 작성 폼 - 목록 아래에 위치 */}
           {isAuthenticated && (
             <div className="qna-write-form">
               <div className="form-header">
@@ -690,8 +676,6 @@ const ProductDetail = () => {
                   rows="5"
                 />
               </div>
-
-              {/* 비밀글 체크박스 추가 */}
               <div className="input-group">
                 <label className="qna-private-checkbox">
                   <input
@@ -702,7 +686,6 @@ const ProductDetail = () => {
                   <span>비밀글로 작성</span>
                 </label>
               </div>
-
               <div className="form-actions">
                 <button className="btn btn-submit" onClick={handleSubmitQna}>
                   문의 등록

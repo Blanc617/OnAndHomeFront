@@ -29,9 +29,6 @@
 
 .product-image-wrapper {
   width: 100%;
-  background: #f9f9f9;
-  border-radius: 8px;
-  overflow: hidden;
   position: relative;
 }
 
@@ -126,38 +123,21 @@
   background-color: #d43d2f;
 }
 
-/* 하트(찜) 버튼 - 테두리 검정 */
-.action-buttons .btn.btn-favorite {
-  background-color: #ffffff;
-  color: #ff4444;
-  font-size: 28px;
+.btn-favorite {
+  background-color: #ff4757;
+  color: white;
+  font-size: 24px;
   flex: 0 0 60px;
   padding: 15px 10px;
-
-  border: 2px solid #000 !important; /* 검은색 테두리 강제 적용 */
-  border-radius: 8px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: all 0.3s ease;
 }
 
-.action-buttons .btn.btn-favorite:hover {
-  background-color: #fff5f5;
-  border-color: #ff4444;
-  transform: scale(1.05);
+.btn-favorite:hover {
+  background-color: #ff3838;
+  transform: scale(1.1);
 }
 
-.action-buttons .btn.btn-favorite:active {
+.btn-favorite:active {
   transform: scale(0.95);
-}
-
-.action-buttons .btn.btn-favorite.active {
-  background-color: #ff4444;
-  color: #ffffff;
-  border-color: #ff4444;
 }
 
 /* 주문 요약 */
@@ -373,7 +353,6 @@
   gap: 15px;
 }
 
-
 .star-rating-container {
   display: flex;
   align-items: center;
@@ -418,7 +397,6 @@
 .product-rating {
   display: flex;
   justify-content: left;
-  /* align-items: center; */
   gap: 4px;
   margin-bottom: 15px;
 }
@@ -443,7 +421,6 @@
   font-size: 14px;
   color: #666;
 }
-
 
 .textarea {
   flex: 1;
@@ -717,49 +694,6 @@
   left: 0;
   color: #333;
   font-weight: bold;
-}
-
-/* 품절 표시 스타일 */
-.product-main-image.out-of-stock {
-  opacity: 0.4;
-  filter: grayscale(30%);
-}
-
-.sold-out-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 5;
-}
-
-.sold-out-badge {
-  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-  color: white;
-  padding: 16px 32px;
-  border-radius: 8px;
-  font-size: 24px;
-  font-weight: 700;
-  text-align: center;
-  border: 3px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  letter-spacing: 2px;
-  transform: rotate(-5deg);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: rotate(-5deg) scale(1);
-  }
-  50% {
-    transform: rotate(-5deg) scale(1.05);
-  }
 }
 
 /* Responsive */
