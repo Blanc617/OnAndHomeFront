@@ -223,6 +223,139 @@
   color: #999;
 }
 
+/* 리뷰 아이템 */
+.review-item {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+/* 리뷰 헤더 */
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+}
+
+.review-author {
+    font-weight: 600;
+    color: #333;
+}
+
+.review-date {
+    color: #999;
+    font-size: 14px;
+    margin-left: auto;
+}
+
+/* 리뷰 내용 */
+.review-content {
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    word-break: break-word;
+}
+
+/* ✅ 리뷰 푸터 - 좋아요와 수정/삭제 버튼 영역 */
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* ✅ 좋아요 버튼 - 작은 크기 */
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    
+    /* 크기 - 수정/삭제 버튼과 비슷하게 */
+    padding: 6px 12px;
+    min-width: auto;
+    height: 32px;
+    
+    /* 박스 스타일 */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: white;
+    
+    /* 인터랙션 */
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    
+    /* 폰트 */
+    font-size: 14px;
+}
+
+/* 호버 */
+.like-btn:hover {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+}
+
+/* 좋아요 상태 */
+.like-btn.liked {
+    border-color: #ff6b6b;
+    background: #ffe0e0;
+}
+
+/* 아이콘 */
+.like-icon {
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* 숫자 */
+.like-count {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* ✅ 수정/삭제 버튼 영역 */
+.review-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+    padding: 6px 14px;
+    height: 32px;
+    border: 1px solid #e0e0e0;
+    background: white;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+    border-color: #4285f4;
+    color: #4285f4;
+    background: #f8f9fa;
+}
+
+.btn-delete:hover {
+    border-color: #ea4335;
+    color: #ea4335;
+    background: #fef2f2;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .review-item {

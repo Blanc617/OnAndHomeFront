@@ -54,11 +54,11 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    if (product) {
-      loadReviews();
-      loadQnas();
+    if (id) {  // ✅ id는 안 바뀜
+        loadReviews();
+        loadQnas();
     }
-  }, [product]);
+}, [id, user?.id]); 
 
   // 남은 시간 계산
   useEffect(() => {
@@ -120,16 +120,15 @@ const ProductDetail = () => {
     }
   };
 
-  const loadReviews = async () => {
-    try {
-      const response = await reviewAPI.getProductReviews(id);
-      if (response.success && response.data) {
-        setReviews(response.data);
+    const loadReviews = async () => {
+      try {
+        const userId = user?.id || null;
+          const reviewList = await reviewAPI.getProductReviews(id, userId);
+          setReviews(reviewList);
+          } catch (error) {
+        console.error("리뷰 조회 오류:", error);
       }
-    } catch (error) {
-      console.error("리뷰 조회 오류:", error);
-    }
-  };
+    };
 
   const loadQnas = async () => {
     try {
@@ -606,26 +605,60 @@ const ProductDetail = () => {
               ))
             )}
           </div>
-          {isAuthenticated && (
-            <div className="review-write-form">
-                         <div className="review-write">
-              <textarea
-                className="textarea"
-                placeholder="리뷰를 작성해주세요"
-                value={reviewContent}
-                onChange={(e) => setReviewContent(e.target.value)}
-              />
+           {isAuthenticated && (
+              <div className="review-write-form">
 
-               {/* 별점 선택 컴포넌트 */} 
-                <StarRating
-                  rating={rating}
-                  onRatingChange={setRating}
-                />
-              <button className="btn btn-submit" onClick={handleSubmitReview}>
-                저장
-              </button>
+                <div className="form-header">
+                  <h3>리뷰 작성</h3>
+                </div>
+
+                <div className="review-write">
+                  <textarea
+                    className="textarea"
+                    placeholder="리뷰 작성"
+                    value={reviewContent}
+                    onChange={(e) => setReviewContent(e.target.value)}
+                  />
+
+                   {/* 별점 선택 컴포넌트 */} 
+                    <div className="rating-row">
+                      <StarRating
+                        rating={rating}
+                        onRatingChange={setRating}
+                      />
+
+                      <button
+                        type="button"
+                        className="btn-photo-upload"
+                        // onClick={handleQnaPhotoUpload}  // 나중에 파일 업로드 연결할 함수
+                      >
+                        사진 첨부
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* ✅ 버튼들을 review-write 밖으로 */}
+                  <div className="review-button-group">
+                      <button className="btn btn-submit" onClick={handleSubmitReview}>
+                          저장
+                      </button>
+                      <button className="btn-cancel-half" onClick={() => {
+                          // 입력된 내용이 있을 때만 확인
+                          if (reviewContent.trim() || rating > 0) {
+                              if (window.confirm('작성 중인 내용이 삭제됩니다. 취소하시겠습니까?')) {
+                                  setReviewContent('');
+                                  setRating(0);
+                              }
+                          } else {
+                              // 입력된 내용이 없으면 바로 초기화
+                              setReviewContent('');
+                              setRating(0);
+                          }
+                      }}>
+                          취소
+                      </button>
+                  </div>
               </div>
-            </div>
           )}
         </div>
 
@@ -685,14 +718,41 @@ const ProductDetail = () => {
                     onChange={(e) => setQnaIsPrivate(e.target.checked)}
                   />
                   <span>비밀글로 작성</span>
+                      <button
+                        type="button"
+                        className="btn-photo-upload"
+                        // onClick={handleQnaPhotoUpload}  // 나중에 파일 업로드 연결할 함수
+                      >
+                        사진 첨부
+                      </button>
                 </label>
               </div>
 
               <div className="form-actions">
+                
                 <button className="btn btn-submit" onClick={handleSubmitQna}>
-                  문의 등록
+                    문의 등록
                 </button>
-              </div>
+                
+                <button className="btn-cancel-half" onClick={() => {
+                  // 입력된 내용이 있는지 확인
+                  if (qnaTitle.trim() || qnaContent.trim() || qnaIsPrivate) {
+                      // 내용이 있으면 확인 창 표시
+                      if (window.confirm('작성 중인 내용이 삭제됩니다. 취소하시겠습니까?')) {
+                          setQnaTitle('');
+                          setQnaContent('');
+                          setQnaIsPrivate(false);
+                      }
+                  } else {
+                      // 입력된 내용이 없으면 바로 초기화 (확인 창 안 띄움)
+                      setQnaTitle('');
+                      setQnaContent('');
+                      setQnaIsPrivate(false);
+                  }
+              }}>
+                  취소
+              </button>
+            </div>
             </div>
           )}
         </div>

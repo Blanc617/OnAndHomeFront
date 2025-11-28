@@ -1,24 +1,33 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import reviewApi from '../../api/reviewApi';
 import StarRating from '../StarRating';
-import "./ReviewItem.css";
-
+import './ReviewItem.css';
 
 const ReviewItem = ({ review, onEdit, onDelete }) => {
     const { user } = useSelector((state) => state.user);
+    
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(review.content);
     const [editedRating, setEditedRating] = useState(review.rating || 5);
+    
+    const [isLiked, setIsLiked] = useState(review.isLiked || false);
+    const [likedCount, setLikedCount] = useState(review.likedCount || 0);
+
+    useEffect(() => {
+    setIsLiked(review.isLiked || false);
+    setLikedCount(review.likedCount ?? 0);
+  }, [review.isLiked, review.likedCount]);
 
     const isAuthor =
         user &&
         (review.username === user.userId ||
             review.author === user.username ||
             review.author === user.userId);
+            
 
-    const handleEdit = () => {
-        setIsEditing(true);
-    };
+    const handleEdit = () => setIsEditing(true);
+    
 
     const handleCancelEdit = () => {
         setIsEditing(false);
@@ -50,19 +59,33 @@ const ReviewItem = ({ review, onEdit, onDelete }) => {
         }
     };
 
+        const handleLikeClick = async () => {
+            try {
+                const result = await reviewApi.toggleLike(review.id, user.id);
+
+                if (result.success) {
+                    setIsLiked(result.data.isLiked);
+                    setLikedCount(result.data.likedCount); // 이름은 likedCount!
+                }
+             } catch (error) {
+                console.error("좋아요 오류: ", error);
+             }
+        };
+
+
     return (
     <div className="review-item-wrapper">
         <div className="review-item">
             {isEditing ? (
                 <div className="review-edit-form">
-                    <div className="rating-edit">
-                        <span className="rating-label">별점: </span>
+                    
+                        <span className="rating-label"></span>
                             {/* 별점 선택 컴포넌트 */} 
                             <StarRating
                                 rating={editedRating}
                                 onRatingChange={setEditedRating}
                                 />
-                            </div>
+                            
                         <textarea
                             className="review-edit-textarea"
                             value={editedContent}
@@ -89,22 +112,29 @@ const ReviewItem = ({ review, onEdit, onDelete }) => {
                                 </div>
                             )}
                         </div>
+
                         <div className="review-content">{review.content}</div>
 
-                        {/* ⭐ 수정/삭제 버튼 */}
-                        {isAuthor && (
-                            <div className="review-actions">
-                                <button onClick={handleEdit} className="btn-edit">
-                                    수정
-                                </button>
-                                <button onClick={handleDelete} className="btn-delete">
-                                    삭제
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                        {/* ✅ footer 영역 - 좋아요와 수정/삭제 버튼 */}
+                <div className="review-footer">
+                    <button 
+                        className={`like-btn ${isLiked ? 'liked' : ''}`}
+                        onClick={handleLikeClick}
+                    >
+                        <span className="like-icon">{isLiked ? "❤️" : "🤍"}</span>
+                        <span className="like-count">{likedCount}</span>
+                    </button>
+                    
+                    {isAuthor && (
+                        <div className="review-actions">
+                            <button onClick={handleEdit} className="btn-edit">수정</button>
+                            <button onClick={handleDelete} className="btn-delete">삭제</button>
+                        </div>
+                    )}
+                </div>
+            </>
+        )}
+    </div>
 
             {/* ⭐ 답글 표시 부분 */}
             {review.replies && review.replies.length > 0 && !isEditing && (
