@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
-import { authApi } from '../../api';
-import Input from '../../components/common/Input';
-import Button from '../../components/common/Button';
-import './LoginPage.css';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+} from "../../store/slices/authSlice";
+import { authApi } from "../../api";
+import Input from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import "./LoginPage.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,27 +17,27 @@ const LoginPage = () => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   // 로그아웃 메시지 확인
   const queryParams = new URLSearchParams(location.search);
-  const isLogout = queryParams.get('logout') === 'true';
+  const isLogout = queryParams.get("logout") === "true";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // 에러 메시지 초기화
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -42,13 +46,13 @@ const LoginPage = () => {
     const newErrors = {};
 
     if (!formData.email) {
-      newErrors.email = '이메일을 입력해주세요.';
+      newErrors.email = "이메일을 입력해주세요.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = '올바른 이메일 형식이 아닙니다.';
+      newErrors.email = "올바른 이메일 형식이 아닙니다.";
     }
 
     if (!formData.password) {
-      newErrors.password = '비밀번호를 입력해주세요.';
+      newErrors.password = "비밀번호를 입력해주세요.";
     }
 
     setErrors(newErrors);
@@ -72,23 +76,26 @@ const LoginPage = () => {
       });
 
       if (response.success) {
-        dispatch(loginSuccess({
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken,
-        }));
+        dispatch(
+          loginSuccess({
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken,
+          })
+        );
 
-        alert('로그인되었습니다.');
-        
+        alert("로그인되었습니다.");
+
         // 이전 페이지로 이동하거나 홈으로
-        const from = location.state?.from?.pathname || '/';
+        const from = location.state?.from?.pathname || "/";
         navigate(from, { replace: true });
       } else {
-        dispatch(loginFailure(response.message || '로그인에 실패했습니다.'));
-        setErrors({ submit: response.message || '로그인에 실패했습니다.' });
+        dispatch(loginFailure(response.message || "로그인에 실패했습니다."));
+        setErrors({ submit: response.message || "로그인에 실패했습니다." });
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
-      const errorMessage = error.response?.data?.message || '로그인 중 오류가 발생했습니다.';
+      console.error("로그인 오류:", error);
+      const errorMessage =
+        error.response?.data?.message || "로그인 중 오류가 발생했습니다.";
       dispatch(loginFailure(errorMessage));
       setErrors({ submit: errorMessage });
     } finally {
@@ -142,7 +149,7 @@ const LoginPage = () => {
             fullWidth
             disabled={isLoading}
           >
-            {isLoading ? '로그인 중...' : '로그인'}
+            {isLoading ? "로그인 중..." : "로그인"}
           </Button>
         </form>
 
@@ -150,28 +157,75 @@ const LoginPage = () => {
           <div className="divider">
             <span>또는</span>
           </div>
-          <button 
+
+          {/* 카카오 로그인 버튼 */}
+          <button
             className="kakao-login-btn"
             onClick={async () => {
               try {
-                const response = await fetch('http://localhost:8080/api/auth/kakao/login-url');
+                const response = await fetch(
+                  "http://localhost:8080/api/auth/kakao/login-url"
+                );
                 const data = await response.json();
                 window.location.href = data.loginUrl;
               } catch (error) {
-                console.error('카카오 로그인 URL 가져오기 실패:', error);
-                alert('카카오 로그인을 시작할 수 없습니다.');
+                console.error("카카오 로그인 URL 가져오기 실패:", error);
+                alert("카카오 로그인을 시작할 수 없습니다.");
               }
             }}
           >
             <img src="/images/kakao-logo.png" alt="카카오" />
             카카오로 시작하기
           </button>
+
+          {/* 네이버 로그인 버튼 */}
+          <button
+            className="naver-login-btn"
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  "http://localhost:8080/api/auth/naver/login-url"
+                );
+                const data = await response.json();
+
+                // state 값을 세션 스토리지에 저장 (CSRF 검증용)
+                sessionStorage.setItem("naverState", data.state);
+
+                // 네이버 로그인 페이지로 이동
+                window.location.href = data.loginUrl;
+              } catch (error) {
+                console.error("네이버 로그인 URL 가져오기 실패:", error);
+                alert("네이버 로그인을 시작할 수 없습니다.");
+              }
+            }}
+          >
+            네이버로 시작하기
+          </button>
+
+          {/* 구글 로그인 버튼 */}
+          <button
+            className="google-login-btn"
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  "http://localhost:8080/api/auth/google/login-url"
+                );
+                const data = await response.json();
+                window.location.href = data.loginUrl;
+              } catch (error) {
+                console.error("구글 로그인 URL 가져오기 실패:", error);
+                alert("구글 로그인을 시작할 수 없습니다.");
+              }
+            }}
+          >
+            <img src="/images/google-logo.png" alt="Google" />
+            Google로 시작하기
+          </button>
         </div>
 
         <div className="login-footer">
           <p>
-            아직 회원이 아니신가요?{' '}
-            <Link to="/signup">회원가입</Link>
+            아직 회원이 아니신가요? <Link to="/signup">회원가입</Link>
           </p>
           <div className="login-links">
             <Link to="/find-email">이메일 찾기</Link>
