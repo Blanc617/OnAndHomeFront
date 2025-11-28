@@ -152,6 +152,35 @@
   line-height: 1;
 }
 
+/* 구글 로그인 버튼 */
+.google-login-btn {
+  width: 100%;
+  height: 50px;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #3c4043;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-top: 10px;
+}
+
+.google-login-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #d2d3d4;
+}
+
+.google-login-btn img {
+  width: 24px;
+  height: 24px;
+}
+
 .login-footer {
   margin-top: 30px;
   text-align: center;

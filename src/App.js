@@ -20,6 +20,7 @@ import Cart from "./pages/user/Cart";
 import Home from "./pages/user/Home";
 import Login from "./pages/user/Login";
 import KakaoCallback from "./pages/user/KakaoCallback";
+import GoogleCallback from "./pages/user/GoogleCallback";
 import NaverCallback from "./pages/auth/NaverCallbackPage";
 import MyInfo from "./pages/user/MyInfo";
 import MyOrders from "./pages/user/MyOrders";
@@ -141,6 +142,7 @@ const AppContent = () => {
           <Route path="login" element={<Login />} />
           <Route path="auth/kakao/callback" element={<KakaoCallback />} />
           <Route path="auth/naver/callback" element={<NaverCallback />} />
+          <Route path="auth/google/callback" element={<GoogleCallback />} />
           <Route path="signup" element={<Signup />} />
           <Route path="reset-password" element={<ResetPassword />} />
           
