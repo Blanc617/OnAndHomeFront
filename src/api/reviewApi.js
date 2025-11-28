@@ -7,12 +7,26 @@ const reviewApi = {
   /**
    * 상품 리뷰 목록 조회
    */
-  getProductReviews: async (productId, page = 0, size = 10) => {
-    const response = await apiClient.get(`/api/reviews/product/${productId}`, {
-      params: { page, size },
-    });
-    return response.data;
-  },
+  getProductReviews: async (productId, userId = null, page = 0, size = 10) => {
+  const params = { page, size };
+
+  if (userId) {
+    params.userId = userId;
+  }
+
+  const response = await apiClient.get(`/api/reviews/product/${productId}`, {
+    params,
+  });
+
+  // ✅ 서버 응답: { success: true, data: [...] } 에서 리뷰 배열만 꺼내서 반환
+  const { success, data } = response.data;
+
+  if (success && Array.isArray(data)) {
+    return data;          // 👉 리뷰 배열만 리턴
+  }
+
+  return [];
+},
 
   /**
    * 리뷰 작성
@@ -56,6 +70,17 @@ const reviewApi = {
     const response = await apiClient.get("/api/reviews/recent", {
       params: { limit },
     });
+    return response.data;
+  },
+   /**
+   * 리뷰 좋아요
+   */
+  toggleLike: async (reviewId, userId) => {
+    const response = await apiClient.post(
+      `/api/reviews/${reviewId}/like`,
+      null,
+      { params: { userId } }
+    );
     return response.data;
   },
 };
