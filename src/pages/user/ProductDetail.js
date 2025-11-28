@@ -6,8 +6,8 @@ import { cartAPI, favoriteAPI, productAPI, qnaAPI, reviewAPI } from "../../api";
 import QnaItem from "../../components/qna/QnaItem";
 import ReviewItem from "../../components/review/ReviewItem";
 import "./ProductDetail.css";
-// 리뷰 - 별점 기능
-import StarRating from "../../components/StarRating.jsx";
+  // 리뷰 - 별점 기능 
+import StarRating from '../../components/StarRating.jsx';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -25,7 +25,7 @@ const ProductDetail = () => {
   const [qnaIsPrivate, setQnaIsPrivate] = useState(false); // 비밀글 체크박스
   const [activeTab, setActiveTab] = useState("detail");
   const [timeRemaining, setTimeRemaining] = useState("");
-  // 리뷰 - 별점 기능
+  // 리뷰 - 별점 기능 
   const [rating, setRating] = useState(0);
   
   // Refs for scrolling
@@ -54,11 +54,11 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    if (id) {  // ✅ id는 안 바뀜
-        loadReviews();
-        loadQnas();
+    if (product) {
+      loadReviews();
+      loadQnas();
     }
-}, [id, user?.id]);
+  }, [product]);
 
   // 남은 시간 계산
   useEffect(() => {
@@ -122,8 +122,7 @@ const ProductDetail = () => {
 
   const loadReviews = async () => {
     try {
-        const userId = user?.id || null;
-        const response = await reviewAPI.getProductReviews(id, userId);
+      const response = await reviewAPI.getProductReviews(id);
       if (response.success && response.data) {
         setReviews(response.data);
       }
@@ -290,9 +289,9 @@ const ProductDetail = () => {
       return;
     }
 
-    // 별점 유효성 검증
+       // 별점 유효성 검증
     if (rating === 0) {
-      alert("별점을 선택해주세요.");
+      alert('별점을 선택해주세요.');
       return;
     }
       
@@ -305,18 +304,18 @@ const ProductDetail = () => {
       });
       
       if (response.success) {
-        alert("리뷰가 등록되었습니다.");
-        setReviewContent("");
+        alert('리뷰가 등록되었습니다.');
+        setReviewContent('');
         loadReviews();
         setRating(0);
         loadReviews();
         loadProductDetail();
       } else {
-        alert(response.message || "리뷰 등록에 실패했습니다.");
+        alert(response.message || '리뷰 등록에 실패했습니다.');
       }
     } catch (error) {
-      console.error("리뷰 작성 오류:", error);
-      alert("리뷰 작성 중 오류가 발생했습니다.");
+      console.error('리뷰 작성 오류:', error);
+      alert('리뷰 작성 중 오류가 발생했습니다.');
     }
   };
 
@@ -368,7 +367,7 @@ const ProductDetail = () => {
       if (response.success) {
         alert("리뷰가 수정되었습니다.");
         loadReviews();
-        loadProductDetail();
+        loadProductDetail(); 
       } else {
         alert(response.message || "리뷰 수정에 실패했습니다.");
       }
@@ -383,7 +382,7 @@ const ProductDetail = () => {
       const response = await reviewAPI.deleteReview(reviewId);
       if (response.success) {
         alert("리뷰가 삭제되었습니다.");
-        loadProductDetail();
+        loadProductDetail(); 
         loadReviews();
       } else {
         alert(response.message || "리뷰 삭제에 실패했습니다.");
@@ -442,57 +441,39 @@ const ProductDetail = () => {
             <img
               src={getImageUrl(product.thumbnailImage)}
               alt={product.name}
-              className={`product-main-image ${product.stock === 0 || product.stock === null ? 'out-of-stock' : ''}`}
+              className="product-main-image"
               onError={(e) => {
                 e.target.src = "/images/item.png";
                 e.target.onerror = null;
               }}
             />
-            {/* 품절 표시 */}
-            {(product.stock === 0 || product.stock === null) && (
-              <div className="sold-out-overlay">
-                <div className="sold-out-badge">
-                  <span>SOLD OUT</span>
-                </div>
-              </div>
-            )}
           </div>
 
-          <div className="product-info-wrapper">
-            <h2 className="product-title">{product.name}</h2>
-            <div className="product-rating-sum">
-              <div className="product-rating">
-                <span className="rating-stars">
-                  {(() => {
-                    const rating = product.averageRating || 0;
-                    const fullStars = Math.floor(rating);
-                    const hasHalfStar = rating - fullStars >= 0.5;
-                    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-                    return (
-                      <>
-                        {Array(fullStars)
-                          .fill()
-                          .map((_, i) => (
-                            <FaStar key={`full-${i}`} />
-                          ))}
-                        {hasHalfStar && <FaStarHalfAlt key="half" />}
-                        {Array(emptyStars)
-                          .fill()
-                          .map((_, i) => (
-                            <FaRegStar key={`empty-${i}`} />
-                          ))}
-                      </>
-                    );
-                  })()}
-                  {(product.averageRating || 0).toFixed(1)}
-                  <span className="rating-sum">
-                    ({product.reviewCount || 0}개 리뷰)
-                  </span>
-                </span>
-              </div>
-            </div>
-
+              <div className="product-info-wrapper">
+     <h2 className="product-title">{product.name}</h2>        
+      <div className="product-rating-sum">
+        <div className="product-rating">
+          <span className="rating-stars">
+            {(() => {
+              const rating = product.averageRating || 0;
+              const fullStars = Math.floor(rating);
+              const hasHalfStar = (rating - fullStars) >= 0.5;
+              const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+              
+              return (
+                <>
+                  {Array(fullStars).fill().map((_, i) => <FaStar key={`full-${i}`} />)}
+                  {hasHalfStar && <FaStarHalfAlt key="half" />}
+                  {Array(emptyStars).fill().map((_, i) => <FaRegStar key={`empty-${i}`} />)}
+                </>
+              );
+            })()}
+            {(product.averageRating || 0).toFixed(1)}
+            <span className="rating-sum">({product.reviewCount || 0}개 리뷰)</span>
+          </span>
+        </div>
+      </div>
+      
             <table className="product-info-table">
               <tbody>
                 <tr>
@@ -627,53 +608,24 @@ const ProductDetail = () => {
           </div>
           {isAuthenticated && (
             <div className="review-write-form">
-              <div className="review-write">
-                <textarea
-                  className="textarea"
-                  placeholder="리뷰를 작성해주세요"
-                  value={reviewContent}
-                  onChange={(e) => setReviewContent(e.target.value)}
+                         <div className="review-write">
+              <textarea
+                className="textarea"
+                placeholder="리뷰를 작성해주세요"
+                value={reviewContent}
+                onChange={(e) => setReviewContent(e.target.value)}
+              />
+
+               {/* 별점 선택 컴포넌트 */} 
+                <StarRating
+                  rating={rating}
+                  onRatingChange={setRating}
                 />
-
-                   {/* 별점 선택 컴포넌트 */}
-                    <div className="rating-row">
-                      <StarRating
-                        rating={rating}
-                        onRatingChange={setRating}
-                      />
-
-                      <button
-                        type="button"
-                        className="btn-photo-upload"
-                        // onClick={handleQnaPhotoUpload}  // 나중에 파일 업로드 연결할 함수
-                      >
-                        사진 첨부
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ✅ 버튼들을 review-write 밖으로 */}
-                  <div className="review-button-group">
-                      <button className="btn btn-submit" onClick={handleSubmitReview}>
-                          저장
-                      </button>
-                      <button className="btn-cancel-half" onClick={() => {
-                          // 입력된 내용이 있을 때만 확인
-                          if (reviewContent.trim() || rating > 0) {
-                              if (window.confirm('작성 중인 내용이 삭제됩니다. 취소하시겠습니까?')) {
-                                  setReviewContent('');
-                                  setRating(0);
-                              }
-                          } else {
-                              // 입력된 내용이 없으면 바로 초기화
-                              setReviewContent('');
-                              setRating(0);
-                          }
-                      }}>
-                          취소
-                      </button>
-                  </div>
+              <button className="btn btn-submit" onClick={handleSubmitReview}>
+                저장
+              </button>
               </div>
+            </div>
           )}
         </div>
 
@@ -733,40 +685,14 @@ const ProductDetail = () => {
                     onChange={(e) => setQnaIsPrivate(e.target.checked)}
                   />
                   <span>비밀글로 작성</span>
-                      <button
-                        type="button"
-                        className="btn-photo-upload"
-                        // onClick={handleQnaPhotoUpload}  // 나중에 파일 업로드 연결할 함수
-                      >
-                        사진 첨부
-                      </button>
                 </label>
               </div>
 
               <div className="form-actions">
                 <button className="btn btn-submit" onClick={handleSubmitQna}>
-                    문의 등록
+                  문의 등록
                 </button>
-
-                <button className="btn-cancel-half" onClick={() => {
-                  // 입력된 내용이 있는지 확인
-                  if (qnaTitle.trim() || qnaContent.trim() || qnaIsPrivate) {
-                      // 내용이 있으면 확인 창 표시
-                      if (window.confirm('작성 중인 내용이 삭제됩니다. 취소하시겠습니까?')) {
-                          setQnaTitle('');
-                          setQnaContent('');
-                          setQnaIsPrivate(false);
-                      }
-                  } else {
-                      // 입력된 내용이 없으면 바로 초기화 (확인 창 안 띄움)
-                      setQnaTitle('');
-                      setQnaContent('');
-                      setQnaIsPrivate(false);
-                  }
-              }}>
-                  취소
-              </button>
-            </div>
+              </div>
             </div>
           )}
         </div>

@@ -23,13 +23,15 @@ const UserList = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
+      // REST API 경로: /api/admin/users
       const params = new URLSearchParams();
       if (searchTerm && searchTerm.trim()) {
         params.append('kw', searchTerm.trim());
       }
       
       const url = `${API_BASE_URL}/api/admin/users${params.toString() ? '?' + params.toString() : ''}`;
-      console.log('Fetching users from:', url);
+      console.log('=== Fetching users ===' );
+      console.log('URL:', url);
       
       const response = await axios.get(url, {
         headers: {
@@ -39,33 +41,48 @@ const UserList = () => {
         }
       });
       
-      console.log('Users response:', response.data);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      console.log('Response data type:', typeof response.data);
+      console.log('Response data is array:', Array.isArray(response.data));
+      console.log('Response data:', response.data);
       
       if (response.data && Array.isArray(response.data)) {
+        console.log('Number of users:', response.data.length);
+        
         const mappedUsers = response.data.map((user, index) => ({
           ...user,
           checked: false,
           no: (currentPage - 1) * itemsPerPage + index + 1
         }));
         
+        console.log('Mapped users:', mappedUsers);
         setUsers(mappedUsers);
+        console.log('Users state updated');
       } else {
+        console.warn('Unexpected response format:', response.data);
         setUsers([]);
       }
     } catch (error) {
-      console.error('회원 목록 조회 실패:', error);
+      console.error('=== 회원 목록 조회 실패 ===');
+      console.error('Error object:', error);
       
       if (error.response) {
         console.error('Response status:', error.response.status);
         console.error('Response data:', error.response.data);
         
+        // 인증 관련 에러는 무시 (관리자 페이지는 DB role로 구분)
         if (error.response.status === 401 || error.response.status === 403) {
-          console.warn('인증 오류');
+          console.warn('인증 오류가 발생했지만 계속 진행합니다.');
+          // 로그인 페이지로 리다이렉트하지 않음
         } else {
           alert('회원 목록을 불러오는데 실패했습니다.');
         }
+      } else if (error.request) {
+        console.error('No response received');
+        alert('서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.');
       } else {
-        alert('서버에 연결할 수 없습니다.');
+        console.error('Error:', error.message);
       }
       
       setUsers([]);
@@ -87,6 +104,7 @@ const UserList = () => {
     );
     setUsers(updatedUsers);
     
+    // selectAll 체크박스 상태 업데이트
     const allChecked = updatedUsers.every(user => user.checked);
     setSelectAll(allChecked);
   };
@@ -105,7 +123,7 @@ const UserList = () => {
       return;
     }
     
-    if (!window.confirm(`선택한 ${selectedUsers.length}명의 회원을 삭제하시겠습니까?\\n\\n이 작업은 되돌릴 수 없습니다.`)) {
+    if (!window.confirm(`선택한 ${selectedUsers.length}명의 회원을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
       return;
     }
 
@@ -116,13 +134,13 @@ const UserList = () => {
       
       console.log('Deleting users:', userIds);
       
+      // REST API 호출: /api/admin/users/delete
       const response = await axios.post(
         `${API_BASE_URL}/api/admin/users/delete`,
         { ids: userIds },
         {
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -131,6 +149,8 @@ const UserList = () => {
       
       if (response.data && response.data.success) {
         alert(response.data.message || `${selectedUsers.length}명의 회원이 삭제되었습니다.`);
+        
+        // 목록 새로고침
         await fetchUsers();
         setSelectAll(false);
       } else {
@@ -142,8 +162,10 @@ const UserList = () => {
       if (error.response?.status === 403) {
         alert('회원 삭제 권한이 없습니다.');
       } else if (error.response?.status === 404) {
-        alert('일부 회원을 찾을 수 없습니다.');
+        alert('일부 회원을 찾을 수 없습니다. 목록을 새로고침합니다.');
         fetchUsers();
+      } else if (error.code === 'ERR_NETWORK') {
+        alert('네트워크 오류가 발생했습니다. 서버가 실행 중인지 확인해주세요.');
       } else {
         alert('회원 삭제 중 오류가 발생했습니다.');
       }
@@ -160,7 +182,9 @@ const UserList = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
+    
     try {
+      // ISO 형식의 날짜를 파싱
       const date = new Date(dateString);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -173,7 +197,9 @@ const UserList = () => {
 
   const formatPhone = (phone) => {
     if (!phone) return '-';
-    const cleaned = phone.replace(/\\D/g, '');
+    
+    // 전화번호 포맷팅 (010-1234-5678)
+    const cleaned = phone.replace(/\D/g, '');
     if (cleaned.length === 11) {
       return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
     } else if (cleaned.length === 10) {
@@ -274,34 +300,11 @@ const UserList = () => {
           </table>
         </div>
 
-        <div className="table-footer" style={{
-          display: 'flex !important',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '20px 30px',
-          background: 'white',
-          borderTop: '1px solid #e0e0e0',
-          borderRadius: '0 0 8px 8px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-          marginTop: '-8px',
-          position: 'relative'
-        }}>
+        <div className="table-footer">
           <button 
-            className="user-list-delete-btn"
-            style={{
-              padding: '10px 30px',
-              background: '#ff4444',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              position: 'absolute',
-              left: '30px'
-            }}
+            className="delete-btn" 
             onClick={handleDeleteSelected}
+            disabled={loading || users.filter(u => u.checked).length === 0}
           >
             삭제
           </button>

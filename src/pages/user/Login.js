@@ -18,9 +18,10 @@ const Login = () => {
 
   // 로그인 페이지 접속 시 기존 인증 정보 정리 (선택적)
   React.useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const userInfo = localStorage.getItem("userInfo");
-
+    // 이미 로그인된 상태면 홈으로 이동
+    const accessToken = localStorage.getItem('accessToken');
+    const userInfo = localStorage.getItem('userInfo');
+    
     if (accessToken && userInfo) {
       try {
         const user = JSON.parse(userInfo);
@@ -31,14 +32,14 @@ const Login = () => {
         }
       } catch (error) {
         // 잘못된 사용자 정보는 제거
-        console.log("잘못된 인증 정보 정리");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("userInfo");
+        console.log('잘못된 인증 정보 정리');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('userInfo');
       }
     }
   }, []);
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -88,9 +89,7 @@ const Login = () => {
       
       if (error.response) {
         // 서버 응답이 있는 경우
-        const errorMessage =
-          error.response.data?.message ||
-          "아이디 또는 비밀번호가 일치하지 않습니다.";
+        const errorMessage = error.response.data?.message || '아이디 또는 비밀번호가 일치하지 않습니다.';
         setError(errorMessage);
       } else if (error.request) {
         // 요청은 보냈지만 응답을 받지 못한 경우
@@ -142,25 +141,18 @@ const Login = () => {
                 disabled={loading}
               />
             </div>
-            <button
-              type="submit"
+            <button 
+              type="submit" 
               className="btn btn--blk w-full mt-40"
               disabled={loading}
             >
               {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
-
+          
           {/* 에러 메시지 표시 */}
           {error && (
-            <div
-              id="errorMessage"
-              style={{
-                color: "#d32f2f",
-                marginTop: "10px",
-                textAlign: "center",
-              }}
-            >
+            <div id="errorMessage" style={{ color: '#d32f2f', marginTop: '10px', textAlign: 'center' }}>
               {error}
             </div>
           )}
@@ -255,110 +247,19 @@ const Login = () => {
               </svg>
               카카오로 시작하기
             </button>
-
-            {/* 네이버 로그인 버튼 */}
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                console.log("네이버 로그인 버튼 클릭");
-
-                try {
-                  const apiUrl =
-                    "http://localhost:8080/api/auth/naver/login-url";
-                  console.log("API 호출:", apiUrl);
-
-                  const response = await fetch(apiUrl, {
-                    method: "GET",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  });
-
-                  console.log("응답 상태:", response.status);
-
-                  if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                  }
-
-                  const data = await response.json();
-                  console.log("받은 데이터:", data);
-                  console.log("로그인 URL:", data.loginUrl);
-
-                  // state 값을 세션 스토리지에 저장 (CSRF 검증용)
-                  if (data.state) {
-                    sessionStorage.setItem("naverState", data.state);
-                  }
-
-                  if (data.loginUrl) {
-                    console.log("네이버 로그인 페이지로 이동:", data.loginUrl);
-                    window.location.href = data.loginUrl;
-                  } else {
-                    throw new Error("로그인 URL이 없습니다.");
-                  }
-                } catch (error) {
-                  console.error("네이버 로그인 오류:", error);
-                  alert("네이버 로그인을 시작할 수 없습니다: " + error.message);
-                }
-              }}
-              style={{
-                width: "100%",
-                height: "50px",
-                backgroundColor: "#03C75A",
-                border: "none",
-                borderRadius: "4px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                cursor: "pointer",
-                fontSize: "16px",
-                fontWeight: "600",
-                color: "#ffffff",
-                transition: "background-color 0.2s",
-                marginTop: "10px",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "#02B350")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#03C75A")
-              }
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M13.227 10.705L6.147 0H0V20H6.773V9.295L13.853 20H20V0H13.227V10.705Z"
-                  fill="white"
-                />
-              </svg>
-              네이버로 시작하기
-            </button>
           </div>
-
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <p>
-              계정이 없으신가요?{" "}
-              <Link
-                to="/signup"
-                style={{ color: "#1976d2", textDecoration: "none" }}
-              >
+          
+          {/* 링크 */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <p style={{ marginBottom: '10px' }}>
+              계정이 없으신가요?{' '}
+              <Link to="/signup" style={{ color: '#1976d2', textDecoration: 'none' }}>
                 <b>회원가입</b>
               </Link>
             </p>
-            <p style={{ marginTop: "10px" }}>
-              비밀번호를 잊어버리셨나요?{" "}
-              <Link
-                to="/reset-password"
-                style={{ color: "#1976d2", textDecoration: "none" }}
-              >
+            <p style={{ marginTop: '10px' }}>
+              비밀번호를 잊어버리셨나요?{' '}
+              <Link to="/reset-password" style={{ color: '#1976d2', textDecoration: 'none' }}>
                 <b>비밀번호 재설정</b>
               </Link>
             </p>
