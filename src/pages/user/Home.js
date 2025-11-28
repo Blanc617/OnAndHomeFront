@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { favoriteAPI } from "../../api/favoriteApi";
 
 import {
   addToCompare,
@@ -40,7 +41,9 @@ const Home = () => {
   const compareItems = useSelector((state) => state.compare.items);
 
   const [products, setProducts] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState(new Set());
 
   // 검색
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -89,15 +92,88 @@ const Home = () => {
     try {
       const response = await productAPI.getAllProductsForUser();
       if (response.success && response.products) {
+        const allProducts = response.products;
+
+        // 각 상품의 찜 개수 가져오기
+        const productsWithFavorites = await Promise.all(
+          allProducts.map(async (product) => {
+            try {
+              const favResponse = await fetch(
+                `http://localhost:8080/api/favorites/count/product/${product.id}`
+              );
+              const favData = await favResponse.json();
+              return {
+                ...product,
+                favoriteCount: favData.success ? favData.count : 0,
+              };
+            } catch (error) {
+              console.error(
+                `찜 개수 조회 실패 (상품 ID: ${product.id}):`,
+                error
+              );
+              return { ...product, favoriteCount: 0 };
+            }
+          })
+        );
+
+        console.log("찜 개수가 포함된 상품 목록:", productsWithFavorites);
+
+        // 찜하기 수로 정렬하여 인기 상품 4개 선택
+        const sortedByFavorites = [...productsWithFavorites].sort(
+          (a, b) => b.favoriteCount - a.favoriteCount
+        );
+
+        console.log(
+          "찜하기 순으로 정렬된 상품:",
+          sortedByFavorites.map((p) => ({
+            name: p.name,
+            favoriteCount: p.favoriteCount,
+          }))
+        );
+
+        setPopularProducts(sortedByFavorites.slice(0, 4));
+
+        // 추천 상품: 전체 상품 중 처음 4개
+        setProducts(allProducts.slice(0, 4));
         setProducts(response.products.slice(0, 8));
       }
     } catch (error) {
       console.error("상품 조회 오류:", error);
       setProducts([]);
+      setPopularProducts([]);
     } finally {
       setLoading(false);
     }
   };
+
+  // 찜 목록 로드
+  useEffect(() => {
+    const loadFavorites = async () => {
+      const token = localStorage.getItem("accessToken");
+
+      // 로그인하지 않은 경우 찜 목록 비우기
+      if (!token) {
+        setFavorites(new Set());
+        return;
+      }
+
+      try {
+        const response = await favoriteAPI.getList();
+        if (response.success) {
+          const favoriteIds = new Set(
+            response.data.map((fav) => fav.productId)
+          );
+          setFavorites(favoriteIds);
+        }
+      } catch (error) {
+        console.error("찜 목록 로드 실패:", error);
+        // 에러 시에도 찜 목록 초기화
+        setFavorites(new Set());
+      }
+    };
+
+    loadFavorites();
+  }, []); // 의존성 배열에 아무것도 없으면 마운트 시에만 실행됨
 
   const formatPrice = (price) => {
     if (!price) return "0";
@@ -144,6 +220,34 @@ const Home = () => {
         image: product.thumbnailImage,
       };
       dispatch(addToCompare(compareProduct));
+    }
+  };
+
+  const handleFavoriteToggle = async (e, productId) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await favoriteAPI.toggle(productId);
+      if (response.success) {
+        const newFavorites = new Set(favorites);
+        if (response.isFavorite) {
+          newFavorites.add(productId);
+        } else {
+          newFavorites.delete(productId);
+        }
+        setFavorites(newFavorites);
+      }
+    } catch (error) {
+      console.error("찜하기 실패:", error);
+      alert("찜하기 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -279,6 +383,137 @@ const Home = () => {
         </div>
       </section>
 
+      {/* ===== 인기 상품 ===== */}
+      <section className="product-section">
+        <h2 className="section-title">인기 상품</h2>
+
+        {popularProducts.length === 0 ? (
+          <div className="loading">등록된 상품이 없습니다.</div>
+        ) : (
+          <>
+            <div className="product-grid-four">
+              {popularProducts.map((product, index) => {
+                const isInCompare = compareItems.some(
+                  (item) => item.id === product.id
+                );
+
+                return (
+                  <Link
+                    to={`/products/${product.id}`}
+                    key={product.id}
+                    className={`product-card ${
+                      product.stock === 0 || product.stock === null
+                        ? "out-of-stock"
+                        : ""
+                    }`}
+                  >
+                    <div className="product-image">
+                      <img
+                        src={getImageUrl(product.thumbnailImage)}
+                        alt={product.name}
+                        onError={(e) => {
+                          e.target.src = "/images/item.png";
+                        }}
+                      />
+
+                      {/* 품절 표시 */}
+                      {(product.stock === 0 || product.stock === null) && (
+                        <div className="sold-out-overlay">
+                          <div className="sold-out-badge">
+                            <span>SOLD OUT</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 순위 배지 */}
+                      <div className={`rank-badge rank-${index + 1}`}>
+                        {index === 0 && <span className="crown">👑</span>}
+                        {index + 1}위
+                      </div>
+
+                      {/* 찜하기 버튼 */}
+                      <button
+                        className={`favorite-btn ${
+                          favorites.has(product.id) ? "active" : ""
+                        }`}
+                        onClick={(e) => handleFavoriteToggle(e, product.id)}
+                        title={favorites.has(product.id) ? "찜 취소" : "찜하기"}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill={
+                            favorites.has(product.id) ? "currentColor" : "none"
+                          }
+                          stroke="currentColor"
+                        >
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className="product-info">
+                      <h3 className="product-name">{product.name}</h3>
+
+                      <div className="product-prices">
+                        {product.salePrice &&
+                        product.salePrice < product.price ? (
+                          <>
+                            <span className="original-price">
+                              {formatPrice(product.price)}원
+                            </span>
+                            <div className="price-row">
+                              <span className="sale-price">
+                                {formatPrice(product.salePrice)}원
+                              </span>
+                              <div className="discount-rate">
+                                {Math.round(
+                                  ((product.price - product.salePrice) /
+                                    product.price) *
+                                    100
+                                )}
+                                % 할인
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="sale-price">
+                            {formatPrice(product.price)}원
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        className={`compare-btn-bottom ${
+                          isInCompare ? "active" : ""
+                        }`}
+                        onClick={(e) => handleCompareToggle(e, product)}
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          {isInCompare ? (
+                            <path d="M9 12l2 2 4-4" />
+                          ) : (
+                            <path d="M12 8v8M8 12h8" />
+                          )}
+                        </svg>
+                        <span>{isInCompare ? "비교중" : "비교하기"}</span>
+                      </button>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+
       {/* ===== 추천 상품 ===== */}
       <section className="product-section">
         <h2 className="section-title">추천 상품</h2>
@@ -298,6 +533,11 @@ const Home = () => {
                     to={`/products/${product.id}`}
                     key={product.id}
                     className="product-card"
+                    className={`product-card ${
+                      product.stock === 0 || product.stock === null
+                        ? "out-of-stock"
+                        : ""
+                    }`}
                   >
                     <div className="product-image">
                       <img
@@ -308,6 +548,35 @@ const Home = () => {
                         }}
                       />
                     </div>
+
+                      {/* 품절 표시 */}
+                      {(product.stock === 0 || product.stock === null) && (
+                        <div className="sold-out-overlay">
+                          <div className="sold-out-badge">
+                            <span>SOLD OUT</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 찜하기 버튼 추가 */}
+                      <button
+                        className={`favorite-btn ${
+                          favorites.has(product.id) ? "active" : ""
+                        }`}
+                        onClick={(e) => handleFavoriteToggle(e, product.id)}
+                        title={favorites.has(product.id) ? "찜 취소" : "찜하기"}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill={
+                            favorites.has(product.id) ? "currentColor" : "none"
+                          }
+                          stroke="currentColor"
+                        >
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+
 
                     <div className="product-info">
                       <h3 className="product-name">{product.name}</h3>
@@ -378,6 +647,122 @@ const Home = () => {
           </>
         )}
       </section>
+
+      {/* 1. 모달 1 */}
+      {isModal1Open && (
+        <div className="modal-overlay">
+          <div className="modal-content-new">
+            <button
+              className="modal-close-x"
+              onClick={handleCloseModal1}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+
+            <div className="modal-event-image">
+              <div className="modal-event-header">믿고 사는 온라인스토어</div>
+              <div className="modal-event-title">
+                <span className="modal-event-emoji">🎁</span>
+                <div className="modal-event-text">첫 구매 특별 혜택</div>
+              </div>
+              <div className="modal-event-subtitle">이벤트 참여하러 가기</div>
+            </div>
+
+            <div className="modal-footer-new">
+              <button
+                className="modal-footer-btn"
+                onClick={handleHideTodayModal1}
+              >
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-footer-btn" onClick={handleCloseModal1}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. 모달 2 */}
+      {isModal2Open && (
+        <div className="modal-overlay">
+          <div className="modal-content-new">
+            <button
+              className="modal-close-x"
+              onClick={handleCloseModal2}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+
+            <div className="modal-event-image">
+              <div className="modal-event-header">믿고 사는 온라인스토어</div>
+              <div className="modal-event-title">
+                <span className="modal-event-emoji">💰</span>
+                <div className="modal-event-text">
+                  가입하면
+                  <br />
+                  5,000원 적립!
+                </div>
+              </div>
+              <div className="modal-event-subtitle">이벤트 참여하러 가기</div>
+            </div>
+
+            <div className="modal-footer-new">
+              <button
+                className="modal-footer-btn"
+                onClick={handleHideTodayModal2}
+              >
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-footer-btn" onClick={handleCloseModal2}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. 모달 3 */}
+      {isModal3Open && (
+        <div className="modal-overlay">
+          <div className="modal-content-new">
+            <button
+              className="modal-close-x"
+              onClick={handleCloseModal3}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+
+            <div className="modal-event-image">
+              <div className="modal-event-header">믿고 사는 온라인스토어</div>
+              <div className="modal-event-title">
+                <span className="modal-event-emoji">🛍️</span>
+                <div className="modal-event-text">
+                  신규 입점
+                  <br />
+                  브랜드!
+                </div>
+              </div>
+              <div className="modal-event-subtitle">이벤트 참여하러 가기</div>
+            </div>
+
+            <div className="modal-footer-new">
+              <button
+                className="modal-footer-btn"
+                onClick={handleHideTodayModal3}
+              >
+                오늘 하루 보지 않기
+              </button>
+              <button className="modal-footer-btn" onClick={handleCloseModal3}>
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
